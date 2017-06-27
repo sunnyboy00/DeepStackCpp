@@ -36,12 +36,18 @@
     <ClInclude Include="arguments.h">
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
+    <ClInclude Include="card_to_string_conversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DeepStackCpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="card_to_string_conversion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
