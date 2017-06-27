@@ -52,4 +52,13 @@ inline int card_to_string_conversion::string_to_card(std::string card_string)
 	return card;
 }
 
+std::vector<int> card_to_string_conversion::string_to_board(std::string card_string)
+{
+	if (card_string == "")
+		return std::vector<int>{};
+	
+	//  return arguments.Tensor{self:string_to_card(card_string)}
+	return std::vector<int>{ string_to_card(card_string) };
+}
+
 

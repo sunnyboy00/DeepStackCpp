@@ -64,7 +64,7 @@ public:
 	//	-- card
 	//	-- @return either an empty tensor or a tensor containing the numeric
 	//	-- representation of the card
-	//function M : string_to_board(card_string)
+	std::vector<int> string_to_board(std::string card_string);
 };
 
 //inline std::string card_to_string_conversion::card_to_suit(int card)
