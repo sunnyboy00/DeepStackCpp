@@ -1,17 +1,16 @@
 #include <iostream>
 #include <Eigen/Dense>
-#include <algorithm>    
+#include <algorithm>  
 
-using Eigen::Vector3i;
+using namespace std;
+using Eigen::ArrayXf;
+using Eigen::VectorXi;
 
 int main(int argc, char **argv)
 {
-	Vector3i m;
-	m << 1, 2, 3;
-	//m.setZero();
-
-	Eigen::Vector4i s;
-
-	memcpy(s.data(), m.data(), m.size() * sizeof(int));
-	std::cout << s;
+	ArrayXf a = ArrayXf::Random(5);
+	a = 0;
+	a += 2;
+	cout << "a =" << endl
+		<< a << endl;
 }

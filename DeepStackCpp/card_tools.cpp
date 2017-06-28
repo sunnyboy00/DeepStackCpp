@@ -8,7 +8,7 @@ card_tools::card_tools()
 {
 }
 
-bool card_tools::hand_is_possible(VectorXi hand)
+bool card_tools::hand_is_possible(ArrayXi hand)
 {
 	assert(hand.minCoeff() > 0 && hand.maxCoeff() <= card_count   && "Illegal cards in hand");
 	std::unordered_map<int, bool> suit_table;
@@ -24,7 +24,7 @@ bool card_tools::hand_is_possible(VectorXi hand)
 	return true;
 }
 
-VectorXi card_tools::get_possible_hand_indexes(VectorXi board)
+ArrayXi card_tools::get_possible_hand_indexes(ArrayXi board)
 {
 	Matrix<mainDataType, card_count, 1> out;
 	out.setZero();
@@ -35,7 +35,7 @@ VectorXi card_tools::get_possible_hand_indexes(VectorXi board)
 		return out;
 	}
 
-	VectorXi whole_hand(board.size() + 1);
+	ArrayXi whole_hand(board.size() + 1);
 	
 	memcpy(whole_hand.data(), board.data(), board.size() * sizeof(mainDataType)); //Warning! sizeof(..) Should be the same type as VectorXi
 	for (int card = 0; card < card_count; card++)
@@ -47,5 +47,13 @@ VectorXi card_tools::get_possible_hand_indexes(VectorXi board)
 		}
 	}
 
+	return out;
+}
+
+ArrayXi card_tools::get_impossible_hand_indexes(ArrayXi board)
+{
+	ArrayXi out = get_possible_hand_indexes(board);
+	out -= 1;
+	out *= -1;
 	return out;
 }
