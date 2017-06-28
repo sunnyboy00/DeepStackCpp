@@ -1,10 +1,9 @@
 #include "card_to_string_conversion.h"
 #include <assert.h>
 
-
 card_to_string_conversion::card_to_string_conversion()
 {
-	for (size_t card = 0; card < card_count; card++)
+	for (int card = 0; card < card_count; card++)
 	{
 		int rank_name = rank_table[card_to_rank(card)];
 		int suit_name = suit_table[card_to_suit(card)];

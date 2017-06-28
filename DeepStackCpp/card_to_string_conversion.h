@@ -4,12 +4,6 @@
 #include <math.h>
 #include "game_settings.h"
 
-// M.suit_table = {'h', 's', 'c', 'd'}
-//std::unordered_map<std::string, int> suit_table;
-
-
-
-
 class card_to_string_conversion
 {
 private:
