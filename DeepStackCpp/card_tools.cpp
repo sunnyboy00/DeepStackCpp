@@ -180,3 +180,8 @@ void card_tools::_init_board_index_table()
 		assert(false && "unsupported board size");
 	}
 }
+
+int get_board_index(ArrayXf board)
+{
+
+}

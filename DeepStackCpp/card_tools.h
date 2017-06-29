@@ -72,6 +72,11 @@ public:
 	//-- @local
 	void _init_board_index_table();
 
+	//-- - Gives a numerical index for a set of board cards.
+	//-- @param board a non - empty vector of board cards
+	//-- @return the numerical index for the board
+	int get_board_index(ArrayXf board);
+
 private:
 
 	// Id's of all possible boards
