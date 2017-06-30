@@ -75,7 +75,14 @@ public:
 	//-- - Gives a numerical index for a set of board cards.
 	//-- @param board a non - empty vector of board cards
 	//-- @return the numerical index for the board
-	int get_board_index(ArrayXf board);
+	int card_tools::get_board_index(MatrixXf board);
+
+	//-- - Normalizes a range vector over hands which are valid with a given board.
+	//-- @param board a possibly empty vector of board cards
+	//-- @param range a range vector
+	//-- @return a modified version of `range` where each invalid hand is given 0
+	//--probability and the vector is normalized
+	CardArray normalize_range(MatrixXf board, CardArray range);
 
 private:
 

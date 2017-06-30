@@ -5,6 +5,7 @@
 
 using namespace std;
 using Eigen::ArrayXf;
+using Eigen::ArrayXXf;
 using Eigen::VectorXi;
 using Eigen::MatrixXf;
 
@@ -16,8 +17,16 @@ ArrayXf Test()
 
 int main(int argc, char **argv)
 {
+	ArrayXXf table(3, 4);
+	table.row(0) = 4;
+	cout << table;
+	int g = table.rows();
+
 	MatrixXf a(1, 5);
 	auto ar = ArrayXf::LinSpaced(5, 0, 5 -1);
+	//cout << ar;
+	cout << ar.row(2);
+
 	//cout << a.col(0);
 
 	a.row(0) = ar;

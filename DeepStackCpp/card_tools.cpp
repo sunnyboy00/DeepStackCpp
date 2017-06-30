@@ -181,7 +181,36 @@ void card_tools::_init_board_index_table()
 	}
 }
 
-int get_board_index(ArrayXf board)
+int card_tools::get_board_index(MatrixXf board)
 {
+	MatrixXf index = MatrixXf(_board_index_table);
+	for (int i = 0; i < index.rows(); i++)
+	{
+		int boardCard = (int)board(i);
+		index = index.row(boardCard);
+	}
 
+	int indexValue = (int)index(0, 0);
+
+	assert(indexValue > 0 && "index should be greater than zero.");
+	return indexValue;
+}
+
+CardArray card_tools::normalize_range(MatrixXf board, CardArray range)
+{
+	MatrixXf rangeM = MatrixXf(range);
+	MatrixXf mask = MatrixXf(_board_index_table);
+	CardArray out = rangeM * mask;
+
+	auto sum = out.sum();
+
+	//--return zero range if it all collides with board(avoid div by zero)
+	if (sum == 0)
+	{
+		return range;
+	}
+
+	out /= sum;
+
+	return out;
 }
