@@ -28,7 +28,7 @@ inline int card_to_string_conversion::card_to_rank(int card)
 	return floor((card - 1) / suit_count) + 1;
 }
 
-std::string card_to_string_conversion::cards_to_string(std::vector<int> cards)
+std::string card_to_string_conversion::cards_to_string(CardArray& cards)
 {
 	//if (cards.size() == 0)
 	//{
@@ -36,7 +36,7 @@ std::string card_to_string_conversion::cards_to_string(std::vector<int> cards)
 	//}
 
 	std::string  out = "";
-	for (int card : cards)
+	for (int card = 0; card < cards.count(); card++)
 	{
 		out += card_to_string(cards[card]);
 	}

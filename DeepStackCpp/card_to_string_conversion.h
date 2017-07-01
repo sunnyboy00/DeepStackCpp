@@ -3,6 +3,7 @@
 #include <vector>
 #include <math.h>
 #include "game_settings.h"
+#include "CustomSettings.h"
 #include <Eigen/Dense>
 
 using Eigen::ArrayXf;
@@ -48,7 +49,7 @@ public:
 	//--representations.
 	//-- @param cards a vector of numeric representations of cards
 	//-- @return a string containing each card's string representation, concatenated
-	std::string cards_to_string(std::vector<int> cards);
+	std::string cards_to_string(CardArray& cards);
 
 	//-- - Converts a card's string representation to its numeric representation.
 	//-- @param card_string the string representation of a card

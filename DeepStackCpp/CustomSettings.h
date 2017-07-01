@@ -1,5 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
+#include "game_settings.h"
 
 typedef float mainDataType;
 

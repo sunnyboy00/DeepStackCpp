@@ -1,5 +1,8 @@
 #pragma once
 #include <assert.h>
+#include <Eigen/Dense>
+
+using Eigen::VectorXf;
 
 //-- - Parameters for DeepStack.
 //--@module arguments
@@ -8,8 +11,9 @@
 //-- - whether to run on GPU
 static const int gpu = false;
 //-- - list of pot - scaled bet sizes to use in tree
-//-- @field bet_sizing
-static const int bet_sizing = { 1 };
+//-- @field bet_sizing.  i. e. a list of fractions of the pot which are allowed 
+//-- as bets, sorted in ascending order
+static const VectorXf bet_sizing = VectorXf::Ones(1);
 //-- - server running the ACPC dealer
 //static const char acpc_server[] = "localhost";
 //-- - server port running the ACPC dealer
@@ -21,9 +25,9 @@ static const int streets_count = 2;
 //-- - the directory for data files
 static const char data_directory[] = "../Data/";
 //-- - the size of the game"s ante, in chips
-static const int ante = 100;
+static const long long ante = 100;
 //-- - the size of each player"s stack, in chips
-static const int stack = 1200;
+static const long long stack = 1200;
 //-- - the number of iterations that DeepStack runs CFR for
 static const int cfr_iters = 1000;
 //-- - the number of preliminary CFR iterations which DeepStack doesn"t factor into the average strategy (included in cfr_iters)
@@ -51,7 +55,7 @@ static const int valid_data_count = 100;
 //-- - learning rate for neural net training
 static const int learning_rate = 0.001;
 
-assert(cfr_iters > cfr_skip_iters);
+//assert(cfr_iters > cfr_skip_iters);
 //if gpu then
 //require "cutorch"
 //Tensor = torch.CudaTensor

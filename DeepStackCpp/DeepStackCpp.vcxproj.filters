@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{58804435-203e-4616-8039-a743d522bab8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Tree">
+      <UniqueIdentifier>{0790e544-7b6b-4532-bb35-09b59ab75b18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tree">
+      <UniqueIdentifier>{c7b1ab93-e993-48be-85d7-2207d60a21f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -57,6 +63,12 @@
     <ClInclude Include="bet_sizing.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="tree_builder.h">
+      <Filter>Header Files\Tree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -73,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="bet_sizing.cpp">
       <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="tree_builder.cpp">
+      <Filter>Source Files\Tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
