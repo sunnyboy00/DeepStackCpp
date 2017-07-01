@@ -16,6 +16,12 @@
     <Filter Include="Header Files\Settings">
       <UniqueIdentifier>{b8a6254d-d206-4fd0-b5e7-65734a977f63}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{5c7277b6-1906-4852-b555-9f368e283cfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{58804435-203e-4616-8039-a743d522bab8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -36,17 +42,20 @@
     <ClInclude Include="arguments.h">
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
-    <ClInclude Include="card_to_string_conversion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="card_tools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CustomSettings.h">
       <Filter>Header Files\Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="card_tools.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="card_to_string_conversion.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="bet_sizing.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -57,10 +66,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="card_to_string_conversion.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="card_tools.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="bet_sizing.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

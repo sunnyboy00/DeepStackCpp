@@ -9,7 +9,7 @@ card_tools::card_tools()
 	_init_board_index_table();
 }
 
-bool card_tools::hand_is_possible(ArrayXf hand)
+bool card_tools::hand_is_possible(ArrayXf& hand)
 {
 	assert(hand.minCoeff() > 0 && hand.maxCoeff() <= card_count   && "Illegal cards in hand");
 	std::unordered_map<int, bool> suit_table;
@@ -25,7 +25,7 @@ bool card_tools::hand_is_possible(ArrayXf hand)
 	return true;
 }
 
-CardArray card_tools::get_possible_hand_indexes(ArrayXf board)
+CardArray card_tools::get_possible_hand_indexes(ArrayXf& board)
 {
 	CardArray out;
 	out.setZero();
@@ -51,7 +51,7 @@ CardArray card_tools::get_possible_hand_indexes(ArrayXf board)
 	return out;
 }
 
-CardArray card_tools::get_impossible_hand_indexes(ArrayXf board)
+CardArray card_tools::get_impossible_hand_indexes(ArrayXf& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out -= 1;
@@ -59,14 +59,14 @@ CardArray card_tools::get_impossible_hand_indexes(ArrayXf board)
 	return out;
 }
 
-CardArray card_tools::get_uniform_range(ArrayXf board)
+CardArray card_tools::get_uniform_range(ArrayXf& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out /= out.sum();
 	return out;
 }
 
-CardArray card_tools::get_random_range(ArrayXf board, int seed = -1)
+CardArray card_tools::get_random_range(ArrayXf& board, int seed = -1)
 {
 	if (seed == -1)
 		srand((unsigned int)time(NULL));
@@ -83,7 +83,7 @@ CardArray card_tools::get_random_range(ArrayXf board, int seed = -1)
 	return out;
 }
 
-bool card_tools::is_valid_range(CardArray range, ArrayXf board)
+bool card_tools::is_valid_range(CardArray& range, ArrayXf& board)
 {
 	CardArray impossibleCards = get_impossible_hand_indexes(board);
 	CardArray check = range * impossibleCards;
@@ -181,7 +181,7 @@ void card_tools::_init_board_index_table()
 	}
 }
 
-int card_tools::get_board_index(MatrixXf board)
+int card_tools::get_board_index(MatrixXf& board)
 {
 	MatrixXf index = MatrixXf(_board_index_table);
 	for (int i = 0; i < index.rows(); i++)
@@ -196,7 +196,7 @@ int card_tools::get_board_index(MatrixXf board)
 	return indexValue;
 }
 
-CardArray card_tools::normalize_range(MatrixXf board, CardArray range)
+CardArray card_tools::normalize_range(MatrixXf& board, CardArray& range)
 {
 	MatrixXf rangeM = MatrixXf(range);
 	MatrixXf mask = MatrixXf(_board_index_table);
