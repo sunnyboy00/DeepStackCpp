@@ -3,9 +3,11 @@
 #include "GameState.h"
 #include "arguments.h"
 #include <algorithm> 
+#include <memory>
 
 using Eigen::VectorXf;
 using Eigen::ArrayX2f;
+using namespace std;
 
 class bet_sizing
 {
@@ -24,7 +26,7 @@ public:
 	//-- * `current_player`: the currently acting player
 	//-- @return an Nx2 tensor where N is the number of new possible game states,
 	//--containing N sets of new commitment levels for each player
-	ArrayX2f get_possible_bets(GameState& node);
+	unique_ptr<ArrayX2f> get_possible_bets(GameState& node);
 
 
 private:

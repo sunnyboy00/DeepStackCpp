@@ -1,5 +1,6 @@
 #include "bet_sizing.h"
 
+
 bet_sizing::bet_sizing(VectorXf* pot_fractions = nullptr)
 {
 	if (pot_fractions == nullptr)
@@ -18,7 +19,7 @@ bet_sizing::~bet_sizing()
 	delete(_pot_fractions);
 }
 
-ArrayX2f bet_sizing::get_possible_bets(GameState& node)
+unique_ptr<ArrayX2f> bet_sizing::get_possible_bets(GameState& node)
 {
 	int current_player = node.current_player;
 	assert(current_player == 1 || current_player == 2 && "Wrong player for bet size computation");
@@ -30,11 +31,12 @@ ArrayX2f bet_sizing::get_possible_bets(GameState& node)
 	//--compute min possible raise size
 	long long max_raise_size = stack - opponent_bet;
 	long long min_raise_size = opponent_bet - node.bets[current_player];
-	long long min_raise_size = std::max(min_raise_size, ante);
-	long long min_raise_size = std::min(max_raise_size, min_raise_size);
+	min_raise_size = std::max(min_raise_size, ante);
+	min_raise_size = std::min(max_raise_size, min_raise_size);
 	if (min_raise_size == 0)
 	{
-		return 
+		unique_ptr<ArrayX2f> ar(new ArrayX2f(1));
+		ar->setOnes();
 	}
 }
 
