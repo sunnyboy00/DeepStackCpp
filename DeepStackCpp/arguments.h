@@ -12,8 +12,8 @@ using Eigen::VectorXf;
 static const int gpu = false;
 //-- - list of pot - scaled bet sizes to use in tree
 //-- @field bet_sizing.  i. e. a list of fractions of the pot which are allowed 
-//-- as bets, sorted in ascending order
-static const VectorXf bet_sizing = VectorXf::Ones(1);
+//-- as bets, sorted in ascending order. Note: Should be integer fraction with current code.
+static const VectorXf bet_sizing = VectorXf::Ones(1); 
 //-- - server running the ACPC dealer
 //static const char acpc_server[] = "localhost";
 //-- - server port running the ACPC dealer
@@ -53,7 +53,7 @@ static const int train_data_count = 100;
 //-- - how many solved poker situations are generated for use as validation examples
 static const int valid_data_count = 100;
 //-- - learning rate for neural net training
-static const int learning_rate = 0.001;
+static const double learning_rate = 0.001;
 
 //assert(cfr_iters > cfr_skip_iters);
 //if gpu then

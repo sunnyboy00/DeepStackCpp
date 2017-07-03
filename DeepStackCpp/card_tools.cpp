@@ -25,11 +25,11 @@ bool card_tools::hand_is_possible(ArrayXf& hand)
 	return true;
 }
 
-unique_ptr<CardArray> card_tools::get_possible_hand_indexes(ArrayXf& board)
+CardArray card_tools::get_possible_hand_indexes(ArrayXf& board)
 {
-	unique_ptr<CardArray> out(new CardArray());
+	CardArray out = CardArray();
 
-	out->setZero();
+	out.setZero();
 
 	if (board.size() == 0)
 	{
@@ -45,14 +45,14 @@ unique_ptr<CardArray> card_tools::get_possible_hand_indexes(ArrayXf& board)
 		whole_hand[whole_hand.size()] = (float)card;
 		if (hand_is_possible(whole_hand))
 		{
-			out[card] = 1;
+			out(card) = 1;
 		}
 	}
 
 	return out;
 }
 
-unique_ptr<CardArray> card_tools::get_impossible_hand_indexes(ArrayXf& board)
+CardArray card_tools::get_impossible_hand_indexes(ArrayXf& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out -= 1;
@@ -60,14 +60,14 @@ unique_ptr<CardArray> card_tools::get_impossible_hand_indexes(ArrayXf& board)
 	return out;
 }
 
-unique_ptr<CardArray> card_tools::get_uniform_range(ArrayXf& board)
+CardArray card_tools::get_uniform_range(ArrayXf& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out /= out.sum();
 	return out;
 }
 
-unique_ptr<CardArray> card_tools::get_random_range(ArrayXf& board, int seed = -1)
+CardArray card_tools::get_random_range(ArrayXf& board, int seed = -1)
 {
 	if (seed == -1)
 		srand((unsigned int)time(NULL));
@@ -197,7 +197,7 @@ int card_tools::get_board_index(MatrixXf& board)
 	return indexValue;
 }
 
-unique_ptr<CardArray> card_tools::normalize_range(MatrixXf& board, CardArray& range)
+CardArray card_tools::normalize_range(MatrixXf& board, CardArray& range)
 {
 	MatrixXf rangeM = MatrixXf(range);
 	MatrixXf mask = MatrixXf(_board_index_table);
