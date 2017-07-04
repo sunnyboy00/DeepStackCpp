@@ -167,8 +167,10 @@
     <ClInclude Include="CustomSettings.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="game_settings.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="strategy_filling.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tree_builder.h" />
   </ItemGroup>
@@ -178,6 +180,7 @@
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="DeepStackCpp.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="strategy_filling.cpp" />
     <ClCompile Include="tree_builder.cpp" />
   </ItemGroup>
   <ItemGroup>

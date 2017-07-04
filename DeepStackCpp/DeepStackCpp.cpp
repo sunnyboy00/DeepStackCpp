@@ -13,6 +13,7 @@ using namespace std;
 //using Eigen::VectorXi;
 using Eigen::MatrixXf;
 //using Eigen::VectorXf;
+#include <vector>
 
 MatrixXf Test()
 {
@@ -22,6 +23,9 @@ MatrixXf Test()
 
 int main(int argc, char **argv)
 {
+	std::vector<int> testV = { 1, 2, 3 };
+	cout << testV.size();
+
 	MatrixXf test = MatrixXf(3, 2);
 	test(0, 0) = 00;
 	test(0, 1) = 01;
