@@ -2,8 +2,9 @@
 #include "Constants.h"
 #include <Eigen/Dense>
 #include <vector>
+#include <memory>
 
-using Eigen::ArrayX2f;
+using namespace std;
 
 struct Node
 {
@@ -23,10 +24,12 @@ struct Node
 	int current_player;
 
 	// The number of chips that each player has committed to the pot
-	long long bets;
+	Eigen::Array2f bets;
 
 	// Half the pot size, equalde to the smaller number in `bets`
 	long long pot;
+
+	Node& parent;
 
 	// Is node a terminal node
 	bool terminal;
@@ -44,9 +47,11 @@ struct Node
 	//--
 	//--For a chance node, `strategy[i][j]` gives the probability of reaching the
 	//-- `i`th child for either player when that player holds the `j`th card.
-	Eigen::MatrixXf strategy;
+	Eigen::ArrayXXf strategy;
 
 	// A list of children nodes
-	std::vector<Node> children;
+	vector<unique_ptr<Node>> children;
+
+	//Node(const Node &node);
 };
 

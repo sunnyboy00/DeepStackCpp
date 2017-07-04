@@ -2,11 +2,12 @@
 #include "Node.h"
 #include "card_tools.h"
 #include "game_settings.h"
+#include "assert.h"
 #include "constants.h"
 #include <Eigen/Dense>
-#include <assert.h>
+#include <memory>
 
-using Eigen::MatrixXf;
+using Eigen::ArrayXXf;
 
 //
 //-- - Fills a game's public tree with a uniform strategy. In particular, fills

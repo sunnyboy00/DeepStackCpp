@@ -19,7 +19,7 @@ static const VectorXf bet_sizing = VectorXf::Ones(1);
 //-- - server port running the ACPC dealer
 //static const int acpc_server_port = 20000;
 //-- - the number of betting rounds in the game
-static const int streets_count = 2;
+//static const int streets_count = 2;
 //-- - the tensor datatype used for storing DeepStack"s internal data
 //Tensor = torch.FloatTensor
 //-- - the directory for data files
@@ -53,7 +53,7 @@ static const int train_data_count = 100;
 //-- - how many solved poker situations are generated for use as validation examples
 static const int valid_data_count = 100;
 //-- - learning rate for neural net training
-static const double learning_rate = 0.001;
+static const float learning_rate = 0.001f;
 
 //assert(cfr_iters > cfr_skip_iters);
 //if gpu then

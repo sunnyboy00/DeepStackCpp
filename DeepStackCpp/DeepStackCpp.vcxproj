@@ -179,6 +179,7 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="DeepStackCpp.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="strategy_filling.cpp" />
     <ClCompile Include="tree_builder.cpp" />

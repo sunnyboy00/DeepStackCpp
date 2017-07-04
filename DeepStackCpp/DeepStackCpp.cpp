@@ -14,6 +14,7 @@ using namespace std;
 using Eigen::MatrixXf;
 //using Eigen::VectorXf;
 #include <vector>
+#include "Node.h"
 
 MatrixXf Test()
 {
@@ -23,11 +24,29 @@ MatrixXf Test()
 
 int main(int argc, char **argv)
 {
-	std::vector<int> testV = { 1, 2, 3 };
-	cout << testV.size();
+	Node n1;
+	n1.pot = 1;
+	n1.bets(0) = 11;
+
+	Node n2(n1);
+	n2.bets(0) = 22;
+
+	cout << n1.bets(0) << "\n";
+	cout << n2.bets(0) << "\n";
 
 	MatrixXf test = MatrixXf(3, 2);
-	test(0, 0) = 00;
+
+	test(0, 0) = 111;
+	test(0, 1) = 01;
+
+	MatrixXf test2 = test;
+	test2(0, 0) = 2222;
+
+	cout << test(0, 0) << "\n";
+	cout << test2(0, 0) << "\n";
+	cout << test2(0, 1) << "\n";
+
+	test(0, 0) = 0;
 	test(0, 1) = 01;
 	test(1, 1) = 11;
 	test(1, 0) = 10;
