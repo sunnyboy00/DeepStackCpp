@@ -36,17 +36,17 @@ vector<unique_ptr<Node>> tree_builder::_get_children_nodes_chance_node(Node & pa
 		CardArray next_board = next_boards.row(i);
 		std::string next_board_string = _card_to_string.cards_to_string(next_board);
 		
-		Node child;
+		//Node child;
 
-		child.node_type = inner_node;
-		child.parent = parent_node;
-			child.current_player = constants.players.P1;
-			child.street = parent_node.street + 1;
-				child.board = next_board;
-				child.board_string = next_board_string;
-					child.bets = parent_node.bets:clone();
+		//child.node_type = inner_node;
+		//child.parent = parent_node;
+		//	child.current_player = constants.players.P1;
+		//	child.street = parent_node.street + 1;
+		//		child.board = next_board;
+		//		child.board_string = next_board_string;
+		//			child.bets = parent_node.bets:clone();
 
-					table.insert(children, child);
+		//			table.insert(children, child);
 	}
 }
 

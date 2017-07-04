@@ -6,10 +6,10 @@ strategy_filling::strategy_filling()
 	_card_tools = card_tools();
 }
 
-//void strategy_filling::fill_uniform(Node & tree)
-//{
-//	_fill_uniform_dfs(tree);
-//}
+void strategy_filling::fill_uniform(Node & tree)
+{
+	_fill_uniform_dfs(tree);
+}
 
 void strategy_filling::_fill_chance(Node& node)
 {
@@ -25,13 +25,26 @@ void strategy_filling::_fill_chance(Node& node)
 	node.strategy.fill(cardsProbability);
 
 	//--setting probability of impossible hands to 0
-	for (unsigned long long i = 0; i < node.children.size(); i++)
+
+	//vector<unique_ptr<Node>> children = node.children;
+
+	long long i = 0;
+	for (auto&& child_node : node.children)
 	{
-		std:unique_ptr<Node> child_node = node.children[i];
-		CardArray mask = _card_tools.get_possible_hand_indexes(child_node.board);
+		CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
 		//node.strategy[i] : fill(0)
 		node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
+		i++;
 	}
+
+	//for (unsigned long long i = 0; i < node.children.size(); i++)
+	//{
+	//	
+	//	auto child_node = &(node.children[i]);
+	//	CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
+	//	//node.strategy[i] : fill(0)
+	//	//node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
+	//}
 }
 
 void strategy_filling::_fill_uniformly(Node & node)
@@ -44,7 +57,7 @@ void strategy_filling::_fill_uniformly(Node & node)
 	}
 
 	node.strategy = MatrixXf(node.children.size(), card_count);
-	node.strategy.fill(1.0 / node.children.size());
+	node.strategy.fill(1.0f / node.children.size());
 }
 
 void strategy_filling::_fill_uniform_dfs(Node& node)
@@ -58,11 +71,9 @@ void strategy_filling::_fill_uniform_dfs(Node& node)
 		_fill_uniformly(node);
 	}
 
-
 	for (long long i = 0; node.children.size(); i++)
 	{
-		_fill_uniform_dfs(node.children[i]);
+		_fill_uniform_dfs(*node.children[i]);
 	}
-	
 }
 

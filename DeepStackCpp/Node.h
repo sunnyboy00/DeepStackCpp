@@ -8,6 +8,7 @@ using namespace std;
 
 struct Node
 {
+
 	// Type of the node. An element of @{constants.node_types} (if applicable)
 	node_types node_type;
 
@@ -29,7 +30,7 @@ struct Node
 	// Half the pot size, equalde to the smaller number in `bets`
 	long long pot;
 
-	Node& parent;
+	Node* parent;
 
 	// Is node a terminal node
 	bool terminal;
