@@ -1,15 +1,23 @@
 #pragma once
-
+#include "bet_sizing.h"
 #include "Node.h"
 #include "assert.h"
 #include "card_tools.h"
 #include "card_to_string_conversion.h"
+#include "arguments.h"
+#include "TreeBuilderParams.h"
+#include "strategy_filling.h"
 
 #include <vector>
 #include <memory>
+#include <algorithm> 
 
 using namespace std;
 using Eigen::Array2f;
+using Eigen::ArrayX2f;
+using Eigen::ArrayXf;
+
+
 
 //-- - Builds a public tree for Leduc Hold'em or variants.
 //--
@@ -37,12 +45,14 @@ public:
 	tree_builder();
 
 private:
+	bet_sizing_manager _bet_sizing_manager;
 
 	// if `true`, only build the current betting round
 	bool _limit_to_street;
 
 	// object which gives the allowed bets for each player
-	long long _bet_sizing;
+	VectorXf _bet_sizing;
+
 
 	card_tools _card_tools;
 
@@ -52,11 +62,50 @@ private:
 	//-- rounds.
 	//-- @param parent_node the node at which the transition call happens
 	//-- @return a list containing the child node
-	vector<unique_ptr<Node>>_get_children_nodes_transition_call(Node& parent_node);
+	vector<Node*>_get_children_nodes_transition_call(Node& parent_node);
 
 	//-- - Creates the children nodes after a chance node.
 	//-- @param parent_node the chance node
 	//-- @return a list of children nodes
-	vector<unique_ptr<Node>>_get_children_nodes_chance_node(Node& parent_node);
+	vector<Node*>_get_children_nodes_chance_node(Node& parent_node);
+
+	//-- - Fills in additional convenience attributes which only depend on existing
+	//-- node attributes.
+	//c-- @param node the node
+	void _fill_additional_attributes(Node& node);
+
+	//-- - Creates the children nodes after a player node.
+	//-- @param parent_node the chance node
+	//-- @return a list of children nodes
+	vector<Node*> _get_children_player_node(Node& parent_node);
+
+	//-- - Creates the children after a node.
+	//-- @param parent_node the node to create children for
+	//-- @return a list of children nodes
+	vector<Node*> _get_children_nodes(Node& parent_node);
+
+	//-- - Recursively build the(sub)tree rooted at the current node.
+	//-- @param current_node the root to build the(sub)tree from
+	//-- @return `current_node` after the(sub)tree has been built
+	Node& _build_tree_dfs(Node& current_node);
+
+//	-- - Builds the tree.
+//		-- @param params table of tree parameters, containing the following fields :
+//	--
+//		-- * `street`: the betting round of the root node
+//		--
+//		-- * `bets`: the number of chips committed at the root node by each player
+//		--
+//		-- * `current_player`: the acting player at the root node
+//		--
+//		-- * `board`: a possibly empty vector of board cards at the root node
+//		--
+//		-- * `limit_to_street`: if `true`, only build the current betting round
+//		--
+//		-- * `bet_sizing` (optional) : a @{bet_sizing} object which gives the allowed
+//	    -- bets for each player
+//      -- @return the root node of the built tree
+
+	Node& build_tree(TreeBuilderParams& params);
 };
 

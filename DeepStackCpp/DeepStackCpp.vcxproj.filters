@@ -63,9 +63,6 @@
     <ClInclude Include="bet_sizing.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="GameState.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="tree_builder.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
@@ -74,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="Node.h">
       <Filter>Header Files\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeBuilderParams.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

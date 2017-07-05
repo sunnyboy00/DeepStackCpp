@@ -51,7 +51,13 @@ struct Node
 	Eigen::ArrayXXf strategy;
 
 	// A list of children nodes
-	vector<unique_ptr<Node>> children;
+	vector<Node*> children;
+
+	// Actions
+	Eigen::ArrayXf actions;
+
+	// Node depth
+	long long depth;
 
 	//Node(const Node &node);
 };

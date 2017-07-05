@@ -1,7 +1,11 @@
 #include "bet_sizing.h"
 
 
-bet_sizing::bet_sizing(VectorXf pot_fractions = VectorXf())
+bet_sizing_manager::bet_sizing_manager()
+{
+}
+
+bet_sizing_manager::bet_sizing_manager(VectorXf pot_fractions = VectorXf())
 {
 	_pot_fractions = pot_fractions;
 
@@ -12,7 +16,7 @@ bet_sizing::bet_sizing(VectorXf pot_fractions = VectorXf())
 	}
 }
 
-ArrayX2f bet_sizing::get_possible_bets(GameState& node)
+ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 {
 	int current_player = node.current_player;
 	assert(current_player == 1 || current_player == 2 && "Wrong player for bet size computation");

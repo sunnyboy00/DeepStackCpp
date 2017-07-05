@@ -26,25 +26,24 @@ void strategy_filling::_fill_chance(Node& node)
 
 	//--setting probability of impossible hands to 0
 
-	//vector<unique_ptr<Node>> children = node.children;
+	//vector<Node*> children = node.children;
 
-	long long i = 0;
-	for (auto&& child_node : node.children)
+	//long long i = 0;
+	//for (auto&& child_node : node.children)
+	//{
+	//	CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
+	//	//node.strategy[i] : fill(0)
+	//	node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
+	//	i++;
+	//}
+
+	for (unsigned long long i = 0; i < node.children.size(); i++)
 	{
+		Node* child_node = node.children[i];
 		CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
 		//node.strategy[i] : fill(0)
 		node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
-		i++;
 	}
-
-	//for (unsigned long long i = 0; i < node.children.size(); i++)
-	//{
-	//	
-	//	auto child_node = &(node.children[i]);
-	//	CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
-	//	//node.strategy[i] : fill(0)
-	//	//node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
-	//}
 }
 
 void strategy_filling::_fill_uniformly(Node & node)

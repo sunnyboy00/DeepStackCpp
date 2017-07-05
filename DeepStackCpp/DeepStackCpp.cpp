@@ -1,24 +1,28 @@
-#include <iostream>
+#include "bet_sizing.h"
+
+//
+//#include <iostream>
 #include <Eigen/Dense>
 #include <algorithm>  
 #include <time.h>
 #include <memory>
-
-#include "CustomSettings.h"
-#include "arguments.h"
-
-#include <vector>
-#include <memory>
-#include <iostream>
-
-using namespace std;
-//using Eigen::ArrayXf;
-//using Eigen::ArrayXXf;
-//using Eigen::VectorXi;
+//
+//
+//#include "CustomSettings.h"
+//#include "arguments.h"
+//
+//#include <vector>
+//#include <memory>
+//#include <iostream>
+//
+//using namespace std;
+////using Eigen::ArrayXf;
+////using Eigen::ArrayXXf;
+////using Eigen::VectorXi;
 using Eigen::MatrixXf;
-//using Eigen::VectorXf;
-#include <vector>
-#include "Node.h"
+using Eigen::VectorXf;
+//#include <vector>
+//#include "Node.h"
 
 //MatrixXf Test()
 //{
@@ -118,28 +122,33 @@ using Eigen::MatrixXf;
 //
 //}
 //
-template <class C>
-void
-display(const C& c)
-{
-	std::cout << '{';
-	if (!c.empty())
-		std::cout << *c.front();
-	for (auto i = std::next(c.begin()); i != c.end(); ++i)
-		std::cout << ", " << **i;
-	std::cout << "}\n";
-}
+//template <class C>
+//void
+//display(const C& c)
+//{
+//	std::cout << '{';
+//	if (!c.empty())
+//		std::cout << *c.front();
+//	for (auto i = std::next(c.begin()); i != c.end(); ++i)
+//		std::cout << ", " << **i;
+//	std::cout << "}\n";
+//}
+
 
 int main(int argc, char **argv)
 {
-	Node node;
-	//node.children = vector <unique_ptr<Node>>();
-	//vector<unique_ptr<Node>> children = node.children;
+//	VectorXf c;
+//	bet_sizing_manager b;
 
-	long long i = 0;
-	for (auto&& child_node : node.children)
-	{
-	}
+
+	//Node node;
+	////node.children = vector <unique_ptr<Node>>();
+	////vector<Node*> children = node.children;
+
+	//long long i = 0;
+	//for (auto&& child_node : node.children)
+	//{
+	//}
 
 
 	//typedef std::unique_ptr<int> Ptr;
