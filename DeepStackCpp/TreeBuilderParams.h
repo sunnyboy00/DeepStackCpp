@@ -1,5 +1,4 @@
 #pragma once
-//#include <Eigen/Dense>
 #include "Node.h"
 
 struct TreeBuilderParams
@@ -22,7 +21,9 @@ struct TreeBuilderParams
 	// object which gives the allowed bets for each player
 	Eigen::VectorXf bet_sizing;
 
-	Node& root_node;
+	Node* root_node;
+
+	TreeBuilderParams();
 }; 
 
 

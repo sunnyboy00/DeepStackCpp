@@ -30,7 +30,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 
 	long long subtree_height = -1;
 	auto children = vector<Node*>();
-	//--1.0 iterate over the next possible boards to build the corresponding subtrees
+	//1.0 iterate over the next possible boards to build the corresponding subtrees
 	for (unsigned long long i = 0; next_boards_count; i++)
 	{
 		CardArray next_board = next_boards.row(i);
@@ -62,7 +62,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 
 	auto children = vector<Node*>();
 
-	//--1.0 fold action
+	//1.0 fold action
 	Node* fold_node = new Node();
 	fold_node->node_type = terminal_fold;
 	fold_node->terminal = true;
@@ -75,8 +75,8 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 	children.push_back(fold_node);
 
 
-	//--2.0 check action
-	if (parent_node.current_player == P1 && (parent_node.bets(1) == parent_node.bets(2)))
+	//2.0 check action
+	if (parent_node.current_player == P1 && (parent_node.bets(0) == parent_node.bets(1)))
 	{
 		Node* check_node = new Node();
 		check_node->node_type = check;
@@ -90,12 +90,12 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 		children.push_back(check_node);
 	}
 
-	//--transition call
+	//transition call
 	else if (
 		(parent_node.street == 1) &&
 		(
-			(parent_node.current_player == P2 && parent_node.bets(1) == parent_node.bets(2)) &&
-			(parent_node.bets(1) != parent_node.bets(2) && parent_node.bets.maxCoeff() < stack))
+			(parent_node.current_player == P2 && parent_node.bets(0) == parent_node.bets(1)) &&
+			(parent_node.bets(0) != parent_node.bets(1) && parent_node.bets.maxCoeff() < stack))
 		)
 	{
 		Node* chnce_node = new Node();
@@ -110,7 +110,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 	}
 	else
 	{
-		//--2.0 terminal call - either last street or allin
+		//2.0 terminal call - either last street or allin
 		Node* terminal_call_node = new Node();
 		terminal_call_node->node_type = terminal_call;
 		terminal_call_node->terminal = true;
@@ -123,12 +123,12 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 		children.push_back(terminal_call_node);
 	}
 	
-	//--3.0 bet actions
-	ArrayX2f possible_bets = _bet_sizing_manager.get_possible_bets(parent_node);
+	//3.0 bet actions
+	ArrayX2f possible_bets = _bet_sizing_manager->get_possible_bets(parent_node);
 
 	if (possible_bets.rows() != 0)
 	{
-		assert(possible_bets.rows() == 2);
+		assert(possible_bets.cols() == players_count);
 
 		for (int i = 0; i < possible_bets.rows(); i++)
 		{
@@ -138,7 +138,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 				child->street = parent_node.street;
 				child->board = parent_node.board;
 				child->board_string = parent_node.board_string;
-				child->bets = possible_bets(i);
+				child->bets = possible_bets.row(i);
 				children.push_back(child);
 		}
 				
@@ -149,20 +149,20 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 
 vector<Node*> tree_builder::_get_children_nodes(Node& parent_node)
 {
-	//--is this a transition call node(leading to a chance node) ? A bug?
+	//is this a transition call node(leading to a chance node) ? A bug?
 	//bool call_is_transit = parent_node.current_player == P2 && parent_node.bets(1) == parent_node.bets(2) && parent_node.street < streets_count;
 
-	//--transition call->create a chance node
+	//transition call->create a chance node
 	if (parent_node.terminal)
 	{
 		return vector<Node*>();
 	}
-	//--chance node
+	//chance node
 	else if (parent_node.current_player == chance)
 	{
 		return _get_children_nodes_chance_node(parent_node);
 	}
-	// --inner nodes->handle bet sizes
+	// inner nodes->handle bet sizes
 	else
 	{
 		return _get_children_player_node(parent_node);
@@ -179,6 +179,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 
 	long long depth = 0;
 
+	int ss = children.size();
 	current_node.actions = ArrayXf(children.size());
 	for (unsigned long long i = 0; i < children.size(); i++)
 	{
@@ -187,11 +188,11 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 		_build_tree_dfs(*cur_children);
 		depth = max(depth, cur_children->depth);
 
-		if (i == 1)
+		if (i == 0)
 		{
 			current_node.actions(i) = fold;
 		}
-		else if (i == 2)
+		else if (i == 1)
 		{
 			current_node.actions(i) = ccall;
 		}
@@ -206,15 +207,15 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 	return current_node;
 }
 
-Node& tree_builder::build_tree(TreeBuilderParams & params)
+Node& tree_builder::build_tree(TreeBuilderParams& params)
 {
 	Node* root = new Node();
 
-	//--copy necessary stuff from the root_node not to touch the input
-	root->street = params.root_node.street;
-	root->bets = params.root_node.bets;
-	root->current_player = params.root_node.current_player;
-	root->board = params.root_node.board;
+	//copy necessary stuff from the root_node not to touch the input
+	root->street = params.root_node->street;
+	root->bets = params.root_node->bets;
+	root->current_player = params.root_node->current_player;
+	root->board = params.root_node->board;
 
 	if (params.bet_sizing.size() == 0)
 	{
@@ -224,6 +225,8 @@ Node& tree_builder::build_tree(TreeBuilderParams & params)
 	{
 		params.bet_sizing = params.bet_sizing;
 	}
+
+	_bet_sizing_manager = new bet_sizing_manager(params.bet_sizing);
 
 	assert(params.bet_sizing.size() != 0);
 	_bet_sizing = params.bet_sizing;

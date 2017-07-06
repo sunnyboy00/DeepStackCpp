@@ -205,7 +205,7 @@ CardArray card_tools::normalize_range(MatrixXf& board, CardArray& range)
 
 	auto sum = out.sum();
 
-	//--return zero range if it all collides with board(avoid div by zero)
+	//return zero range if it all collides with board(avoid div by zero)
 	if (sum == 0)
 	{
 		return range;

@@ -35,19 +35,19 @@ struct Node
 	// Is node a terminal node
 	bool terminal;
 
-	//--A strategy is represented at each public node by a NxK tensor where:
-	//--
-	//-- * N is the number of possible child nodes.
-	//--
-	//-- * K is the number of information sets for the active player in the public
-	//--node.For the Leduc Hold'em variants we implement, there is one for each
-	//-- private card that the player could hold.
-	//--
-	//--For a player node, `strategy[i][j]` gives the probability of taking the
-	//-- action that leads to the `i`th child when the player holds the `j`th card.
-	//--
-	//--For a chance node, `strategy[i][j]` gives the probability of reaching the
-	//-- `i`th child for either player when that player holds the `j`th card.
+	//A strategy is represented at each public node by a NxK tensor where:
+	//
+	// * N is the number of possible child nodes.
+	//
+	// * K is the number of information sets for the active player in the public
+	//node.For the Leduc Hold'em variants we implement, there is one for each
+	// private card that the player could hold.
+	//
+	//For a player node, `strategy[i][j]` gives the probability of taking the
+	// action that leads to the `i`th child when the player holds the `j`th card.
+	//
+	//For a chance node, `strategy[i][j]` gives the probability of reaching the
+	// `i`th child for either player when that player holds the `j`th card.
 	Eigen::ArrayXXf strategy;
 
 	// A list of children nodes

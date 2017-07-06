@@ -17,14 +17,14 @@ void strategy_filling::_fill_chance(Node& node)
 
 	assert(!node.terminal);
 
-	//--filling strategy
-	//--we will fill strategy with an uniform probability, but it has to be zero for hands that are not possible on
-	//--corresponding board
-	float cardsProbability = 1.0 / (card_count - 2); //--remove 2 because each player holds one card
+	//filling strategy
+	//we will fill strategy with an uniform probability, but it has to be zero for hands that are not possible on
+	//corresponding board
+	float cardsProbability = 1.0 / (card_count - 2); //remove 2 because each player holds one card
 	node.strategy = ArrayXXf(node.children.size(), card_count);
 	node.strategy.fill(cardsProbability);
 
-	//--setting probability of impossible hands to 0
+	//setting probability of impossible hands to 0
 
 	//vector<Node*> children = node.children;
 
@@ -70,7 +70,7 @@ void strategy_filling::_fill_uniform_dfs(Node& node)
 		_fill_uniformly(node);
 	}
 
-	for (long long i = 0; node.children.size(); i++)
+	for (unsigned long long i = 0; i < node.children.size(); i++)
 	{
 		_fill_uniform_dfs(*node.children[i]);
 	}
