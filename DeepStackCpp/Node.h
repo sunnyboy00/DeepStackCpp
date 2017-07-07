@@ -30,6 +30,7 @@ struct Node
 	// Half the pot size, equalde to the smaller number in `bets`
 	long long pot;
 
+	// Parant of the node
 	Node* parent;
 
 	// Is node a terminal node
@@ -56,7 +57,7 @@ struct Node
 	// Actions
 	Eigen::ArrayXf actions;
 
-	// Node depth
+	// Depth of the node inside the tree
 	long long depth;
 
 	//Node(const Node &node);

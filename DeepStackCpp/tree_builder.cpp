@@ -61,12 +61,13 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 	assert(parent_node.current_player != chance);
 
 	auto children = vector<Node*>();
+	int current_player = 3 - parent_node.current_player;
 
 	//1.0 fold action
 	Node* fold_node = new Node();
 	fold_node->node_type = terminal_fold;
 	fold_node->terminal = true;
-	fold_node->current_player = 3 - parent_node.current_player;
+	fold_node->current_player = current_player;
 	fold_node->street = parent_node.street;
 	fold_node->board = parent_node.board;
 	fold_node->board_string = parent_node.board_string;
@@ -76,12 +77,13 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 
 
 	//2.0 check action
+	//Warning: why only if cur_player == P1. What about check for p2?
 	if (parent_node.current_player == P1 && (parent_node.bets(0) == parent_node.bets(1)))
 	{
 		Node* check_node = new Node();
 		check_node->node_type = check;
 		check_node->terminal = false;
-		check_node->current_player = 3 - parent_node.current_player;
+		check_node->current_player = current_player;
 		check_node->street = parent_node.street;
 		check_node->board = parent_node.board;
 		check_node->board_string = parent_node.board_string;
@@ -114,7 +116,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 		Node* terminal_call_node = new Node();
 		terminal_call_node->node_type = terminal_call;
 		terminal_call_node->terminal = true;
-		terminal_call_node->current_player = 3 - parent_node.current_player;
+		terminal_call_node->current_player = current_player;
 		terminal_call_node->street = parent_node.street;
 		terminal_call_node->board = parent_node.board;
 		terminal_call_node->board_string = parent_node.board_string;
@@ -123,7 +125,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 		children.push_back(terminal_call_node);
 	}
 	
-	//3.0 bet actions
+	//3.0 bet actions  
 	ArrayX2f possible_bets = _bet_sizing_manager->get_possible_bets(parent_node);
 
 	if (possible_bets.rows() != 0)
@@ -134,7 +136,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 		{
 				Node* child = new Node();
 				child->parent = &parent_node;
-				child->current_player = 3 - parent_node.current_player;
+				child->current_player = current_player;
 				child->street = parent_node.street;
 				child->board = parent_node.board;
 				child->board_string = parent_node.board_string;
@@ -188,17 +190,17 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 		_build_tree_dfs(*cur_children);
 		depth = max(depth, cur_children->depth);
 
-		if (i == 0)
+		if (i == 0) // First child is always fold, if exists
 		{
 			current_node.actions(i) = fold;
 		}
-		else if (i == 1)
+		else if (i == 1) // Second child is always call, if exists
 		{
 			current_node.actions(i) = ccall;
 		}
-		else
+		else // All others children are possible bets
 		{
-			current_node.actions(i) = cur_children->bets.maxCoeff();
+			current_node.actions(i) = cur_children->bets.maxCoeff(); // Max possible bet is the max bet off child?
 		}
 	}
 

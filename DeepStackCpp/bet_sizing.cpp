@@ -43,7 +43,7 @@ ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 		// iterate through all bets and check if they are possible
 		long long max_possible_bets_count = _pot_fractions.size() + 1; // we can always go allin
 		ArrayX2f out(max_possible_bets_count, player_count);
-		out.fill((float)opponent_bet); // Perf: don't need to fill all array that will be overwrited
+		out.fill((float)opponent_bet); // Warning: Perf: don't need to fill all array that will be overwrited
 
 		// take pot size after opponent bet is called
 		long long pot = opponent_bet * 2;

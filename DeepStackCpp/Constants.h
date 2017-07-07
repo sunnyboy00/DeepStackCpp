@@ -14,7 +14,7 @@ enum players { chance = 0, P1 = 1, P2 = 2 };
 
 //  IDs for terminal nodes (either after a fold or call action) and nodes that follow a check action
 // @field terminal_fold(terminal node following fold) `-2`
-// @field terminal_call(terminal node following call) `-1`
+// @field terminal_call(terminal node following call) -either last street or allin- `-1`
 // @field chance_node(node for the chance player) `0`
 // @field check(node following check) `-1`
 // @field inner_node(any other node) `2`
