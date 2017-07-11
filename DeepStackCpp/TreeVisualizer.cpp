@@ -2,8 +2,6 @@
 
 
 
-
-
 TreeVisualizer::TreeVisualizer(): _card_to_string()
 {
 }
@@ -105,12 +103,12 @@ unique_ptr<GraphvisNode> TreeVisualizer::node_to_graphviz(const Node & node)
 	}
 	else
 	{
-		out->Label += "| bet1: " + to_string(node.bets[P1]) + "| bet2: " + to_string(node.bets[P2]);
+		out->Label += "| bet1: " + to_string(node.bets(P1 - 1)) + "| bet2: " + to_string(node.bets(P2 - 1));
 
 		if (node.street > 0)
 		{
 			out->Label += "| street: " + node.street;
-			out->Label += "| board: " + _card_to_string.cards_to_string(CardArray(node.board));
+			out->Label += "| board: " + _card_to_string.cards_to_string(node.board);
 			out->Label += "| depth: "  + node.depth;
 		}
 	}
@@ -180,9 +178,10 @@ unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const Grap
 unique_ptr<GraphvisNode> TreeVisualizer::graphviz_dfs(const Node& node, vector<unique_ptr<GraphvisNode>>& nodes, vector<unique_ptr<GraphvizConnection>>& edges)
 {
 	unique_ptr<GraphvisNode> gv_node = node_to_graphviz(node);
-	nodes.push_back(move(gv_node));
+	auto ptr = make_shared<GraphvisNode>(gv_node);
+	nodes.push_back(ptr);
 
-	for (size_t i = 0; i < nodes.size(); i++)
+	for (size_t i = 0; i < node.children.size(); i++)
 	{
 		Node* child_node = node.children[i];
 		unique_ptr<GraphvisNode> gv_node_child = graphviz_dfs(*child_node, nodes, edges);
@@ -209,14 +208,14 @@ void TreeVisualizer::graphviz(const Node & root, string filename)
 
 	for (size_t i = 0; i < nodes.size(); i++)
 	{
-		unique_ptr<GraphvisNode> node = std::move(nodes[i]);
+		unique_ptr<GraphvisNode> node = move(nodes[i]);
 		string node_text = node->Name + "[" + "label=" + node->Label + " shape = " + node->Shape + "];";
 		out += node_text;
 	}
 
 	for (size_t i = 0; i < edges.size(); i++)
 	{
-		unique_ptr<GraphvizConnection> edge = std::move(edges[i]);
+		unique_ptr<GraphvizConnection> edge = move(edges[i]);
 		string edge_text = edge->Id_from + ":f0 -> " + edge->Id_to + ":f0 [ id = " + to_string(edge->Id) + " label = \"" + edge->Strategy + "\"];";
 		out += edge_text;
 	}
@@ -231,7 +230,6 @@ void TreeVisualizer::graphviz(const Node & root, string filename)
 	file.close();
 
 	//--run graphviz program to generate image
-
 	string dotTarget = "dot " + targetpath + " -Tsvg -O";
 	system(dotTarget.c_str());
 }

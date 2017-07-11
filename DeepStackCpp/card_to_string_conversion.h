@@ -5,18 +5,20 @@
 #include "game_settings.h"
 #include "CustomSettings.h"
 #include <Eigen/Dense>
+#include <string>
 
 using Eigen::ArrayXf;
+using namespace std;
 
 class card_to_string_conversion
 {
 private:
 	// All possible card suits - only the first 2 are used in Leduc Hold'em.
-	std::vector<int> suit_table{ 'h', 's', 'c', 'd' };
+	static string const suit_table[];
 
 	// All possible card ranks - only the first 3 - 4 are used in Leduc Hold'em and 
 	//variants.
-	std::vector<int> rank_table = { 'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2' };
+	static string const  rank_table[];
 
 public:
 
@@ -49,12 +51,12 @@ public:
 	//representations.
 	// @param cards a vector of numeric representations of cards
 	// @return a string containing each card's string representation, concatenated
-	std::string cards_to_string(CardArray& cards);
+	std::string cards_to_string(ArrayXf cards);
 
 	// Converts a card's string representation to its numeric representation.
 	// @param card_string the string representation of a card
 	// @return the numeric representation of the card
-	inline int string_to_card(std::string card_string);
+	inline int string_to_card(string card_string);
 
 	// Converts a string representing zero or one board cards to a
 	//	-- vector of numeric representations.
@@ -62,7 +64,7 @@ public:
 	//	-- card
 	//	-- @return either an empty tensor or a tensor containing the numeric
 	//	-- representation of the card
-	ArrayXf string_to_board(std::string card_string);
+	ArrayXf string_to_board(string card_string);
 };
 
 //inline std::string card_to_string_conversion::card_to_suit(int card)

@@ -135,21 +135,9 @@ using Eigen::VectorXf;
 //	std::cout << "}\n";
 //}
 
-void TestF(char * t)
-{
-	string gg(t);
-	cout << gg;
-}
-
 int main(int argc, char **argv)
 {
-	TestF("ff");
-	printf("%.3f", 3.123456);
-
-	string out;
-	cout << out;
-	out.assign("1");
-	Tests::test_tree_builder();
+	Tests::test_tree_visualiser();
 
 //	VectorXf c;
 //	bet_sizing_manager b;
