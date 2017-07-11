@@ -12,15 +12,15 @@ class card_to_string_conversion
 {
 private:
 	// Holds the string representation for every possible card, indexed by its
-	//  numeric representation.
+	// numeric representation.
 	std::unordered_map<int, std::string> card_to_string_table;
 
 	// Holds the numeric representation for every possible card, indexed by its
-	//  string representation.
+	// string representation.
 	std::unordered_map<std::string, int> string_to_card_table;
 
 
-	// -All possible card suits - only the first 2 are used in Leduc Hold'em.
+	// All possible card suits - only the first 2 are used in Leduc Hold'em.
 	std::vector<int> suit_table{ 'h', 's', 'c', 'd' };
 
 	// All possible card ranks - only the first 3 - 4 are used in Leduc Hold'em and 

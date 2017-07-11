@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <memory>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 using namespace std;
 
@@ -59,6 +60,34 @@ struct Node
 
 	// Depth of the node inside the tree
 	long long depth;
+
+	// A 2xK tensor containing the probabilities of each
+	// player reaching the current node with each private hand
+	Eigen::Array2Xf ranges_absolute;
+
+	//-- Recursively calculated counterfactual values for each player 
+	//-- using the saved strategy profile when playing against
+	//--each other
+	Eigen::Array2Xf cf_values;
+
+	//-- The cfvs for a best response against each player in the profile
+	Eigen::Array2Xf cf_values_br;
+
+	// Counterfactual values weighted by the reach prob
+	Eigen::Array2Xf cfv_infset;
+
+	// CFV-BR values weighted by the reach prob
+	Eigen::Array2Xf cfv_br_infset;
+
+	// Difference between CFV-BR and Counterfactual values = node.cfv_br_infset - node.cfv_infset
+	Eigen::Array2Xf epsilon;
+
+	// <action_id, parent_id, gp_id>
+	// action_id - the index of the action that led to this node
+	// parent_id - the index of the current node's parent
+	// gp_id - he index of the current node's grandparent.
+	Eigen::Tensor<float, 3> lookahead_coordinates
+
 
 	//Node(const Node &node);
 };

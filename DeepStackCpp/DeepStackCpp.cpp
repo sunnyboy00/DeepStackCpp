@@ -12,11 +12,11 @@
 //#include "CustomSettings.h"
 //#include "arguments.h"
 //
-//#include <vector>
-//#include <memory>
-//#include <iostream>
-//
-//using namespace std;
+#include <vector>
+#include <memory>
+#include <iostream>
+
+using namespace std;
 ////using Eigen::ArrayXf;
 ////using Eigen::ArrayXXf;
 ////using Eigen::VectorXi;
@@ -135,9 +135,21 @@ using Eigen::VectorXf;
 //	std::cout << "}\n";
 //}
 
+void TestF(char * t)
+
+{
+	string gg(t);
+	cout << gg;
+}
 
 int main(int argc, char **argv)
 {
+	TestF("ff");
+	printf("%.3f", 3.123456);
+
+	string out;
+	cout << out;
+	out.assign("1");
 	Tests::test_tree_builder();
 
 //	VectorXf c;

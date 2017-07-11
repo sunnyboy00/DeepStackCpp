@@ -166,6 +166,8 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSettings.h" />
     <ClInclude Include="game_settings.h" />
+    <ClInclude Include="GraphvizConnection.h" />
+    <ClInclude Include="GraphvizNode.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -173,6 +175,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Tests.h" />
     <ClInclude Include="TreeBuilderParams.h" />
+    <ClInclude Include="TreeVisualizer.h" />
     <ClInclude Include="tree_builder.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +188,7 @@
     <ClCompile Include="strategy_filling.cpp" />
     <ClCompile Include="Tests.cpp" />
     <ClCompile Include="TreeBuilderParams.cpp" />
+    <ClCompile Include="TreeVisualizer.cpp" />
     <ClCompile Include="tree_builder.cpp" />
   </ItemGroup>
   <ItemGroup>
