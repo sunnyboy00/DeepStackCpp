@@ -13,4 +13,7 @@ struct GraphvizConnection
 
 	// The graphical node connection id
 	long long Id;
+
+	// String strategy representation
+	string Strategy;
 };

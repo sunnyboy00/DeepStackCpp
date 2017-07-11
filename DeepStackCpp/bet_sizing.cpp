@@ -17,15 +17,15 @@ ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 
 	int current_player_z = node.current_player - 1; // -1 because in tourch index is 1 based.
 	int opponent = 2 - node.current_player;
-	long long opponent_bet = node.bets(opponent);
+	float opponent_bet = node.bets(opponent);
 
 	assert(node.bets(current_player_z) <= opponent_bet);
 
 	//compute min possible raise size
-	long long max_raise_size = stack - opponent_bet;
-	long long min_raise_size = opponent_bet - node.bets(current_player_z);
-	min_raise_size = std::max(min_raise_size, ante);
-	min_raise_size = std::min(max_raise_size, min_raise_size);
+	float max_raise_size = stack - opponent_bet;
+	float min_raise_size = opponent_bet - node.bets(current_player_z);
+	min_raise_size = max(min_raise_size, ante);
+	min_raise_size = min(max_raise_size, min_raise_size);
 	if (min_raise_size == 0)
 	{
 		ArrayX2f ar;
@@ -46,16 +46,16 @@ ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 		out.fill((float)opponent_bet); // Warning: Perf: don't need to fill all array that will be overwrited
 
 		// take pot size after opponent bet is called
-		long long pot = opponent_bet * 2;
+		float pot = opponent_bet * 2;
 		long long used_bets_count = 0;
 		// try all pot fractions bet and see if we can use them
 		for (int i = 0; i < _pot_fractions.size(); i++)
 		{
-			long long raise_size = pot * (long long)_pot_fractions(i);
+			float raise_size = pot * _pot_fractions(i);
 			if (raise_size >= min_raise_size && raise_size < max_raise_size)
 			{
 				//used_bets_count++;
-				out(used_bets_count, current_player_z) = (float)(opponent_bet + raise_size);
+				out(used_bets_count, current_player_z) = opponent_bet + raise_size;
 				used_bets_count++;
 			}
 		}

@@ -86,7 +86,7 @@ struct Node
 	// action_id - the index of the action that led to this node
 	// parent_id - the index of the current node's parent
 	// gp_id - he index of the current node's grandparent.
-	Eigen::Tensor<float, 3> lookahead_coordinates
+	Eigen::Tensor<float, 3> lookahead_coordinates;
 
 
 	//Node(const Node &node);

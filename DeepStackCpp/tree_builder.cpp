@@ -181,7 +181,6 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 
 	long long depth = 0;
 
-	int ss = children.size();
 	current_node.actions = ArrayXf(children.size());
 	for (unsigned long long i = 0; i < children.size(); i++)
 	{

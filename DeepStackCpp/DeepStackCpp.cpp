@@ -136,7 +136,6 @@ using Eigen::VectorXf;
 //}
 
 void TestF(char * t)
-
 {
 	string gg(t);
 	cout << gg;

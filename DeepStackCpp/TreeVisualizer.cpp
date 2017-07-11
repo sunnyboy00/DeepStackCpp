@@ -18,7 +18,7 @@ string TreeVisualizer::string_format(const std::string& format, Args ... args)
 	return string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-string TreeVisualizer::add_tensor(ArrayXXf tensor, const char* name = nullptr, const char* format = nullptr, const vector<string>* labels = nullptr)
+string TreeVisualizer::add_tensor(ArrayXXf tensor, const char* name, const char* format, const std::unordered_map<int, string>* labels)
 {
 	// std::stringstream fmt;
 	string out = "";
@@ -44,11 +44,10 @@ string TreeVisualizer::add_tensor(ArrayXXf tensor, const char* name = nullptr, c
 	{
 		if (labels != nullptr)
 		{
-			string currentLable = (*labels)[i];
-			out += currentLable + ":";
+			out += labels->at(i) + ":";
 		}
 
-		out += string_format(format_l, tensor[i]) + ", ";
+		out += string_format(format_l, tensor(i)) + ", ";
 
 	}
 
@@ -116,7 +115,7 @@ unique_ptr<GraphvisNode> TreeVisualizer::node_to_graphviz(const Node & node)
 		}
 	}
 
-	// No such field node.margin
+	// No such field node.margin in sources
 	//if (node.margin > 0)
 	//{
 	//	out->Label += "| margin: " + to_string(node.margin);
@@ -150,12 +149,12 @@ unique_ptr<GraphvisNode> TreeVisualizer::node_to_graphviz(const Node & node)
 	// --3.0 shape
 	out->Shape = "\"record\"";
 
-	node_to_graphviz_counter += 1;
+	node_to_graphviz_counter++;
 
 	return out;
 }
 
-unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const GraphvisNode & from, const GraphvisNode & to, const Node & node, const Node & child_node)
+unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const GraphvisNode& from, const GraphvisNode & to, const Node & node, const Node & child_node)
 {
 	unique_ptr<GraphvizConnection> out = make_unique<GraphvizConnection>();
 	out->Id_from = from.Name;
@@ -164,7 +163,7 @@ unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const Grap
 
 	// --get the child id of the child node
 	long long child_id = -1;
-	for (long long i = 0; i < node.children.size(); i++)
+	for (size_t i = 0; i < node.children.size(); i++)
 	{
 		if (node.children[i] == &child_node)
 		{
@@ -173,11 +172,68 @@ unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const Grap
 	}
 
 	assert(child_id != -1);
-	out->strategy = add_tensor(node.strategy.row(child_id), nullptr, "%.2f", _card_to_string.card_to_string_table)
+	out->Strategy = add_tensor(node.strategy.row(child_id), nullptr, "%.2f", &_card_to_string.card_to_string_table);
+	edge_to_graphviz_counter++;
+	return out;
+}
 
-			self.edge_to_graphviz_counter = self.edge_to_graphviz_counter + 1
-			return out
-	
+unique_ptr<GraphvisNode> TreeVisualizer::graphviz_dfs(const Node& node, vector<unique_ptr<GraphvisNode>>& nodes, vector<unique_ptr<GraphvizConnection>>& edges)
+{
+	unique_ptr<GraphvisNode> gv_node = node_to_graphviz(node);
+	nodes.push_back(move(gv_node));
+
+	for (size_t i = 0; i < nodes.size(); i++)
+	{
+		Node* child_node = node.children[i];
+		unique_ptr<GraphvisNode> gv_node_child = graphviz_dfs(*child_node, nodes, edges);
+		unique_ptr<GraphvizConnection> gv_edge = nodes_to_graphviz_edge(*gv_node, *gv_node_child, node, *child_node);
+		edges.push_back(move(gv_edge));
+	}
+
+	return gv_node;
+}
+
+void TreeVisualizer::graphviz(const Node & root, string filename)
+{
+	if (filename == "")
+	{
+		filename = "tree_2.dot";
+	}
+
+	string out = "digraph g {  graph [ rankdir = \"LR\"];node [fontsize = \"16\" shape = \"ellipse\"]; edge [];";
+
+	vector<unique_ptr<GraphvisNode>> nodes;
+	vector<unique_ptr<GraphvizConnection>> edges;
+
+	graphviz_dfs(root, nodes, edges);
+
+	for (size_t i = 0; i < nodes.size(); i++)
+	{
+		unique_ptr<GraphvisNode> node = std::move(nodes[i]);
+		string node_text = node->Name + "[" + "label=" + node->Label + " shape = " + node->Shape + "];";
+		out += node_text;
+	}
+
+	for (size_t i = 0; i < edges.size(); i++)
+	{
+		unique_ptr<GraphvizConnection> edge = std::move(edges[i]);
+		string edge_text = edge->Id_from + ":f0 -> " + edge->Id_to + ":f0 [ id = " + to_string(edge->Id) + " label = \"" + edge->Strategy + "\"];";
+		out += edge_text;
+	}
+
+	out += "}";
+
+	//--write into dot file
+	ofstream file;
+	string targetpath = data_directory + "Dot/" + filename;
+	file.open(targetpath);
+	file << out;
+	file.close();
+
+	//--run graphviz program to generate image
+
+	string dotTarget = "dot " + targetpath + " -Tsvg -O";
+	system(dotTarget.c_str());
 }
 
 

@@ -1,12 +1,12 @@
 #pragma once
 #include <assert.h>
 #include <Eigen/Dense>
+#include <string>
 
 using Eigen::VectorXf;
 
 // Parameters for DeepStack.
 //@module arguments
-
 
 // whether to run on GPU
 static const int gpu = false;
@@ -23,7 +23,7 @@ static const VectorXf bet_sizing = VectorXf::Ones(1);
 // the tensor datatype used for storing DeepStack"s internal data
 //Tensor = torch.FloatTensor
 // the directory for data files
-static const char data_directory[] = "../Data/";
+static const string data_directory = "../Data/";
 // the size of the game"s ante, in chips
 static const long long ante = 100;
 // the size of each player"s stack, in chips
