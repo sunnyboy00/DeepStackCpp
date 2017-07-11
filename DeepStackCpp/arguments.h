@@ -23,7 +23,7 @@ static const VectorXf bet_sizing = VectorXf::Ones(1);
 // the tensor datatype used for storing DeepStack"s internal data
 //Tensor = torch.FloatTensor
 // the directory for data files
-static const string data_directory = "../Data/";
+static const string data_directory = "C:\\data\\";
 // the size of the game"s ante, in chips
 static const long long ante = 100;
 // the size of each player"s stack, in chips
@@ -37,9 +37,9 @@ static const int gen_batch_size = 10;
 // how many poker situations are used in each neural net training batch
 static const int train_batch_size = 100;
 // path to the solved poker situation data used to train the neural net
-static const char data_path[] = "../Data/TrainSamples/PotBet/";
+static const string data_path = "C:\\data\\TrainSamples\\PotBet\\";
 // path to the neural net model
-static const char model_path[] = "../Data/Models/PotBet/";
+static const string model_path = "C:\\data\\Models\\PotBet\\";
 // the name of the neural net file
 static const char value_net_name[] = "final";
 // the neural net architecture

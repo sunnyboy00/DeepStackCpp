@@ -15,7 +15,7 @@ card_to_string_conversion::card_to_string_conversion()
 	}
 }
 
-inline std::string card_to_string_conversion::card_to_string(int card)
+inline string card_to_string_conversion::card_to_string(int card)
 {
 	assert(card >= 0 && card < card_count);
 	return card_to_string_table[card];
@@ -31,7 +31,7 @@ inline int card_to_string_conversion::card_to_rank(int card)
 	return int(floor((card - 1) / suit_count)) + 1;
 }
 
-std::string card_to_string_conversion::cards_to_string(ArrayXf cards)
+string card_to_string_conversion::cards_to_string(ArrayXf cards)
 {
 	//if (cards.size() == 0)
 	//{

@@ -79,9 +79,9 @@ string TreeVisualizer::add_range_info(const Node& node)
 	return out;
 }
 
-unique_ptr<GraphvisNode> TreeVisualizer::node_to_graphviz(const Node & node)
+GraphvisNode* TreeVisualizer::node_to_graphviz(const Node & node)
 {
-	unique_ptr<GraphvisNode> out = make_unique<GraphvisNode>();
+	GraphvisNode* out = new GraphvisNode();
 
 	//--1.0 label
 	out->Label = "\"<f0>" + to_string(node.current_player);
@@ -103,13 +103,16 @@ unique_ptr<GraphvisNode> TreeVisualizer::node_to_graphviz(const Node & node)
 	}
 	else
 	{
-		out->Label += "| bet1: " + to_string(node.bets(P1 - 1)) + "| bet2: " + to_string(node.bets(P2 - 1));
+		string betOneStr = string_format("%.0f", node.bets(P1 - 1));
+		string betTwoStr = string_format("%.0f", node.bets(P2 - 2));
+
+		out->Label += "| bet1: " + betOneStr + "| bet2: " + betTwoStr;
 
 		if (node.street > 0)
 		{
-			out->Label += "| street: " + node.street;
+			out->Label += "| street: " + to_string(node.street);
 			out->Label += "| board: " + _card_to_string.cards_to_string(node.board);
-			out->Label += "| depth: "  + node.depth;
+			out->Label += "| depth: "  + to_string(node.depth);
 		}
 	}
 
@@ -152,9 +155,9 @@ unique_ptr<GraphvisNode> TreeVisualizer::node_to_graphviz(const Node & node)
 	return out;
 }
 
-unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const GraphvisNode& from, const GraphvisNode & to, const Node & node, const Node & child_node)
+GraphvizConnection* TreeVisualizer::nodes_to_graphviz_edge(const GraphvisNode& from, const GraphvisNode & to, const Node & node, const Node & child_node)
 {
-	unique_ptr<GraphvizConnection> out = make_unique<GraphvizConnection>();
+	GraphvizConnection* out = new GraphvizConnection();
 	out->Id_from = from.Name;
 	out->Id_to = to.Name;
 	out->Id = edge_to_graphviz_counter;
@@ -175,18 +178,17 @@ unique_ptr<GraphvizConnection> TreeVisualizer::nodes_to_graphviz_edge(const Grap
 	return out;
 }
 
-unique_ptr<GraphvisNode> TreeVisualizer::graphviz_dfs(const Node& node, vector<unique_ptr<GraphvisNode>>& nodes, vector<unique_ptr<GraphvizConnection>>& edges)
+GraphvisNode* TreeVisualizer::graphviz_dfs(const Node& node, vector<GraphvisNode*>& nodes, vector<GraphvizConnection*>& edges)
 {
-	unique_ptr<GraphvisNode> gv_node = node_to_graphviz(node);
-	auto ptr = make_shared<GraphvisNode>(gv_node);
-	nodes.push_back(ptr);
+	GraphvisNode* gv_node = node_to_graphviz(node);
+	nodes.push_back(gv_node);
 
 	for (size_t i = 0; i < node.children.size(); i++)
 	{
 		Node* child_node = node.children[i];
-		unique_ptr<GraphvisNode> gv_node_child = graphviz_dfs(*child_node, nodes, edges);
-		unique_ptr<GraphvizConnection> gv_edge = nodes_to_graphviz_edge(*gv_node, *gv_node_child, node, *child_node);
-		edges.push_back(move(gv_edge));
+		GraphvisNode* gv_node_child = graphviz_dfs(*child_node, nodes, edges);
+		GraphvizConnection* gv_edge = nodes_to_graphviz_edge(*gv_node, *gv_node_child, node, *child_node);
+		edges.push_back(gv_edge);
 	}
 
 	return gv_node;
@@ -201,21 +203,21 @@ void TreeVisualizer::graphviz(const Node & root, string filename)
 
 	string out = "digraph g {  graph [ rankdir = \"LR\"];node [fontsize = \"16\" shape = \"ellipse\"]; edge [];";
 
-	vector<unique_ptr<GraphvisNode>> nodes;
-	vector<unique_ptr<GraphvizConnection>> edges;
+	vector<GraphvisNode*> nodes;
+	vector<GraphvizConnection*> edges;
 
 	graphviz_dfs(root, nodes, edges);
 
 	for (size_t i = 0; i < nodes.size(); i++)
 	{
-		unique_ptr<GraphvisNode> node = move(nodes[i]);
+		GraphvisNode* node = nodes[i];
 		string node_text = node->Name + "[" + "label=" + node->Label + " shape = " + node->Shape + "];";
 		out += node_text;
 	}
 
 	for (size_t i = 0; i < edges.size(); i++)
 	{
-		unique_ptr<GraphvizConnection> edge = move(edges[i]);
+		GraphvizConnection* edge = edges[i];
 		string edge_text = edge->Id_from + ":f0 -> " + edge->Id_to + ":f0 [ id = " + to_string(edge->Id) + " label = \"" + edge->Strategy + "\"];";
 		out += edge_text;
 	}

@@ -8,7 +8,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 #include <Eigen/Dense>
 #include <iostream>
 #include <iomanip>
@@ -41,7 +40,7 @@ public:
 	//-- - Generates data for a graphical representation of a node in a public tree.
 	//-- @param node the node to generate data for
 	//-- @return a table containing `name`, `label`, and `shape` fields for graphviz
-	unique_ptr<GraphvisNode> node_to_graphviz(const Node& node);
+	GraphvisNode* node_to_graphviz(const Node& node);
 
 	//-- - Generates data for graphical representation of a public tree action as an
 	//	-- edge in a tree.
@@ -51,13 +50,13 @@ public:
 	//	-- @param child_node the public tree node that results from taking the action
 	//	-- @return a table containing fields `id_from`, `id_to`, `id` for graphviz and
 	//	--a `strategy` field to use as a label for the edge
-	unique_ptr<GraphvizConnection> nodes_to_graphviz_edge(const GraphvisNode& from, const GraphvisNode& to, const Node& node, const Node& child_node);
+	GraphvizConnection* nodes_to_graphviz_edge(const GraphvisNode& from, const GraphvisNode& to, const Node& node, const Node& child_node);
 
 	//-- - Recursively generates graphviz data from a public tree.
 	//	-- @param node the current node in the public tree
 	//	-- @param nodes a table of graphical nodes generated so far
 	//	-- @param edges a table of graphical edges generated so far
-	unique_ptr<GraphvisNode> graphviz_dfs(const Node& node, vector<unique_ptr<GraphvisNode>>& nodes, vector<unique_ptr<GraphvizConnection>>& edges);
+	GraphvisNode* graphviz_dfs(const Node& node, vector<GraphvisNode*>& nodes, vector<GraphvizConnection*>& edges);
 
 	//-- - Generates `.dot` and `.svg` image files which graphically represent
 	//	-- a game's public tree.
