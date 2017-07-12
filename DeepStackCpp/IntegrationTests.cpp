@@ -1,3 +1,4 @@
+#pragma once
 #include "IntegrationTests.h"
 #include "TreeBuilderParams.h"
 #include "card_to_string_conversion.h"

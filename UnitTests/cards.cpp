@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
-#include "..\DeepStackCpp\card_to_string_conversion.h"
+#include "card_to_string_conversion.h"
 #include <string>
 
 using namespace std;
@@ -11,6 +11,6 @@ unsigned int Factorial(unsigned int number) {
 
 TEST_CASE("card_to_string", "[factorial]") {
 	card_to_string_conversion converter;
-	string card = converter.cards_to_string(0);
+	string card = converter.card_to_string(0);
 	REQUIRE(card == "Ah");
 }
