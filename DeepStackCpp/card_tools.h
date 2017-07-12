@@ -76,7 +76,7 @@ public:
 	// Gives a numerical index for a set of board cards.
 	// @param board a non - empty vector of board cards
 	// @return the numerical index for the board
-	int card_tools::get_board_index(MatrixXf& board);
+	int card_tools::get_board_index(ArrayXf& board);
 
 	// Normalizes a range vector over hands which are valid with a given board.
 	// @param board a possibly empty vector of board cards

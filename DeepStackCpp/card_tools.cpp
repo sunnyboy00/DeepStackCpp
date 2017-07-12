@@ -9,17 +9,21 @@ card_tools::card_tools()
 	_init_board_index_table();
 }
 
-bool card_tools::hand_is_possible(ArrayXf& hand)
+bool card_tools::hand_is_possible(ArrayXf& hand) //Perfomance warning: Cant we change all ArrayXf to vectors?
 {
-	assert(hand.minCoeff() > 0 && hand.maxCoeff() <= card_count   && "Illegal cards in hand");
-	std::unordered_map<int, bool> suit_table;
+	assert(hand.minCoeff() >= 0 && hand.maxCoeff() < card_count   && "Illegal cards in hand");
+	vector<bool> cards_table(card_count);
 
-	for (int card  = 0; card < hand.cols(); card++)
+
+	for (int i = 0; i < hand.size(); i++)
 	{
-		if (suit_table[card])
+		int card = (int)hand(i);
+		if (cards_table[card]) // If this card already exists in hand
+		{
 			return false;
+		}
 
-		suit_table[card] = true;
+		cards_table[card] = true;
 	}
 
 	return true;
@@ -37,12 +41,13 @@ CardArray card_tools::get_possible_hand_indexes(ArrayXf& board)
 		return out;
 	}
 
-	ArrayXf whole_hand(board.size() + 1);
+	unsigned int newSize = board.size() + 1; //some extra space for one more element
+	ArrayXf whole_hand(newSize);
 	
-	memcpy(whole_hand.data(), board.data(), board.size() * sizeof(mainDataType)); 
+	memcpy(whole_hand.data(), board.data(), board.size() * sizeof(float));  //copy data to the beginning
 	for (int card = 0; card < card_count; card++)
 	{
-		whole_hand[whole_hand.size()] = (float)card;
+		whole_hand[newSize - 1] = (float)card; // setting last element
 		if (hand_is_possible(whole_hand))
 		{
 			out(card) = 1;
@@ -123,7 +128,7 @@ MatrixXf card_tools::get_second_round_boards()
 	if (board_card_count == 1)
 	{
 		MatrixXf out(boards_count, 1);
-		for (int card = 1; card < card_count; card++)
+		for (int card = 0; card < card_count; card++)
 		{
 			out(card, 0) = (float)card;
 		}
@@ -134,7 +139,7 @@ MatrixXf card_tools::get_second_round_boards()
 	{
 		MatrixXf out(boards_count, 2);
 		long long board_idx = 0;
-		for (int card_1 = 1; card_1 < card_count; card_1++)
+		for (int card_1 = 0; card_1 < card_count; card_1++)
 		{
 			for (int card_2 = card_1 + 1; card_2 < card_count; card_2++)
 			{
@@ -160,13 +165,13 @@ void card_tools::_init_board_index_table()
 	if (board_card_count == 1)
 	{
 		_board_index_table = MatrixXf(1, card_count);
-		_board_index_table.row(0) = ArrayXf::LinSpaced(card_count, 1.0, (float)card_count);
+		_board_index_table.row(0) = ArrayXf::LinSpaced(card_count, 0.0, (float)card_count - 1);
 	}
 	else if (board_card_count == 2)
 	{
 		_board_index_table = ArrayXXf::Constant(1, card_count, -1);
 		float board_idx = 0;
-		for (int card_1 = 1; card_1 < card_count; card_1++)
+		for (int card_1 = 0; card_1 < card_count; card_1++)
 		{
 			for (int card_2 = card_1 + 1; card_2 < card_count; card_2++)
 			{
@@ -182,19 +187,23 @@ void card_tools::_init_board_index_table()
 	}
 }
 
-int card_tools::get_board_index(MatrixXf& board)
+int card_tools::get_board_index(ArrayXf& board)
 {
-	MatrixXf index = MatrixXf(_board_index_table);
-	for (int i = 0; i < index.rows(); i++)
+	int bordsSize = board.size();
+
+	assert(bordsSize > 0 && bordsSize <= 2 && "unsupported board size");
+	if (bordsSize == 0)
 	{
-		int boardCard = (int)board(i);
-		index = index.row(boardCard);
+		return 0;
 	}
-
-	int indexValue = (int)index(0, 0);
-
-	assert(indexValue > 0 && "index should be greater than zero.");
-	return indexValue;
+	else if (bordsSize == 1)
+	{
+		return _board_index_table(0, board(0));
+	}
+	else
+	{
+		return _board_index_table(board(0), board(1));
+	}
 }
 
 CardArray card_tools::normalize_range(MatrixXf& board, CardArray& range)

@@ -41,5 +41,11 @@
     <ClCompile Include="bet_sizing.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
+    <ClCompile Include="tree_builder.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
+    <ClCompile Include="card_tools.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

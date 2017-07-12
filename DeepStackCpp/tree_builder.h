@@ -62,7 +62,7 @@ public:
 	//      -- @return the root node of the built tree
 	Node& build_tree(TreeBuilderParams& params);
 
-private:
+//private: Remove after testing
 	bet_sizing_manager* _bet_sizing_manager;
 
 	// if `true`, only build the current betting round

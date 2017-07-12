@@ -34,7 +34,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 	for (unsigned long long i = 0; next_boards_count; i++)
 	{
 		CardArray next_board = next_boards.row(i);
-		std::string next_board_string = _card_to_string.cards_to_string(next_board);
+		string next_board_string = _card_to_string.cards_to_string(next_board);
 		
 		Node* child = new Node();
 		child->node_type = inner_node;
