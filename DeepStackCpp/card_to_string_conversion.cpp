@@ -12,8 +12,9 @@ card_to_string_conversion::card_to_string_conversion()
 		string rank_name = rank_table[cardRank];
 		int cardSuit = card_to_suit(card);
 		string suit_name = suit_table[cardSuit];
-		card_to_string_table[card] = rank_name + suit_name;
-		string_to_card_table[card_to_string_table[card]] = card;
+		string cardName = rank_name + suit_name;
+		card_to_string_table[card] = cardName;
+		string_to_card_table[cardName] = card;
 	}
 }
 
@@ -32,7 +33,7 @@ inline int card_to_string_conversion::card_to_suit(int card)
 inline int card_to_string_conversion::card_to_rank(int card)
 {
 	assert(card >= 0 && card < card_count);
-	return int(floor((card - 1) / suit_count));
+	return card / suit_count;
 }
 
 string card_to_string_conversion::cards_to_string(ArrayXf cards)

@@ -24,11 +24,11 @@ public:
 
 	// Holds the string representation for every possible card, indexed by its
 	// numeric representation.
-	std::unordered_map<int, std::string> card_to_string_table;
+	std::unordered_map<int, string> card_to_string_table;
 
 	// Holds the numeric representation for every possible card, indexed by its
 	// string representation.
-	std::unordered_map<std::string, int> string_to_card_table;
+	std::unordered_map<string, int> string_to_card_table;
 
 	card_to_string_conversion();
 
