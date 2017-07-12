@@ -1,4 +1,6 @@
 #pragma once
+#pragma warning(disable:4554) 
+
 #include "Constants.h"
 #include <Eigen/Dense>
 #include <vector>

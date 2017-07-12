@@ -1,5 +1,5 @@
 #include "bet_sizing.h"
-#include "Tests.h"
+#include "IntegrationTests.h"
 
 //
 //#include <iostream>
@@ -137,7 +137,7 @@ using Eigen::VectorXf;
 
 int main(int argc, char **argv)
 {
-	Tests::test_tree_visualiser();
+	IntegrationTests::test_tree_visualiser();
 
 //	VectorXf c;
 //	bet_sizing_manager b;

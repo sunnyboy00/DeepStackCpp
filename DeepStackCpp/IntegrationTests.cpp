@@ -1,4 +1,4 @@
-#include "Tests.h"
+#include "IntegrationTests.h"
 #include "TreeBuilderParams.h"
 #include "card_to_string_conversion.h"
 #include "Node.h"
@@ -7,7 +7,7 @@
 #include "tree_builder.h"
 #include "TreeVisualizer.h"
 
-void Tests::test_tree_builder()
+void IntegrationTests::test_tree_builder()
 {
 	TreeBuilderParams params;
 	Node node;
@@ -23,7 +23,7 @@ void Tests::test_tree_builder()
 	Node& tree = builder.build_tree(params);
 }
 
-void Tests::test_tree_visualiser()
+void IntegrationTests::test_tree_visualiser()
 {
 	TreeBuilderParams params;
 	Node node;

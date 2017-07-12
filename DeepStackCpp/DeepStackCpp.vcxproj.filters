@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Tree">
       <UniqueIdentifier>{c7b1ab93-e993-48be-85d7-2207d60a21f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Tests">
+      <UniqueIdentifier>{980106d2-db98-41fe-9c48-ee8a75865b0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests">
+      <UniqueIdentifier>{e20aeee6-3f36-4d0d-87d5-e255f3dfdfb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -75,9 +81,6 @@
     <ClInclude Include="TreeBuilderParams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TreeVisualizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="GraphvizConnection.h">
       <Filter>Header Files\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegrationTests.h">
+      <Filter>Header Files\Tests</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -113,14 +119,14 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TreeBuilderParams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TreeVisualizer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IntegrationTests.cpp">
+      <Filter>Source Files\Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

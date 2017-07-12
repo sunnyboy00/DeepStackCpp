@@ -37,9 +37,9 @@ public:
 	// @return the index of the suit
 	static inline int card_to_suit(int card);
 
-	/*-- - Gets the rank of a card.
-	-- @param card the numeric representation of the card
-	-- @return the index of the rank*/
+	//-- Gets the rank of a card.
+	//-- @param card the numeric representation of the card
+	// -- @return the index of the rank
 	static inline int card_to_rank(int card);
 
 	// Converts a card's numeric representation to its string representation.
