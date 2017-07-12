@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Leduc">
+      <UniqueIdentifier>{2ac18558-2dc4-437d-ab61-98126f274220}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -32,8 +35,11 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LeducCardsConvertion.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="cards_convertion.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
+    <ClCompile Include="bet_sizing.cpp">
+      <Filter>Source Files\Leduc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

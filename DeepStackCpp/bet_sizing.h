@@ -3,6 +3,7 @@
 #include "Node.h"
 #include "arguments.h"
 #include "game_settings.h"
+#include "Windows.h"
 #include <algorithm> 
 #include <memory>
 
@@ -13,6 +14,7 @@ using namespace std;
 class bet_sizing_manager
 {
 public:
+	bet_sizing_manager();
 
 	// Constructor
 	// @param pot_fractions a list of fractions of the pot which are allowed

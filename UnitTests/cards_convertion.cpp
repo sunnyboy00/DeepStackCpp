@@ -5,11 +5,6 @@
 
 using namespace std;
 
-unsigned int Factorial(unsigned int number) {
-	return number <= 1 ? number : Factorial(number - 1)*number;
-}
-
-
 TEST_CASE("card_to_suit") {
 	card_to_string_conversion converter;
 	REQUIRE(converter.card_to_suit(0) == 0);

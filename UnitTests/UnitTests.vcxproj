@@ -166,7 +166,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LeducCardsConvertion.cpp" />
+    <ClCompile Include="bet_sizing.cpp" />
+    <ClCompile Include="cards_convertion.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

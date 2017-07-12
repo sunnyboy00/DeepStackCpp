@@ -1,6 +1,6 @@
 #include "bet_sizing.h"
 
-bet_sizing_manager::bet_sizing_manager(VectorXf pot_fractions = VectorXf())
+bet_sizing_manager::bet_sizing_manager(VectorXf pot_fractions)
 {
 	_pot_fractions = pot_fractions;
 
@@ -10,6 +10,8 @@ bet_sizing_manager::bet_sizing_manager(VectorXf pot_fractions = VectorXf())
 		_pot_fractions.setOnes();
 	}
 }
+
+bet_sizing_manager::bet_sizing_manager() : bet_sizing_manager(VectorXf()) {}
 
 ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 {
@@ -28,6 +30,7 @@ ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 	min_raise_size = min(max_raise_size, min_raise_size);
 	if (min_raise_size == 0)
 	{
+		DebugBreak();
 		ArrayX2f ar;
 		return ar;
 	}
