@@ -170,6 +170,7 @@
     <ClInclude Include="game_settings.h" />
     <ClInclude Include="GraphvizConnection.h" />
     <ClInclude Include="GraphvizNode.h" />
+    <ClInclude Include="LeducEvaluator.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="DeepStackCpp.cpp" />
+    <ClCompile Include="LeducEvaluator.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="strategy_filling.cpp" />
