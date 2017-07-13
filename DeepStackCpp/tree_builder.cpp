@@ -72,9 +72,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 
 	children.push_back(fold_node);
 
-
 	//2.0 check action
-	//Warning: why only if cur_player == P1. What about check for p2?
 	if (parent_node.current_player == P1 && (parent_node.bets(0) == parent_node.bets(1)))
 	{
 		Node* check_node = new Node();

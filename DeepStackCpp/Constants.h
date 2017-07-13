@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+#include <string>
 
 //  - Various constants used in DeepStack.
 //  @module constants
@@ -18,7 +20,9 @@ enum players { chance = 0, P1 = 1, P2 = 2 };
 // @field chance_node(node for the chance player) `0`
 // @field check(node following check) `-1`
 // @field inner_node(any other node) `2`
-enum node_types { terminal_fold = -2, terminal_call = -1, check = -1, chance_node = 0, inner_node = 1 };
+enum node_types { uninitialized = -100, terminal_fold = -2, terminal_call = -1, check = -1, chance_node = 0, inner_node = 1 };
+
+
 
 //  IDs for fold and check/call actions
 enum actions { fold = -2, ccall = -1 };

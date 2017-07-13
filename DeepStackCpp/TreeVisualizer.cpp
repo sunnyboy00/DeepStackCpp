@@ -104,7 +104,7 @@ GraphvisNode* TreeVisualizer::node_to_graphviz(const Node & node)
 	else
 	{
 		string betOneStr = string_format("%.0f", node.bets(P1 - 1));
-		string betTwoStr = string_format("%.0f", node.bets(P2 - 2));
+		string betTwoStr = string_format("%.0f", node.bets(P2 - 1));
 
 		out->Label += "| bet1: " + betOneStr + "| bet2: " + betTwoStr;
 
