@@ -41,7 +41,7 @@ CardArray card_tools::get_possible_hand_indexes(ArrayXf& board)
 		return out;
 	}
 
-	unsigned int newSize = board.size() + 1; //some extra space for one more element
+	int newSize = (int)board.size() + 1; //some extra space for one more element
 	ArrayXf whole_hand(newSize);
 	
 	memcpy(whole_hand.data(), board.data(), board.size() * sizeof(float));  //copy data to the beginning
@@ -189,7 +189,7 @@ void card_tools::_init_board_index_table()
 
 int card_tools::get_board_index(ArrayXf& board)
 {
-	int bordsSize = board.size();
+	int bordsSize = (int)board.size();
 
 	assert(bordsSize > 0 && bordsSize <= 2 && "unsupported board size");
 	if (bordsSize == 0)
@@ -198,18 +198,18 @@ int card_tools::get_board_index(ArrayXf& board)
 	}
 	else if (bordsSize == 1)
 	{
-		return _board_index_table(0, board(0));
+		return (int)_board_index_table(0, (int)board(0));
 	}
 	else
 	{
-		return _board_index_table(board(0), board(1));
+		return (int)_board_index_table((int)board(0), (int)board(1));
 	}
 }
 
-CardArray card_tools::normalize_range(MatrixXf& board, CardArray& range)
+CardArray card_tools::normalize_range(ArrayXf& board, CardArray& range)
 {
-	MatrixXf rangeM = MatrixXf(range);
-	MatrixXf mask = MatrixXf(_board_index_table);
+	ArrayXf rangeM = ArrayXf(range);
+	ArrayXf mask = get_possible_hand_indexes(board);
 	CardArray out = rangeM * mask;
 
 	auto sum = out.sum();

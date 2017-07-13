@@ -137,6 +137,7 @@ TEST_CASE("get_second_round_boards")
 	REQUIRE(boards(5, 0) == 5);
 	REQUIRE(boards.rows() == card_count);
 }
+
 TEST_CASE("get_board_index")
 {
 	card_tools cardTools;
@@ -152,4 +153,20 @@ TEST_CASE("get_board_index")
 
 	index = cardTools.get_board_index(board2);
 	REQUIRE(index == 0);
+}
+
+TEST_CASE("normalize_range")
+{
+	card_tools cardTools;
+
+	ArrayXf board1(0);
+
+	CardArray uniformRange = cardTools.get_uniform_range(board1);
+
+	ArrayXf board2(1);
+	board2 << 3;
+
+	ArrayXf resultRange = cardTools.normalize_range(board2, uniformRange);
+	REQUIRE(resultRange.sum() == 1.0);
+	REQUIRE(resultRange(3) == 0.0);
 }

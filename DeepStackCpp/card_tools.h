@@ -83,7 +83,7 @@ public:
 	// @param range a range vector
 	// @return a modified version of `range` where each invalid hand is given 0
 	//probability and the vector is normalized
-	CardArray normalize_range(MatrixXf& board, CardArray& range);
+	CardArray normalize_range(ArrayXf& board, CardArray& range);
 
 private:
 
