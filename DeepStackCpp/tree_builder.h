@@ -63,7 +63,7 @@ public:
 	Node& build_tree(TreeBuilderParams& params);
 
 //private: Remove after testing
-	bet_sizing_manager* _bet_sizing_manager;
+	bet_sizing_manager _bet_sizing_manager;
 
 	// if `true`, only build the current betting round
 	bool _limit_to_street;

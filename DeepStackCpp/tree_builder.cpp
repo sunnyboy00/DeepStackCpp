@@ -1,11 +1,8 @@
 #include "tree_builder.h"
 
 
-tree_builder::tree_builder()
+tree_builder::tree_builder()//: _card_tools(), _card_to_string(), _bet_sizing_manager()
 {
-	_card_tools = card_tools();
-	_card_to_string = card_to_string_conversion();
-
 }
 
 vector<Node*> tree_builder::_get_children_nodes_transition_call(Node& parent_node)
@@ -26,14 +23,14 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 	}
 
 	MatrixXf next_boards = _card_tools.get_second_round_boards();
-	long long next_boards_count = next_boards.rows();
+	size_t next_boards_count = next_boards.rows();
 
 	long long subtree_height = -1;
 	auto children = vector<Node*>();
 	//1.0 iterate over the next possible boards to build the corresponding subtrees
-	for (unsigned long long i = 0; next_boards_count; i++)
+	for (size_t i = 0; i < next_boards_count; i++)
 	{
-		CardArray next_board = next_boards.row(i);
+		ArrayXf next_board = next_boards.row(i);
 		string next_board_string = _card_to_string.cards_to_string(next_board);
 		
 		Node* child = new Node();
@@ -56,7 +53,7 @@ void tree_builder::_fill_additional_attributes(Node& node)
 	node.pot =(long long)node.bets.minCoeff();
 }
 
-vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
+vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 {
 	assert(parent_node.current_player != chance);
 
@@ -126,9 +123,9 @@ vector<Node*> tree_builder::_get_children_player_node(Node & parent_node)
 	}
 	
 	//3.0 bet actions  
-	ArrayX2f possible_bets = _bet_sizing_manager->get_possible_bets(parent_node);
+	ArrayX2f possible_bets = _bet_sizing_manager.get_possible_bets(parent_node);
 
-	if (possible_bets.rows() != 0)
+	if (possible_bets.rows() > 0)
 	{
 		assert(possible_bets.cols() == players_count);
 
@@ -227,7 +224,7 @@ Node& tree_builder::build_tree(TreeBuilderParams& params)
 		params.bet_sizing = params.bet_sizing;
 	}
 
-	_bet_sizing_manager = new bet_sizing_manager(params.bet_sizing);
+	_bet_sizing_manager.SetPotFraction(params.bet_sizing);
 
 	assert(params.bet_sizing.size() != 0);
 	_bet_sizing = params.bet_sizing;

@@ -31,6 +31,9 @@ public:
 	// containing N sets of new commitment levels for each player.
 	ArrayX2f get_possible_bets(Node& node);
 
+	// Sets new _pot_fractions value
+	void SetPotFraction(VectorXf& potFractions);
+
 
 private:
 	VectorXf _pot_fractions;

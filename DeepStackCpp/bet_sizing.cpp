@@ -11,7 +11,7 @@ bet_sizing_manager::bet_sizing_manager(VectorXf pot_fractions)
 	}
 }
 
-bet_sizing_manager::bet_sizing_manager() : bet_sizing_manager(VectorXf()) {}
+bet_sizing_manager::bet_sizing_manager() : bet_sizing_manager(bet_sizing) {}
 
 ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 {
@@ -30,7 +30,7 @@ ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 	min_raise_size = min(max_raise_size, min_raise_size);
 	if (min_raise_size == 0)
 	{
-		DebugBreak();
+		//DebugBreak();
 		ArrayX2f ar;
 		return ar;
 	}
@@ -71,6 +71,11 @@ ArrayX2f bet_sizing_manager::get_possible_bets(Node& node)
 		out.conservativeResize(used_bets_count, player_count);
 		return out;
 	}
+}
+
+void bet_sizing_manager::SetPotFraction(VectorXf& potFractions)
+{
+	_pot_fractions = potFractions;
 }
 
 

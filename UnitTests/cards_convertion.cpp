@@ -38,3 +38,26 @@ TEST_CASE("card_to_string") {
 	REQUIRE(converter.card_to_string(4) == "Qh");
 	REQUIRE(converter.card_to_string(5) == "Qs");
 }
+
+TEST_CASE("cards_to_string") {
+	card_to_string_conversion converter;
+	ArrayXf cards(2);
+	cards << 0, 3;
+	REQUIRE(converter.cards_to_string(cards) == "AhKs");
+}
+
+TEST_CASE("string_to_card") {
+	card_to_string_conversion converter;
+	REQUIRE(converter.string_to_card("Ah") == 0);
+	REQUIRE(converter.string_to_card("As") == 1);
+	REQUIRE(converter.string_to_card("Kh") == 2);
+	REQUIRE(converter.string_to_card("Ks") == 3);
+	REQUIRE(converter.string_to_card("Qh") == 4);
+	REQUIRE(converter.string_to_card("Qs") == 5);
+}
+
+TEST_CASE("string_to_board") {
+	card_to_string_conversion converter;
+	ArrayXf result = converter.string_to_board("Qh");
+	REQUIRE(result(0) == 4);
+}

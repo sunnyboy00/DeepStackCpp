@@ -44,7 +44,7 @@ string card_to_string_conversion::cards_to_string(ArrayXf cards)
 	//}
 
 	std::string  out = "";
-	for (int card = 0; card < cards.count(); card++)
+	for (int card = 0; card < cards.size(); card++)
 	{
 		int curCard = (int)cards(card);
 		out += card_to_string(curCard);
