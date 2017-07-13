@@ -87,12 +87,12 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		children.push_back(check_node);
 	}
 
-	//transition call
+	// Transition call. That is any not terminal call i.e. any call not on the last street becase after any of this call the chance occur(flop, turn, river).
 	else if (
 		(parent_node.street == 1) &&
 		(
-			(parent_node.current_player == P2 && parent_node.bets(0) == parent_node.bets(1)) &&
-			(parent_node.bets(0) != parent_node.bets(1) && parent_node.bets.maxCoeff() < stack))
+			(parent_node.current_player == P2 && parent_node.bets(0) == parent_node.bets(1)) || // If now is player 2 turn and bets are equal - call will not be terminal
+			(parent_node.bets(0) != parent_node.bets(1) && parent_node.bets.maxCoeff() < stack)) // Or bets are not equal and less then stack size - call will not be terminal
 		)
 	{
 		Node* chnce_node = new Node();
