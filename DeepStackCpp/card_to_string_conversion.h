@@ -24,34 +24,34 @@ public:
 
 	// Holds the string representation for every possible card, indexed by its
 	// numeric representation.
-	std::unordered_map<int, string> card_to_string_table;
+	unordered_map<int, string> card_to_string_table;
 
 	// Holds the numeric representation for every possible card, indexed by its
 	// string representation.
-	std::unordered_map<string, int> string_to_card_table;
+	unordered_map<string, int> string_to_card_table;
 
 	card_to_string_conversion();
-
-	// Gets the suit of a card.
-	// @param card the numeric representation of the card
-	// @return the index of the suit
-	static inline int card_to_suit(int card);
 
 	//-- Gets the rank of a card.
 	//-- @param card the numeric representation of the card
 	// -- @return the index of the rank
-	static inline int card_to_rank(int card);
+	inline int card_to_rank(int card);
+
+	// Gets the suit of a card.
+	// @param card the numeric representation of the card
+	// @return the index of the suit
+	inline int card_to_suit(int card);
 
 	// Converts a card's numeric representation to its string representation.
 	// @param card the numeric representation of a card
 	// @return the string representation of the card
-	inline std::string card_to_string(int card);
+	inline string card_to_string(int card);
 
 	// Converts several cards' numeric representations to their string 
 	//representations.
 	// @param cards a vector of numeric representations of cards
 	// @return a string containing each card's string representation, concatenated
-	std::string cards_to_string(ArrayXf cards);
+	string cards_to_string(ArrayXf cards);
 
 	// Converts a card's string representation to its numeric representation.
 	// @param card_string the string representation of a card

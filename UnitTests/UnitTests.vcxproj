@@ -169,6 +169,7 @@
     <ClCompile Include="bet_sizing.cpp" />
     <ClCompile Include="cards_convertion.cpp" />
     <ClCompile Include="card_tools.cpp" />
+    <ClCompile Include="leduc_evaluator.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="tree_builder.cpp" />
   </ItemGroup>
