@@ -9,7 +9,7 @@ card_tools::card_tools()
 	_init_board_index_table();
 }
 
-bool card_tools::hand_is_possible(ArrayXf& hand) //Perfomance warning: Cant we change all ArrayXf to vectors?
+bool card_tools::hand_is_possible(const ArrayXf& hand) // Perfomance warning: Cant we change all ArrayXf to vectors?
 {
 	assert(hand.minCoeff() >= 0 && hand.maxCoeff() < card_count   && "Illegal cards in hand");
 	vector<bool> cards_table(card_count);
@@ -29,7 +29,7 @@ bool card_tools::hand_is_possible(ArrayXf& hand) //Perfomance warning: Cant we c
 	return true;
 }
 
-CardArray card_tools::get_possible_hand_indexes(ArrayXf& board)
+CardArray card_tools::get_possible_hand_indexes(const ArrayXf& board)
 {
 	CardArray out = CardArray();
 
@@ -57,7 +57,7 @@ CardArray card_tools::get_possible_hand_indexes(ArrayXf& board)
 	return out;
 }
 
-CardArray card_tools::get_impossible_hand_indexes(ArrayXf& board)
+CardArray card_tools::get_impossible_hand_indexes(const ArrayXf& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out -= 1;
@@ -65,14 +65,14 @@ CardArray card_tools::get_impossible_hand_indexes(ArrayXf& board)
 	return out;
 }
 
-CardArray card_tools::get_uniform_range(ArrayXf& board)
+CardArray card_tools::get_uniform_range(const ArrayXf& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out /= out.sum();
 	return out;
 }
 
-CardArray card_tools::get_random_range(ArrayXf& board, int seed = -1)
+CardArray card_tools::get_random_range(const ArrayXf& board, int seed = -1)
 {
 	if (seed == -1)
 		srand((unsigned int)time(NULL));
@@ -89,7 +89,7 @@ CardArray card_tools::get_random_range(ArrayXf& board, int seed = -1)
 	return out;
 }
 
-bool card_tools::is_valid_range(CardArray& range, ArrayXf& board)
+bool card_tools::is_valid_range(const CardArray& range, const  ArrayXf& board)
 {
 	CardArray impossibleCards = get_impossible_hand_indexes(board);
 	CardArray check = range * impossibleCards;
@@ -98,7 +98,7 @@ bool card_tools::is_valid_range(CardArray& range, ArrayXf& board)
 	return only_possible_hands && sums_to_one;
 }
 
-int card_tools::board_to_street(ArrayXf board)
+int card_tools::board_to_street(const ArrayXf& board)
 {
 	if (board.size() == 0)
 		return 1;
@@ -187,7 +187,7 @@ void card_tools::_init_board_index_table()
 	}
 }
 
-int card_tools::get_board_index(ArrayXf& board)
+int card_tools::get_board_index(const ArrayXf& board)
 {
 	int bordsSize = (int)board.size();
 
@@ -206,7 +206,7 @@ int card_tools::get_board_index(ArrayXf& board)
 	}
 }
 
-CardArray card_tools::normalize_range(ArrayXf& board, CardArray& range)
+CardArray card_tools::normalize_range(const ArrayXf& board, CardArray& range)
 {
 	ArrayXf rangeM = ArrayXf(range);
 	ArrayXf mask = get_possible_hand_indexes(board);

@@ -47,5 +47,11 @@
     <ClCompile Include="card_tools.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
+    <ClCompile Include="leduc_evaluator.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
+    <ClCompile Include="terminal_equity.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

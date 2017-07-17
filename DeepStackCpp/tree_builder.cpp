@@ -5,7 +5,7 @@ tree_builder::tree_builder()//: _card_tools(), _card_to_string(), _bet_sizing_ma
 {
 }
 
-vector<Node*> tree_builder::_get_children_nodes_transition_call(Node& parent_node)
+vector<Node*> tree_builder::_get_children_nodes_transition_call(const Node& parent_node)
 {
 	Node* chance_node = new Node(parent_node);
 	chance_node->current_player = chance;

@@ -171,6 +171,7 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="leduc_evaluator.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="tree_builder.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

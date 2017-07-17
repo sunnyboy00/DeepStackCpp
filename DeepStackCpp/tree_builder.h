@@ -80,7 +80,7 @@ public:
 	// rounds.
 	// @param parent_node the node at which the transition call happens
 	// @return a list containing the child node
-	vector<Node*>_get_children_nodes_transition_call(Node& parent_node);
+	vector<Node*>_get_children_nodes_transition_call(const Node& parent_node);
 
 	// Creates the children nodes after a chance node.
 	// @param parent_node the chance node

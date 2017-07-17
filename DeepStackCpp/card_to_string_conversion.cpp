@@ -1,7 +1,8 @@
 #include "card_to_string_conversion.h"
 #include <assert.h>
 
-string const card_to_string_conversion::suit_table[] = { "h", "s", "c", "d" };
+//string const card_to_string_conversion::suit_table[] = { "h", "s", "c", "d" };
+string const card_to_string_conversion::suit_table[] = { "s", "h", "c", "d" }; // Suits are calculated out of order in the original implimentation. Changing the order to get the same results.
 string const card_to_string_conversion::rank_table[] = { "A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2" };
 
 card_to_string_conversion::card_to_string_conversion()
@@ -38,11 +39,6 @@ inline int card_to_string_conversion::card_to_suit(int card)
 
 string card_to_string_conversion::cards_to_string(ArrayXf cards)
 {
-	//if (cards.size() == 0)
-	//{
-	//	return "";
-	//}
-
 	std::string  out = "";
 	for (int card = 0; card < cards.size(); card++)
 	{

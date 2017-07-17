@@ -34,35 +34,35 @@ TEST_CASE("card_to_rank")
 TEST_CASE("card_to_string")
 {
 	card_to_string_conversion converter;
-	REQUIRE(converter.card_to_string(0) == "Ah");
-	REQUIRE(converter.card_to_string(1) == "As");
-	REQUIRE(converter.card_to_string(2) == "Kh");
-	REQUIRE(converter.card_to_string(3) == "Ks");
-	REQUIRE(converter.card_to_string(4) == "Qh");
-	REQUIRE(converter.card_to_string(5) == "Qs");
+	REQUIRE(converter.card_to_string(0) == "As");
+	REQUIRE(converter.card_to_string(1) == "Ah");
+	REQUIRE(converter.card_to_string(2) == "Ks");
+	REQUIRE(converter.card_to_string(3) == "Kh");
+	REQUIRE(converter.card_to_string(4) == "Qs");
+	REQUIRE(converter.card_to_string(5) == "Qh");
 }
 
 TEST_CASE("cards_to_string") {
 	card_to_string_conversion converter;
 	ArrayXf cards(2);
 	cards << 0, 3;
-	REQUIRE(converter.cards_to_string(cards) == "AhKs");
+	REQUIRE(converter.cards_to_string(cards) == "AsKh");
 }
 
 TEST_CASE("string_to_card")
 {
 	card_to_string_conversion converter;
-	REQUIRE(converter.string_to_card("Ah") == 0);
-	REQUIRE(converter.string_to_card("As") == 1);
-	REQUIRE(converter.string_to_card("Kh") == 2);
-	REQUIRE(converter.string_to_card("Ks") == 3);
-	REQUIRE(converter.string_to_card("Qh") == 4);
-	REQUIRE(converter.string_to_card("Qs") == 5);
+	REQUIRE(converter.string_to_card("As") == 0);
+	REQUIRE(converter.string_to_card("Ah") == 1);
+	REQUIRE(converter.string_to_card("Ks") == 2);
+	REQUIRE(converter.string_to_card("Kh") == 3);
+	REQUIRE(converter.string_to_card("Qs") == 4);
+	REQUIRE(converter.string_to_card("Qh") == 5);
 }
 
 TEST_CASE("string_to_board")
 {
 	card_to_string_conversion converter;
-	ArrayXf result = converter.string_to_board("Qh");
+	ArrayXf result = converter.string_to_board("Qs");
 	REQUIRE(result(0) == 4);
 }

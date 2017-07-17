@@ -52,7 +52,6 @@ ArrayXf LeducEvaluator::evaluate(ArrayXf hand, ArrayXf impossible_hand_value)
 {
 	assert(hand.maxCoeff() <= card_count && hand.minCoeff() >= 0 && "hand does not correspond to any cards");
 
-	// impossible_hand_value = impossible_hand_value or -1
 	if (!_card_tools.hand_is_possible(hand))
 	{
 		return impossible_hand_value;
@@ -113,3 +112,10 @@ ArrayXf LeducEvaluator::batch_eval(ArrayXf board, ArrayXf impossible_hand_value)
 	return hand_values;
 }
 
+// Warning is it ok to use -1 as DEFAULT_IMPOSSIBLE_HAND_VALUE?
+ArrayXf LeducEvaluator::batch_eval(ArrayXf board)
+{
+	ArrayXf impossible_hand_value(1);
+	impossible_hand_value << DEFAULT_IMPOSSIBLE_HAND_VALUE;
+	return batch_eval(board, impossible_hand_value);
+}
