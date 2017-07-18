@@ -72,20 +72,23 @@
     <ClInclude Include="Node.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
-    <ClInclude Include="TreeBuilderParams.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TreeVisualizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GraphvizNode.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
     <ClInclude Include="GraphvizConnection.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
+    <ClInclude Include="TreeBuilderParams.h">
+      <Filter>Header Files\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeVisualizer.h">
+      <Filter>Header Files\Tree</Filter>
+    </ClInclude>
     <ClInclude Include="LeducEvaluator.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="terminal_equity.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -113,14 +116,17 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="TreeBuilderParams.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TreeVisualizer.cpp">
+    <ClCompile Include="terminal_equity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LeducEvaluator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeBuilderParams.cpp">
+      <Filter>Source Files\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeVisualizer.cpp">
+      <Filter>Source Files\Tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

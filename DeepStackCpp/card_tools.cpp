@@ -122,7 +122,7 @@ long long card_tools::get_boards_count()
 	}
 }
 
-MatrixXf card_tools::get_second_round_boards()
+ArrayXXf card_tools::get_second_round_boards()
 {
 	long long boards_count = get_boards_count();
 	if (board_card_count == 1)

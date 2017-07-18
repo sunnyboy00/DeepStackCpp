@@ -128,7 +128,7 @@ TEST_CASE("get_boards_count")
 TEST_CASE("get_second_round_boards")
 {
 	card_tools cardTools;
-	MatrixXf boards = cardTools.get_second_round_boards();
+	ArrayXXf boards = cardTools.get_second_round_boards();
 	REQUIRE(boards(0, 0) == 0);
 	REQUIRE(boards(1, 0) == 1);
 	REQUIRE(boards(2, 0) == 2);

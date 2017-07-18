@@ -22,7 +22,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 		return vector<Node*>();
 	}
 
-	MatrixXf next_boards = _card_tools.get_second_round_boards();
+	ArrayXXf next_boards = _card_tools.get_second_round_boards();
 	size_t next_boards_count = next_boards.rows();
 
 	long long subtree_height = -1;

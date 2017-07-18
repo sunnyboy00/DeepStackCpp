@@ -25,7 +25,6 @@ long long GetStrenPositionByEval(string cardOne, string cardTwo)
 	return (long long)res(0);
 }
 
-
 TEST_CASE("evaluate_with_two_card_hand")
 {
 	REQUIRE(GetStrenPositionByEval("As", "Ah") == GetStrenPositionByEval("Ah", "As"));
@@ -42,6 +41,10 @@ TEST_CASE("evaluate_with_two_card_hand")
 	REQUIRE(GetStrenPositionByEval("As", "Kh") < GetStrenPositionByEval("As", "Qh"));
 	REQUIRE(GetStrenPositionByEval("Ks", "Qh") > GetStrenPositionByEval("Qh", "As"));
 	REQUIRE(GetStrenPositionByEval("Qh", "Ah") < GetStrenPositionByEval("Qh", "Ks"));
+
+	REQUIRE(GetStrenPositionByEval("Ah", "Kh") > GetStrenPositionByEval("Ks", "Kh"));
+	REQUIRE(GetStrenPositionByEval("Kh", "Ks") < GetStrenPositionByEval("Qs", "Qh"));
+
 }
 
 ArrayXf GetBatchEvalVector(string boardCard)

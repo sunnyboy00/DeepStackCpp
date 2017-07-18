@@ -36,7 +36,6 @@ public:
 
 	//-- - Gives strength representations for all private hands on the given board.
 	//	-- @param board a possibly empty vector of board cards
-	//	-- @param impossible_hand_value the value to assign to hands which are invalid
 	//	-- on the board
 	//	-- @return a vector containing a strength value or `impossible_hand_value` for
 	//	--every private hand.

@@ -8,6 +8,8 @@ LeducEvaluator::LeducEvaluator()
 
 long long LeducEvaluator::evaluate_two_card_hand(Array2f hand_ranks)
 {
+	hand_ranks += 1; //ToDo: performance warning to review. added this line.
+
 	////--check for the pair
 	long long hand_value;
 
@@ -27,6 +29,8 @@ long long LeducEvaluator::evaluate_two_card_hand(Array2f hand_ranks)
 
 long long LeducEvaluator::evaluate_three_card_hand(Array2f hand_ranks)
 {
+	hand_ranks += 1;
+
 	long long hand_value;
 	// //--check for the pair
 	if (hand_ranks(0) == hand_ranks(1))
@@ -116,6 +120,6 @@ ArrayXf LeducEvaluator::batch_eval(ArrayXf board, ArrayXf impossible_hand_value)
 ArrayXf LeducEvaluator::batch_eval(ArrayXf board)
 {
 	ArrayXf impossible_hand_value(1);
-	impossible_hand_value << DEFAULT_IMPOSSIBLE_HAND_VALUE;
+	impossible_hand_value << (float)DEFAULT_IMPOSSIBLE_HAND_VALUE;
 	return batch_eval(board, impossible_hand_value);
 }

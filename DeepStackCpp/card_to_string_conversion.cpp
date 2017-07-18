@@ -56,6 +56,7 @@ inline int card_to_string_conversion::string_to_card(string card_string)
 	return card;
 }
 
+//Warning: return by value? Perf degradation? ToDo:Review
 ArrayXf card_to_string_conversion::string_to_board(string card_string)
 {
 	if (card_string == "")

@@ -67,7 +67,7 @@ public:
 	// Gives all possible sets of board cards for the game.
 	// @return an NxK tensor, where N is the number of possible boards, and K is
 	// the number of cards on each board
-	MatrixXf get_second_round_boards();
+	ArrayXXf get_second_round_boards();
 
 	// Initializes the board index table.
 	// @local
