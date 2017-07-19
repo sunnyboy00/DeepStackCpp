@@ -34,7 +34,6 @@ void terminal_equity::_set_call_matrix(const ArrayXf & board)
 			ArrayXf nextBoard = next_round_boards.row(board);
 			get_last_round_call_matrix(nextBoard, next_round_equity_matrix);
 			_equity_matrix += next_round_equity_matrix;
-			cout << _equity_matrix << "\n" << "\n";
 		}
 
 		//--averaging the values in the call matrix
@@ -58,18 +57,54 @@ void terminal_equity::_set_fold_matrix(const ArrayXf & board)
 	_fold_matrix = ArrayXXf(card_count, card_count);
 	_fold_matrix.fill(1);
 	// --setting cards that block each other to zero - exactly elements on diagonal in leduc variants
-	_fold_matrix -= (ArrayXXf)MatrixXf::Identity(card_count, card_count);
+	_fold_matrix -= MatrixXf::Identity(card_count, card_count).array();
 	_handle_blocking_cards(_fold_matrix, board);
+}
+
+void terminal_equity::call_value(const MatrixXf & ranges, MatrixXf & result)
+{
+	result.noalias() = ranges * _equity_matrix.matrix();// ToDo: check performance without no alias
+}
+
+void terminal_equity::fold_value(const MatrixXf & ranges, MatrixXf & result)
+{
+	result.noalias() = ranges * _fold_matrix.matrix();
+}
+
+MatrixXf terminal_equity::get_call_matrix()
+{
+	return _equity_matrix.matrix();
+}
+
+void terminal_equity::tree_node_call_value(const MatrixXf& ranges, MatrixXf& result)
+{
+	//ToDo: performance warning maybe just call_value and swap rows? Or Maps as below commented out will be faster?
+	MatrixXf tempResult(result.rows(), result.cols());
+	call_value(ranges, tempResult);
+	result.row(0) = tempResult.row(1);
+	result.row(1) = tempResult.row(0);
+	//result.row(0) = Map<MatrixXf>(tempResult.row(1).data(), 1, ranges.cols());
+	//result.row(1) = Map<MatrixXf>(tempResult.row(0).data(), 1, ranges.cols());
+}
+
+void terminal_equity::tree_node_fold_value(const MatrixXf & ranges, MatrixXf & result, int folding_player)
+{
+	MatrixXf tempResult(result.rows(), result.cols());
+	fold_value(ranges, tempResult);
+	result.row(0) = tempResult.row(1);
+	result.row(1) = tempResult.row(0);
+
+	result.row(folding_player - 1) *= -1;
 }
 
 void terminal_equity::_handle_blocking_cards(ArrayXXf& equity_matrix, const ArrayXf& board)
 {
 	RowVectorXf possible_hand_indexes_1(_cardTools.get_possible_hand_indexes(board));
 	//ArrayXXf possible_hand_matrix = possible_hand_indexes.replicate(card_count, 1); remove
-	equity_matrix *= (ArrayXXf)possible_hand_indexes_1.replicate(card_count, 1);
+	equity_matrix *= possible_hand_indexes_1.replicate(card_count, 1).array();
 
 	VectorXf possible_hand_indexes_2(possible_hand_indexes_1);
-	equity_matrix *= (ArrayXXf)possible_hand_indexes_2.replicate(1, card_count);
+	equity_matrix *= possible_hand_indexes_2.replicate(1, card_count).array();
 }
 
 void terminal_equity::get_last_round_call_matrix(const ArrayXf& board_cards, ArrayXXf& call_matrix)

@@ -2,6 +2,8 @@
 #include "terminal_equity.h"
 #include <iostream>
 
+const float myEps = 0.001f;
+
 float GetMatrixVal(string me, string other, ArrayXXf matrix)
 {
 	card_to_string_conversion converter;
@@ -90,7 +92,6 @@ TEST_CASE("_call_matrix")
 
 	term._set_call_matrix(board);
 	auto callMatrix = term._equity_matrix;
-	cout << callMatrix;
 	REQUIRE(GetMatrixVal("As", "Ah", callMatrix) == 0);
 	REQUIRE(GetMatrixVal("Ah", "As", callMatrix) == 0);
 	REQUIRE(GetMatrixVal("Ah", "Ah", callMatrix) == 0);
@@ -116,4 +117,68 @@ TEST_CASE("_call_matrix")
 	REQUIRE(GetMatrixVal("Ks", "Qs", callMatrix) == 0.5);
 	REQUIRE(GetMatrixVal("Qs", "Ks", callMatrix) == -0.5);
 	REQUIRE(GetMatrixVal("Qs", "As", callMatrix) == -0.5);
+}
+
+TEST_CASE("call_matrix_with_board")
+{
+	card_to_string_conversion converter;
+	ArrayXf board = converter.string_to_board("Qs");
+	terminal_equity term;
+
+	term._set_call_matrix(board);
+	auto callMatrix = term._equity_matrix;
+	REQUIRE(GetMatrixVal("Qs", "Ah", callMatrix) == 0);
+	REQUIRE(GetMatrixVal("As", "Qs", callMatrix) == 0);
+	REQUIRE(GetMatrixVal("Kh", "Qs", callMatrix) == 0);
+	REQUIRE(GetMatrixVal("Ks", "Qs", callMatrix) == 0);
+	REQUIRE(GetMatrixVal("Qs", "Qs", callMatrix) == 0);
+	REQUIRE(GetMatrixVal("Qh", "Qs", callMatrix) == 0);
+}
+
+TEST_CASE("tree_node_call_value")
+{
+	Matrix2Xf range(2, 6);
+	int i = 0;
+	for (size_t r = 0; r < 2; r++)
+	{
+		for (size_t k = 0; k < 6; k++)
+		{
+			range(r, k) = 0.5f / (i + 1);
+			i++;
+		}
+	}
+
+	MatrixXf result(2, 6);
+	terminal_equity term;
+	term.tree_node_call_value(range, result);
+	REQUIRE(result(0,0) == Approx(0.0963).epsilon(myEps));
+	REQUIRE(result(1,1) == Approx(0.2375).epsilon(myEps));
+	REQUIRE(result(0,3) == Approx(-0.0234).epsilon(myEps));
+	REQUIRE(result(1,3) == Approx(-0.2833).epsilon(myEps));
+	REQUIRE(result(0,4) == Approx(-0.1197).epsilon(myEps));
+	REQUIRE(result(1,4) == Approx(-0.5208).epsilon(myEps));
+}
+
+TEST_CASE("tree_node_fold_value")
+{
+	Matrix2Xf range(2, 6);
+	int i = 0;
+	for (size_t r = 0; r < 2; r++)
+	{
+		for (size_t k = 0; k < 6; k++)
+		{
+			range(r, k) = 0.5f / (i + 1);
+			i++;
+		}
+	}
+
+	MatrixXf result(2, 6);
+	terminal_equity term;
+	term.tree_node_fold_value(range, result, P2);
+	REQUIRE(result(0, 0) == Approx(0.2552).epsilon(myEps));
+	REQUIRE(result(1, 1) == Approx(-0.9750).epsilon(myEps));
+	REQUIRE(result(0, 3) == Approx(0.2766).epsilon(myEps));
+	REQUIRE(result(1, 3) == Approx(-1.10).epsilon(myEps));
+	REQUIRE(result(0, 4) == Approx(0.2810).epsilon(myEps));
+	REQUIRE(result(1, 4) == Approx(-1.1250).epsilon(myEps));
 }
