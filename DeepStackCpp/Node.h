@@ -73,7 +73,7 @@ struct Node
 	
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
-	Array2Xf ranges_absolute;
+	ArrayXXf ranges_absolute;
 
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against
@@ -88,6 +88,12 @@ struct Node
 
 	// CFV-BR values weighted by the reach prob
 	MatrixXf cfv_br_infset;
+
+	//Weighted sum card ranges
+	ArrayXf iter_weight_sum;
+
+	//Weighted current card ranges contribution;
+	ArrayXf iter_weight_contribution;
 
 	// Difference between CFV-BR and Counterfactual values = node.cfv_br_infset - node.cfv_infset
 	MatrixXf epsilon;

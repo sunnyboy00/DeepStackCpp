@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Tree">
       <UniqueIdentifier>{c7b1ab93-e993-48be-85d7-2207d60a21f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{de61f6e7-9398-4051-8879-746b0d7e4e9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -93,6 +96,9 @@
     <ClInclude Include="TreeCFR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -132,6 +138,9 @@
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
     <ClCompile Include="TreeCFR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
