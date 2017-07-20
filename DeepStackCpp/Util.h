@@ -9,22 +9,80 @@ using namespace Eigen;
 class Util
 {
 	public:
-		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as);
+		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as)
+		{
+			//ToDo: remove during optimization for performance reasons
+			float difCols = (float)as.cols() / data.cols();
+			assert(difCols >= 1.0);
+			assert(ceilf(difCols) == difCols && "The coefficients must be integers");
 
-		static inline ArrayXXf ExpandAs(ArrayXf data, ArrayXXf as);
+			float difRows = (float)as.rows() / data.rows();
+			assert(difRows >= 1.0);
+			assert(ceilf(difRows) == difRows && "The coefficients must be integers");
 
-		static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as);
+			ArrayXXf res = data.replicate(difRows, difCols);
+			return res;
+		}
 
-		static inline MatrixXf ExpandAs(VectorXf data, MatrixXf as);
+		static inline ArrayXXf ExpandAs(ArrayXf data, ArrayXXf as)
+		{
+			return data.replicate(as.rows(), as.cols());
+		}
 
-		static inline void ClipLow(ArrayXXf& target, float lowLimin);
+		//static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as)
+		//{
+		//	return data.replicate(as.rows(), as.cols());
+		//}
 
-		static inline void ClipLow(MatrixXf& target, float lowLimin);
+		static inline MatrixXf ExpandAs(VectorXf data, MatrixXf as)
+		{
+			return data.replicate(as.rows(), as.cols());
+		}
 
-		static inline void Util::ClipLow(ArrayXf& target, float lowLimin);
+		static inline void ClipLow(ArrayXXf& target, float lowLimin)
+		{
+			target = (target >= lowLimin).select(
+				target,
+				ArrayXXf::Constant(target.rows(), target.cols(), lowLimin)
+			);
+		}
 
-		static inline void CopyTo(MatrixXf& target, MatrixXf& source);
+		static inline void ClipLow(ArrayXf& target, float lowLimin)
+		{
+			target = (target >= lowLimin).select(
+				target,
+				ArrayXf::Constant(target.rows(), target.cols(), lowLimin)
+			);
+		}
 
-		static inline void CopyTo(ArrayXXf& target, ArrayXXf& source);
+		//static inline void ClipLow(MatrixXf& target, float lowLimin)
+		//{
+		//	target = (target.array() >= lowLimin).select(
+		//		target,
+		//		MatrixXf::Constant(target.rows(), target.cols(), lowLimin)
+		//	);
+		//}
+
+		static inline void CopyTo(ArrayXXf & target, ArrayXXf & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
+		{
+			return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
+		}
+
+		//static inline TensorMap<Tensor<float, 2>> ToTensor(MatrixXf & source)
+		//{
+		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
+		//}
+
+		//static inline void CopyTo(MatrixXf & target, MatrixXf & source)
+		//{
+		//	assert(target.size() >= source.size());
+		//	memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		//}
 
 };

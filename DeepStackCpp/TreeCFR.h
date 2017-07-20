@@ -16,6 +16,14 @@ class TreeCFR
 public:
 	TreeCFR();
 
+	//	-- - Run CFR to solve the given game tree.
+	//	-- @param root the root node of the tree to solve.
+	//	-- @param[opt] starting_ranges probability vectors over player private hands
+	//	-- at the root node(default uniform)
+	//	-- @param[opt] iter_count the number of iterations to run CFR for
+	//	--(default @{arguments.cfr_iters
+	//})
+	void run_cfr(Node& root, const ArrayXXf&  starting_ranges, size_t iter_count = 0);
 
 private:
 
@@ -52,15 +60,5 @@ private:
 
 	// Reduces 3d tensor to ArrayXXf map using specific dim
 	inline Map<ArrayXXf> Reduce3dTensor(Tensor<float, 3>& tensor, int dim);
-
-	//	-- - Run CFR to solve the given game tree.
-	//	-- @param root the root node of the tree to solve.
-	//	-- @param[opt] starting_ranges probability vectors over player private hands
-	//	-- at the root node(default uniform)
-	//	-- @param[opt] iter_count the number of iterations to run CFR for
-	//	--(default @{arguments.cfr_iters
-	//})
-	void run_cfr(Node& root, const ArrayXXf&  starting_ranges, size_t iter_count = 0);
-
 };
 

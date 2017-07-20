@@ -106,7 +106,7 @@ public:
 	//-- @param ranges a 2xK tensor containing ranges for each player(where K is the range size)
 	//-- @param result a 2xK tensor in which to store the cfvs for each player
 	//-- @param folding_player which player folded
-	void tree_node_fold_value(const Matrix2Xf& ranges, MatrixXf&  result, int folding_player);
+	void tree_node_fold_value(const MatrixXf& ranges, MatrixXf&  result, int folding_player);
 
 
 //private: ToDo:Remove after testing

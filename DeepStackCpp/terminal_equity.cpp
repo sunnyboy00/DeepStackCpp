@@ -87,7 +87,7 @@ void terminal_equity::tree_node_call_value(const MatrixXf& ranges, MatrixXf& res
 	//result.row(1) = Map<MatrixXf>(tempResult.row(0).data(), 1, ranges.cols());
 }
 
-void terminal_equity::tree_node_fold_value(const Matrix2Xf & ranges, MatrixXf & result, int folding_player)
+void terminal_equity::tree_node_fold_value(const MatrixXf & ranges, MatrixXf & result, int folding_player)
 {
 	MatrixXf tempResult(result.rows(), result.cols());
 	fold_value(ranges, tempResult);

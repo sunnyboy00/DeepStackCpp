@@ -35,7 +35,7 @@ inline Map<ArrayXXf> TreeCFR::Reduce3dTensor(Tensor<float, 3>& tensor, int dim)
 void TreeCFR::run_cfr(Node& root, const ArrayXXf& starting_ranges, size_t iter_count)
 {
 	assert(starting_ranges.size() > 0);
-	size_t iter_count = iter_count > 0 ? iter_count : cfr_iters;
+	iter_count = iter_count > 0 ? iter_count : cfr_iters;
 	root.ranges_absolute = starting_ranges;
 
 	for (size_t iter = 0; iter < iter_count; iter++)
@@ -62,26 +62,26 @@ void TreeCFR::update_average_strategy(Node& node, ArrayXXf& current_strategy, si
 	{
 		if (node.strategy.size() == 0)
 		{
-			int actions_count = node.children.size();
+			int actions_count = (int)node.children.size();
 			node.strategy = ArrayXXf(actions_count, card_count);
 			node.strategy.fill(0);
 		}
 
 		if (node.iter_weight_sum.size() == 0)
 		{
-			int actions_count = node.children.size();
-			node.iter_weight_sum = ArrayXXf(card_count);
+			int actions_count = (int)node.children.size();
+			node.iter_weight_sum = ArrayXf(card_count);
 			node.iter_weight_sum.fill(0);
 		}
 
-		Array2Xf iter_weight_contribution = node.ranges_absolute.row(node.current_player); // Copy?
+		ArrayXf iter_weight_contribution = node.ranges_absolute.row(node.current_player); // Copy?
 		Util::ClipLow(node.iter_weight_contribution, regret_epsilon);
 		node.iter_weight_sum += iter_weight_contribution;
 
 		ArrayXf iter_weight = iter_weight_contribution / node.iter_weight_sum;
 		iter_weight.conservativeResize(1, card_count);
 		ArrayXXf expanded_weight = Util::ExpandAs(iter_weight, node.strategy);
-		ArrayXXf old_strategy_scale = expanded_weight * (-1) + 1; //--same as 1 - expanded weight
+		ArrayXXf old_strategy_scale = (expanded_weight * (-1)) + 1; //--same as 1 - expanded weight
 		node.strategy *= old_strategy_scale;
 		ArrayXXf strategy_addition = current_strategy  * expanded_weight;
 		node.strategy += strategy_addition;
@@ -122,11 +122,11 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 		//--multiply by the pot
 		node.cf_values *= node.pot;
 		node.cf_values.conservativeResize(node.ranges_absolute.rows(), node.ranges_absolute.cols());
-			
+
 	}
 	else
 	{
-		int actions_count = node.children.size();
+		int actions_count = (int)node.children.size();
 
 		ArrayXXf current_strategy;
 
@@ -145,7 +145,7 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 				node.regrets.fill(regret_epsilon);
 			}
 
-			if (node.regrets.size() == 0)
+			if (node.possitive_regrets.size() == 0)
 			{
 				node.possitive_regrets = MatrixXf(actions_count, card_count);
 				node.possitive_regrets.fill(regret_epsilon);
@@ -157,9 +157,9 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 			Util::ClipLow(node.possitive_regrets, regret_epsilon);
 
 			//--compute the current strategy
-			float regrets_sum = node.possitive_regrets.row(action_dimension).sum();
+			ArrayXXf regrets_sum = node.possitive_regrets.colwise().sum().row(action_dimension);
 			current_strategy = ArrayXXf(node.possitive_regrets);
-			current_strategy /= regrets_sum;
+			current_strategy /= Util::ExpandAs(regrets_sum, current_strategy);
 		}
 
 		//--current cfv[[actions, players, ranges]]
@@ -178,21 +178,23 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 		}
 		else
 		{
-			Array2Xf ranges_mul_matrix = node.ranges_absolute.row(currentPlayerNorm).replicate(actions_count, 1);
+			ArrayXXf ranges_mul_matrix = node.ranges_absolute.row(currentPlayerNorm).replicate(actions_count, 1);
 			children_ranges_absolute.row(currentPlayerNorm) = current_strategy * ranges_mul_matrix;
-			children_ranges_absolute.row(currentPlayerNorm) = node.ranges_absolute.row(opponentIndexNorm).replicate(actions_count, 1); // I have removed clone ToDo: check
+			auto sm = node.ranges_absolute.row(0);
+			auto res = node.ranges_absolute.row(opponentIndexNorm).replicate(actions_count, 1);
+			children_ranges_absolute.row(currentPlayerNorm) = ArrayXXf(res); // I have removed clone ToDo: check
 		}
 
 		for (size_t i = 0; i < node.children.size(); i++)
 		{
 			Node* child_node = node.children[i];
 			//--set new absolute ranges(after the action) for the child
-			child_node->ranges_absolute = Array2Xf(node.ranges_absolute);
+			child_node->ranges_absolute = ArrayXXf(node.ranges_absolute);
 
 			child_node->ranges_absolute.row(0) = children_ranges_absolute.row(0)(i);
 			child_node->ranges_absolute.row(1) = children_ranges_absolute.row(1)(i);
 			cfrs_iter_dfs(*child_node, iter);
-			cf_values_allactions.chip(i, 0) = child_node->cf_values;
+			cf_values_allactions.chip(i, 0) = Util::ToTensor(child_node->cf_values);
 		}
 
 		node.cf_values = MatrixXf(players_count, card_count);
@@ -215,7 +217,7 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 			node.cf_values.row(0) = Reduce3dTensor(cf_values_allactions, 0).colwise().sum();
 			node.cf_values.row(1) = Reduce3dTensor(cf_values_allactions, 1).colwise().sum();
 		}
-		
+
 		if (node.current_player != chance)
 		{
 			//--computing regrets
@@ -234,5 +236,7 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 		}
 	}
 }
+
+
 
 

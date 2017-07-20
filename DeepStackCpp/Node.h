@@ -66,10 +66,10 @@ struct Node
 	long long depth;
 
 	// Player regrets. A tensor of (actions_count x card_count) size.
-	MatrixXf regrets;
+	ArrayXXf regrets;
 
 	// Player positive regrets. A tensor of (actions_count x card_count) size.
-	MatrixXf possitive_regrets;
+	ArrayXXf possitive_regrets;
 	
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
@@ -78,16 +78,16 @@ struct Node
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against
 	//--each other
-	MatrixXf cf_values;
+	ArrayXXf cf_values;
 
 	//-- The cfvs for a best response against each player in the profile
-	MatrixXf cf_values_br;
+	ArrayXXf cf_values_br;
 
 	// Counterfactual values weighted by the reach prob
-	MatrixXf cfv_infset;
+	ArrayXXf cfv_infset;
 
 	// CFV-BR values weighted by the reach prob
-	MatrixXf cfv_br_infset;
+	ArrayXXf cfv_br_infset;
 
 	//Weighted sum card ranges
 	ArrayXf iter_weight_sum;
@@ -96,7 +96,7 @@ struct Node
 	ArrayXf iter_weight_contribution;
 
 	// Difference between CFV-BR and Counterfactual values = node.cfv_br_infset - node.cfv_infset
-	MatrixXf epsilon;
+	ArrayXXf epsilon;
 
 	// <action_id, parent_id, gp_id>
 	// action_id - the index of the action that led to this node

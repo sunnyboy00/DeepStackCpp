@@ -164,17 +164,20 @@ TEST_CASE("tree_node_call_value")
 TEST_CASE("tree_node_fold_value")
 {
 	// Create a tensor of 2 dimensions
-	Eigen::Tensor<int, 2> a(2, 3);
-	a.setValues({ { 1, 2, 3 },{ 6, 5, 4 } });
-	// Reduce it along the second dimension (1)...
-	//Eigen::array<int, 1> dims(1);
-	Eigen::array<int, 1> three_dims{ { 0 } };
+	//Eigen::Tensor<int, 2> a(2, 3);
+	//a.setValues({ { 1, 2, 3 },{ 6, 5, 4 } });
+	//// Reduce it along the second dimension (1)...
+	////Eigen::array<int, 1> dims(1);
+	//Eigen::array<int, 1> three_dims{ { 0 } };
 
-	// ...using the "maximum" operator.
-	// The result is a tensor with one dimension.  The size of
-	// that dimension is the same as the first (non-reduced) dimension of a.
-	Eigen::Tensor<int, 1> b = a.sum(edim(0));
-	cout << b;
+	//Matrix2Xf f(2, 6);
+
+
+	//// ...using the "maximum" operator.
+	//// The result is a tensor with one dimension.  The size of
+	//// that dimension is the same as the first (non-reduced) dimension of a.
+	//Eigen::Tensor<int, 1> b = a.sum(edim(0));
+	//cout << b;
 	//cout << "a" << endl << a << endl << endl;
 	//cout << "b" << endl << b << endl << endl;
 	//a.chip(2, 0) = a.chip(0, 0);

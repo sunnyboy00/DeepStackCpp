@@ -9,9 +9,10 @@
 #include "card_to_string_conversion.h"
 #include "Node.h"
 #include "Constants.h"
-#include <Eigen/Dense>
 #include "tree_builder.h"
 #include "TreeVisualizer.h"
+#include "TreeCFR.h"
+#include <Eigen/Dense>
 #include <iostream>
 
 void test_tree_builder()
@@ -48,34 +49,64 @@ void test_tree_visualiser()
 	visualizer.graphviz(tree, "big_tree");
 }
 
+void test_tree_cfr()
+{
+	TreeBuilderParams params;
+	Node node;
+	params.root_node = &node;
+	card_to_string_conversion converter;
+	params.root_node->board = converter.string_to_board("");
+	params.root_node->street = 1;
+	params.root_node->current_player = P1;
+	params.root_node->bets << 100, 100;
+
+	tree_builder builder;
+	Node& tree = builder.build_tree(params);
+	card_tools cradTools;
+
+	ArrayXXf starting_ranges(players_count, card_count);
+	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
+	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+
+	TreeCFR tree_cfr;
+	tree_cfr.run_cfr(tree, starting_ranges);
+}
+
 int main()
 {
+	RowVectorXf data(6);
+	data << 0, 1, 2, 3, 4, 5;
+	ArrayXXf as(4, 6);
+
+	ArrayXXf res = data.replicate(2, 4);
+	cout << res;
+	test_tree_cfr();
 	//float target[6] = { -1, 1, 5, 5, 6, 6 };
 
 	//float array[40];
 	//for (int i = 0; i < 40; ++i) array[i] = i;
-	typedef Matrix<float, Dynamic, Dynamic, RowMajor> MatrixType;
+	//typedef Matrix<float, Dynamic, Dynamic, RowMajor> MatrixType;
 
-	Vector2f test;
-	test << 1, 2;
+	//Vector2f test;
+	//test << 1, 2;
 
-	MatrixType res = test.replicate(1, 2);
+	//MatrixType res = test.replicate(1, 2);
 
-	cout << res;
+	//cout << res;
 
-	MatrixType M1(3, 3);
-	M1 << 1, 2, 3,
-		4, 5, 6,
-		7, 8, 9;
+	//MatrixType M1(3, 3);
+	//M1 << 1, 2, 3,
+	//	4, 5, 6,
+	//	7, 8, 9;
 
 
 
-	Map<MatrixType, 0, Stride<0, 0>> zeroMap(M1.data(), 2, 2);  
-	Map<MatrixType, 0, Stride<2, 0>> oneMap(M1.data(), 2, 2);  
-	cout << "Row stride = 0:" << "\n";
-	cout << zeroMap << "\n" << "Row stride = 2:" << "\n";
-	cout << oneMap;
-	cout << "\n" << "Done";
+	//Map<MatrixType, 0, Stride<0, 0>> zeroMap(M1.data(), 2, 2);  
+	//Map<MatrixType, 0, Stride<2, 0>> oneMap(M1.data(), 2, 2);  
+	//cout << "Row stride = 0:" << "\n";
+	//cout << zeroMap << "\n" << "Row stride = 2:" << "\n";
+	//cout << oneMap;
+	//cout << "\n" << "Done";
 	//cout << m2map;
 
 	//MapTypeConst m2mapconst(p, m2.size());  // a read-only accessor for m2
