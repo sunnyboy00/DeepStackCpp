@@ -50,7 +50,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 
 void tree_builder::_fill_additional_attributes(Node& node)
 {
-	node.pot =(long long)node.bets.minCoeff();
+	node.pot = node.bets.minCoeff();
 }
 
 vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)

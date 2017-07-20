@@ -32,10 +32,10 @@ struct Node
 	// The number of chips that each player has committed to the pot
 	Array2f bets;
 
-	// Half the pot size, equalde to the smaller number in `bets`
-	long long pot;
+	// Half the pot size, equaled to the smaller number in `bets`
+	float pot;
 
-	// Parant of the node
+	// Parent of the node
 	Node* parent;
 
 	// Is node a terminal node
@@ -65,6 +65,12 @@ struct Node
 	// Depth of the node inside the tree
 	long long depth;
 
+	// Player regrets. A tensor of (actions_count x card_count) size.
+	MatrixXf regrets;
+
+	// Player positive regrets. A tensor of (actions_count x card_count) size.
+	MatrixXf possitive_regrets;
+	
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
 	Array2Xf ranges_absolute;
@@ -72,19 +78,19 @@ struct Node
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against
 	//--each other
-	Array2Xf cf_values;
+	MatrixXf cf_values;
 
 	//-- The cfvs for a best response against each player in the profile
-	Array2Xf cf_values_br;
+	MatrixXf cf_values_br;
 
 	// Counterfactual values weighted by the reach prob
-	Array2Xf cfv_infset;
+	MatrixXf cfv_infset;
 
 	// CFV-BR values weighted by the reach prob
-	Array2Xf cfv_br_infset;
+	MatrixXf cfv_br_infset;
 
 	// Difference between CFV-BR and Counterfactual values = node.cfv_br_infset - node.cfv_infset
-	Array2Xf epsilon;
+	MatrixXf epsilon;
 
 	// <action_id, parent_id, gp_id>
 	// action_id - the index of the action that led to this node

@@ -90,6 +90,9 @@
     <ClInclude Include="terminal_equity.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="TreeCFR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -127,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="TreeVisualizer.cpp">
       <Filter>Source Files\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeCFR.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

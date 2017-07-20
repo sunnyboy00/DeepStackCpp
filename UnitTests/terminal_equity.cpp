@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "terminal_equity.h"
 #include <iostream>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 const float myEps = 0.001f;
 
@@ -161,6 +162,23 @@ TEST_CASE("tree_node_call_value")
 
 TEST_CASE("tree_node_fold_value")
 {
+	// Create a tensor of 2 dimensions
+	Eigen::Tensor<int, 2> a(2, 3);
+	a.setValues({ { 1, 2, 3 },{ 6, 5, 4 } });
+	// Reduce it along the second dimension (1)...
+	Eigen::array<int, 1> dims({ 1 /* dimension to reduce */ });
+	// ...using the "maximum" operator.
+	// The result is a tensor with one dimension.  The size of
+	// that dimension is the same as the first (non-reduced) dimension of a.
+	Eigen::Tensor<int, 1> b = a.maximum(dims);
+	cout << "a" << endl << a << endl << endl;
+	cout << "b" << endl << b << endl << endl;
+	//a.chip(2, 0) = a.chip(0, 0);
+
+	//Eigen::Tensor<int, 1> row_3 = a.chip(2, 0);
+	//Eigen::Tensor<int, 1> col_2 = a.chip(1, 1);
+	//cout << "a" << endl << a << endl;
+	//cout << "row_3" << endl << row_3 << endl;
 	Matrix2Xf range(2, 6);
 	int i = 0;
 	for (size_t r = 0; r < 2; r++)
@@ -171,6 +189,7 @@ TEST_CASE("tree_node_fold_value")
 			i++;
 		}
 	}
+
 
 	MatrixXf result(2, 6);
 	terminal_equity term;

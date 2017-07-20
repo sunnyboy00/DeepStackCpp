@@ -178,6 +178,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="terminal_equity.h" />
     <ClInclude Include="TreeBuilderParams.h" />
+    <ClInclude Include="TreeCFR.h" />
     <ClInclude Include="TreeVisualizer.h" />
     <ClInclude Include="tree_builder.h" />
   </ItemGroup>
@@ -192,6 +193,7 @@
     <ClCompile Include="strategy_filling.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="TreeBuilderParams.cpp" />
+    <ClCompile Include="TreeCFR.cpp" />
     <ClCompile Include="TreeVisualizer.cpp" />
     <ClCompile Include="tree_builder.cpp" />
   </ItemGroup>

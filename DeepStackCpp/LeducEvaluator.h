@@ -41,7 +41,7 @@ public:
 	//	--every private hand.
 	ArrayXf batch_eval(ArrayXf board, ArrayXf impossible_hand_value);
 
-	ArrayXf LeducEvaluator::batch_eval(ArrayXf board);
+	ArrayXf batch_eval(ArrayXf board);
 
 private:
 
