@@ -57,8 +57,5 @@ private:
 	//-- @param current_strategy the CFR strategy for the current iteration
 	//-- @param iter the iteration number of the current CFR iteration
 	void update_average_strategy(Node& node, ArrayXXf& current_strategy, size_t iter);
-
-	// Reduces 3d tensor to ArrayXXf map using specific dim
-	inline Map<ArrayXXf> Reduce3dTensor(Tensor<float, 3>& tensor, int dim);
 };
 

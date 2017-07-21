@@ -74,12 +74,50 @@ void test_tree_cfr()
 
 int main()
 {
-	RowVectorXf data(6);
-	data << 0, 1, 2, 3, 4, 5;
-	ArrayXXf as(4, 6);
+	Eigen::Tensor<int, 2> a(4, 3);
+	a.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
+	{ 600, 700, 800 },{ 900, 1000, 1100 } });
+	Eigen::Tensor<int, 1> row_3 = a.chip(2, 0);
+	Eigen::Tensor<int, 1> col_2 = a.chip(1, 1);
+	cout << "a" << endl << a << endl;
+	cout << "row_3" << endl << row_3 << endl;
+	cout << "col_2" << endl << col_2 << endl;
 
-	ArrayXXf res = data.replicate(2, 4);
-	cout << res;
+	//int d1 = 4;
+	//int d2 = 3;
+	//int d3 = 3;
+
+	//Eigen::Tensor<float, 3> tensor(d1, d2, d3);
+
+	//float koef = 0;
+	//for (int i = 0; i < d1; ++i) {
+	//	for (int j = 0; j < d2; ++j) {
+	//		for (int k = 0; k < d3; ++k) {
+	//			tensor(i, j, k) = koef;
+	//			koef++;
+	//		}
+	//	}
+	//}
+	//
+	//Tensor<float, 2> playerCf = tensor.chip(0, 1);
+	//Map<ArrayXXf> plCfAr(playerCf.data(), playerCf.dimension(0), playerCf.dimension(1));
+	//Tensor<float, 2> temp;
+
+	//Map<ArrayXXf> map = Util::TensorToArray2d(tensor, 1, temp);
+	////Tensor<float, 2> playerCf = tensor.chip(0, 1);
+
+	////Map<ArrayXXf> plCfAr(playerCf.data(), playerCf.dimension(0), playerCf.dimension(1));
+
+	////auto res = Reduce3dTensor2(tensor, 0);
+	//cout << playerCf << endl;
+	////cout << res;
+
+	//RowVectorXf data(6);
+	//data << 0, 1, 2, 3, 4, 5;
+	//ArrayXXf as(4, 6);
+
+	//ArrayXXf res = data.replicate(2, 4);
+//	cout << map;
 	test_tree_cfr();
 	//float target[6] = { -1, 1, 5, 5, 6, 6 };
 

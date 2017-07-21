@@ -78,7 +78,7 @@ struct Node
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against
 	//--each other
-	ArrayXXf cf_values;
+	MatrixXf cf_values;
 
 	//-- The cfvs for a best response against each player in the profile
 	ArrayXXf cf_values_br;

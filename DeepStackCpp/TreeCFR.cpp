@@ -1,5 +1,6 @@
 #include "TreeCFR.h"
-
+#include <iostream>
+#include <string>
 
 
 TreeCFR::TreeCFR()
@@ -23,13 +24,6 @@ terminal_equity* TreeCFR::_get_terminal_equity(Node& node)
 	}
 
 	return cached;
-}
-
-inline Map<ArrayXXf> TreeCFR::Reduce3dTensor(Tensor<float, 3>& tensor, int dim)
-{
-	Tensor<float, 2> playerCf = tensor.chip(0, dim);
-	Map<ArrayXXf> plCfAr(playerCf.data(), playerCf.dimension(0), playerCf.dimension(1)); //Or just convert (ArrayXXf)?
-	return plCfAr;
 }
 
 void TreeCFR::run_cfr(Node& root, const ArrayXXf& starting_ranges, size_t iter_count)
@@ -93,7 +87,8 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 	assert(node.current_player == P1 || node.current_player == P2 || node.current_player == chance);
 
 	int currentPlayerNorm = node.current_player - 1;
-	int opponentIndexNorm = 2 - node.current_player;
+	int opponnent = 3 - node.current_player;
+	int opponentIndexNorm = opponnent - 1;
 
 	//--dimensions in tensor
 	static const int action_dimension = 0;
@@ -105,14 +100,12 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 
 		terminal_equity* termEquity = _get_terminal_equity(node);
 
-		//MatrixXf values = MatrixXf(node.ranges_absolute);
-		memcpy(node.cf_values.data(), node.ranges_absolute.data(), node.ranges_absolute.size() * sizeof(float));
-
-		node.cf_values.fill(0); //ToDo: performance do we need this?
+		node.cf_values = MatrixXf(node.ranges_absolute);
+		node.cf_values.fill(0);
 
 		if (node.node_type == terminal_fold)
 		{
-			termEquity->tree_node_fold_value(node.ranges_absolute, node.cf_values, opponentIndexNorm);
+			termEquity->tree_node_fold_value(node.ranges_absolute, node.cf_values, opponnent);
 		}
 		else
 		{
@@ -164,25 +157,25 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 
 		//--current cfv[[actions, players, ranges]]
 		Tensor<float, 3> cf_values_allactions(actions_count, players_count, card_count);
+		const int PLAYERS_DIM = 1;
+
 		cf_values_allactions.setZero();
 
-		Array2Xf children_ranges_absolute;
+		map <int, ArrayXXf> children_ranges_absolute;
 
 		if (node.current_player == chance)
 		{
-			Array2Xf ranges_mul_matrix = node.ranges_absolute.row(0).replicate(actions_count, 1);
-			children_ranges_absolute.row(0) = current_strategy * ranges_mul_matrix;
+			ArrayXXf ranges_mul_matrix = node.ranges_absolute.row(0).replicate(actions_count, 1);
+			children_ranges_absolute[0] = current_strategy * ranges_mul_matrix;
 
 			ranges_mul_matrix = node.ranges_absolute.row(1).replicate(actions_count, 1);
-			children_ranges_absolute.row(1) = current_strategy * ranges_mul_matrix;
+			children_ranges_absolute[1] = current_strategy * ranges_mul_matrix;
 		}
 		else
 		{
 			ArrayXXf ranges_mul_matrix = node.ranges_absolute.row(currentPlayerNorm).replicate(actions_count, 1);
-			children_ranges_absolute.row(currentPlayerNorm) = current_strategy * ranges_mul_matrix;
-			auto sm = node.ranges_absolute.row(0);
-			auto res = node.ranges_absolute.row(opponentIndexNorm).replicate(actions_count, 1);
-			children_ranges_absolute.row(currentPlayerNorm) = ArrayXXf(res); // I have removed clone ToDo: check
+			children_ranges_absolute[currentPlayerNorm] = current_strategy.array() * ranges_mul_matrix.array();
+			children_ranges_absolute[opponentIndexNorm] = node.ranges_absolute.row(opponentIndexNorm).replicate(actions_count, 1); // I have removed clone ToDo: check
 		}
 
 		for (size_t i = 0; i < node.children.size(); i++)
@@ -191,8 +184,8 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 			//--set new absolute ranges(after the action) for the child
 			child_node->ranges_absolute = ArrayXXf(node.ranges_absolute);
 
-			child_node->ranges_absolute.row(0) = children_ranges_absolute.row(0)(i);
-			child_node->ranges_absolute.row(1) = children_ranges_absolute.row(1)(i);
+			child_node->ranges_absolute.row(0) = children_ranges_absolute[0](i);
+			child_node->ranges_absolute.row(1) = children_ranges_absolute[1](i);
 			cfrs_iter_dfs(*child_node, iter);
 			cf_values_allactions.chip(i, 0) = Util::ToTensor(child_node->cf_values);
 		}
@@ -200,34 +193,35 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 		node.cf_values = MatrixXf(players_count, card_count);
 		node.cf_values.fill(0);
 
+		Tensor<float, 2> tempVar;
+
 		if (node.current_player != chance)
 		{
 			current_strategy.conservativeResize(actions_count, card_count);
 			//ArrayXXf strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
-
-			Map<ArrayXXf> plCfAr = Reduce3dTensor(cf_values_allactions, currentPlayerNorm);
+			Map<ArrayXXf> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
 			ArrayXXf tempRes = current_strategy * plCfAr; // strategy_mul_matrix * plCfAr
 			node.cf_values.row(currentPlayerNorm) = tempRes.colwise().sum();
 
-			Map<ArrayXXf> opCfAr = Reduce3dTensor(cf_values_allactions, opponentIndexNorm);
+			Map<ArrayXXf> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
 			node.cf_values.row(opponentIndexNorm) = opCfAr.colwise().sum();
 		}
 		else
 		{
-			node.cf_values.row(0) = Reduce3dTensor(cf_values_allactions, 0).colwise().sum();
-			node.cf_values.row(1) = Reduce3dTensor(cf_values_allactions, 1).colwise().sum();
+			node.cf_values.row(0) = Util::TensorToArray2d(cf_values_allactions, 0, PLAYERS_DIM, tempVar).colwise().sum();
+			node.cf_values.row(1) = Util::TensorToArray2d(cf_values_allactions, 1, PLAYERS_DIM, tempVar).colwise().sum();
 		}
 
 		if (node.current_player != chance)
 		{
 			//--computing regrets
 
-			Map<ArrayXXf> current_regrets = Reduce3dTensor(cf_values_allactions, currentPlayerNorm);
+			Map<ArrayXXf> current_regrets = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
 			current_regrets.resize(actions_count, card_count);
 
-			VectorXf tempRes = node.cf_values.row(currentPlayerNorm);
+			ArrayXXf tempRes = node.cf_values.row(currentPlayerNorm);
 			tempRes.resize(1, card_count);
-			MatrixXf matrixToDiv = tempRes.replicate(current_regrets.rows(), current_regrets.cols());
+			MatrixXf matrixToDiv = tempRes.replicate(current_regrets.rows(), 1);
 			current_regrets -= matrixToDiv.array();
 			update_regrets(node, current_regrets);
 
