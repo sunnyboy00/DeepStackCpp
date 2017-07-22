@@ -20,7 +20,7 @@ class Util
 			assert(difRows >= 1.0);
 			assert(ceilf(difRows) == difRows && "The coefficients must be integers");
 
-			ArrayXXf res = data.replicate(difRows, difCols);
+			ArrayXXf res = data.replicate((int)difRows, (int)difCols);
 			return res;
 		}
 

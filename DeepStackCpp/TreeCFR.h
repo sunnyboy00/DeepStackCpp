@@ -8,6 +8,8 @@
 #include <map>
 #include <Eigen/Dense>
 
+void _fillPlayersRangesAndStrategy();
+
 using namespace std;
 using namespace Eigen;
 
@@ -26,6 +28,10 @@ public:
 	void run_cfr(Node& root, const ArrayXXf&  starting_ranges, size_t iter_count = 0);
 
 private:
+
+	//--dimensions in tensor
+	static const int action_dimension = 0;
+	static const int card_dimension = 1;
 
 	// --for ease of implementation, we use small epsilon rather than zero when working with regrets
 	const float regret_epsilon = 1.0f / 1000000000;
@@ -47,7 +53,11 @@ private:
 	//	-- @local
 	void cfrs_iter_dfs(Node& node, size_t iter);
 
-	void _fillCFvaluesForNonTerminalNode(Node &node, int opponnent, size_t iter);
+	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
+
+	void _fillChanceRangesAndStrategy(Node &node, map<int, ArrayXXf> &children_ranges_absolute, ArrayXXf& current_strategy);
+
+	void _fillPlayersRangesAndStrategy(Node & node, map<int, ArrayXXf>& children_ranges_absolute, ArrayXXf & current_strategy);
 
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update
@@ -61,6 +71,6 @@ private:
 	void update_average_strategy(Node& node, ArrayXXf& current_strategy, size_t iter);
 
 	// Fill cf_values for terminal nodes
-	void _fillCFvaluesForTerminalNode(Node &node, int opponnent);
+	void _fillCFvaluesForTerminalNode(Node &node);
 };
 
