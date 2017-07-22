@@ -47,6 +47,8 @@ private:
 	//	-- @local
 	void cfrs_iter_dfs(Node& node, size_t iter);
 
+	void _fillCFvaluesForNonTerminalNode(Node &node, int opponnent, size_t iter);
+
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update
 	//-- @param current_regrets the regrets from the current iteration of CFR
@@ -57,5 +59,8 @@ private:
 	//-- @param current_strategy the CFR strategy for the current iteration
 	//-- @param iter the iteration number of the current CFR iteration
 	void update_average_strategy(Node& node, ArrayXXf& current_strategy, size_t iter);
+
+	// Fill cf_values for terminal nodes
+	void _fillCFvaluesForTerminalNode(Node &node, int opponnent);
 };
 
