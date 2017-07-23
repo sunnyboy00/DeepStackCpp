@@ -1,8 +1,7 @@
 #include "terminal_equity.h"
 #include <iostream>
 #include <string>
-
-
+#include "Util.h"
 
 terminal_equity::terminal_equity() 
 {
@@ -91,6 +90,7 @@ void terminal_equity::tree_node_fold_value(const MatrixXf & ranges, MatrixXf & r
 {
 	MatrixXf tempResult(result.rows(), result.cols());
 	fold_value(ranges, tempResult);
+	Util::ToString(result);
 	result.row(0) = tempResult.row(1);
 	result.row(1) = tempResult.row(0);
 

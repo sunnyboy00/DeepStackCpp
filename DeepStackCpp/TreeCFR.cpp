@@ -106,7 +106,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 
 		// Now coping cf_values from children to calculate the regret
 		cf_values_allactions[0].row(i) = child_node->cf_values.row(0); //ToDo: Can be single copy operation(two rows copy)?
-		cf_values_allactions[i].row(i) = child_node->cf_values.row(1);
+		cf_values_allactions[1].row(i) = child_node->cf_values.row(1);
 
 		//cf_values_allactions.chip(i, 0) = Util::ToTensor(child_node->cf_values);
 	}
@@ -256,26 +256,30 @@ ArrayXXf TreeCFR::ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<f
 	//current_strategy.conservativeResize(actions_count, card_count); // Do we need this?
 
 	//Map<ArrayXXf> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
-	ArrayXXf opCfAr = cf_values_allactions[opponentIndexNorm];
+
+	ArrayXXf opCfAr = cf_values_allactions[opponentIndexNorm]; // [actions X cards] - cf values for the opponent
 	node.cf_values.row(opponentIndexNorm) = opCfAr.colwise().sum(); // for opponent assume that strategy is uniform
 
 	//ArrayXXf strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
 	//Map<ArrayXXf> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
-	ArrayXXf current_regrets = cf_values_allactions[currentPlayerNorm];
-	ArrayXXf weigtedCurrentRegrets = current_strategy * current_regrets; // weight the regrets by the used strategy
-	node.cf_values.row(currentPlayerNorm) = weigtedCurrentRegrets.colwise().sum();
+
+	ArrayXXf currentPlayerCfValues = cf_values_allactions[currentPlayerNorm];
+	assert(currentPlayerCfValues.rows() == actions_count && currentPlayerCfValues.cols() == card_count);
+
+	ArrayXXf weigtedCfValues = current_strategy * currentPlayerCfValues; // weight the regrets by the used strategy
+	node.cf_values.row(currentPlayerNorm) = weigtedCfValues.colwise().sum(); // summing CF values for different actions
 
 	//--computing regrets
 	//Map<ArrayXXf> current_regrets = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
 
-	assert(current_strategy.rows() == actions_count && current_strategy.cols() == card_count);
 	//current_regrets.resize(actions_count, card_count); Do we need this resize?
 
+
 	ArrayXXf cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayerNorm);
-	cfValuesOdCurrentPlayer.resize(1, card_count); 
-	ArrayXXf matrixToSubstract = cfValuesOdCurrentPlayer.replicate(current_regrets.rows(), 1);
-	current_regrets -= matrixToSubstract;
-	return current_regrets;
+	cfValuesOdCurrentPlayer.resize(1, card_count); // [1(action) X card_count]
+	ArrayXXf matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
+	currentPlayerCfValues -= matrixToSubstract; // Substructing sum of CF values over all actions with every action CF value
+	return currentPlayerCfValues;
 }
 
 

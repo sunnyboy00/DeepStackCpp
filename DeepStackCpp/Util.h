@@ -1,8 +1,12 @@
 #pragma once
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <Eigen/Dense>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace Eigen;
+using namespace std;
 
 #define edim(dimSlice) Eigen::array<int, 1> { { dimSlice} }
 
@@ -69,6 +73,10 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
+		static void ToString(ArrayXXf dataArg);
+
+		static void ToString(MatrixXf dataArg);
+
 		//static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
 		//{
 		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
@@ -94,3 +102,4 @@ class Util
 		//}
 
 };
+
