@@ -69,23 +69,23 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
-		{
-			return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
-		}
+		//static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
+		//{
+		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
+		//}
 
-		static inline TensorMap<Tensor<float, 2>> ToTensor(MatrixXf & source)
-		{
-			return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
-		}
+		//static inline TensorMap<Tensor<float, 2>> ToTensor(MatrixXf & source)
+		//{
+		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
+		//}
 
-		// Returns 2d tensor from 3d 
-		static Map<ArrayXXf> TensorToArray2d(Tensor<float, 3>& tensor, int offset, int dim, Tensor<float, 2>& tempVar)
-		{
-			tempVar = tensor.chip(offset, dim);
-			Map<ArrayXXf> plCfAr(tempVar.data(), tempVar.dimension(0), tempVar.dimension(1));
-			return plCfAr;
-		}
+		//// Returns 2d tensor from 3d 
+		//static Map<ArrayXXf> TensorToArray2d(Tensor<float, 3>& tensor, int offset, int dim, Tensor<float, 2>& tempVar)
+		//{
+		//	tempVar = tensor.chip(offset, dim);
+		//	Map<ArrayXXf> plCfAr(tempVar.data(), tempVar.dimension(0), tempVar.dimension(1));
+		//	return plCfAr;
+		//}
 
 		//static inline void CopyTo(MatrixXf & target, MatrixXf & source)
 		//{

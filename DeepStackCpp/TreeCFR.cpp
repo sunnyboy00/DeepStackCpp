@@ -103,6 +103,8 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 		child_node->ranges_absolute.row(0) = children_ranges_absolute[0](i);
 		child_node->ranges_absolute.row(1) = children_ranges_absolute[1](i);
 		cfrs_iter_dfs(*child_node, iter);
+
+		// Now coping cf_values from children to calculate the regret
 		cf_values_allactions[0].row(i) = child_node->cf_values.row(0); //ToDo: Can be single copy operation(two rows copy)?
 		cf_values_allactions[i].row(i) = child_node->cf_values.row(1);
 
@@ -116,6 +118,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 
 	if (node.current_player == chance)
 	{
+		// For the chance node just sum regrets from all cards
 		node.cf_values.row(0) = cf_values_allactions[0].colwise().sum();
 		node.cf_values.row(1) = cf_values_allactions[1].colwise().sum();
 		//node.cf_values.row(0) = Util::TensorToArray2d(cf_values_allactions, 0, PLAYERS_DIM, tempVar).colwise().sum();
@@ -233,11 +236,11 @@ void TreeCFR::_fillPlayersRangesAndStrategy(Node &node, map<int, ArrayXXf> &chil
 	//--compute the current strategy
 	ArrayXXf regrets_sum = node.regrets.colwise().sum().row(action_dimension);
 	current_strategy = ArrayXXf(node.regrets);
-	current_strategy /= Util::ExpandAs(regrets_sum, current_strategy);
+	current_strategy /= Util::ExpandAs(regrets_sum, current_strategy); // We are dividing regrets for each actions by the sum of regrets for all actions and doing this element wise for every card
 
 	ArrayXXf ranges_mul_matrix = node.ranges_absolute.row(currentPlayerNorm).replicate(actions_count, 1);
-	children_ranges_absolute[currentPlayerNorm] = current_strategy.array() * ranges_mul_matrix.array();
-	children_ranges_absolute[opponentIndexNorm] = node.ranges_absolute.row(opponentIndexNorm).replicate(actions_count, 1); // I have removed clone ToDo: check
+	children_ranges_absolute[currentPlayerNorm] = current_strategy.array() * ranges_mul_matrix.array(); // Just multiplying ranges(cards probabilities) by the probability that action will be taken(from the strategy) inside the matrix  
+	children_ranges_absolute[opponentIndexNorm] = node.ranges_absolute.row(opponentIndexNorm).replicate(actions_count, 1); //For opponent we are just cloning ranges
 }
 
 ArrayXXf TreeCFR::ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<float, Dynamic, card_count>* cf_values_allactions)
@@ -249,25 +252,29 @@ ArrayXXf TreeCFR::ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<f
 	const int currentPlayerNorm = node.current_player - 1; // Because we have zero based indexes, unlike the original source.
 	const int opponentIndexNorm = opponnent - 1;
 
-	current_strategy.conservativeResize(actions_count, card_count);
-	//ArrayXXf strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
-	//Map<ArrayXXf> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
-	ArrayXXf current_regrets = cf_values_allactions[currentPlayerNorm];
-	ArrayXXf tempRes = current_strategy * current_regrets; // strategy_mul_matrix * plCfAr
-	node.cf_values.row(currentPlayerNorm) = tempRes.colwise().sum();
+	assert(current_strategy.rows() == actions_count && current_strategy.cols() == card_count);
+	//current_strategy.conservativeResize(actions_count, card_count); // Do we need this?
 
 	//Map<ArrayXXf> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
 	ArrayXXf opCfAr = cf_values_allactions[opponentIndexNorm];
-	node.cf_values.row(opponentIndexNorm) = opCfAr.colwise().sum();
+	node.cf_values.row(opponentIndexNorm) = opCfAr.colwise().sum(); // for opponent assume that strategy is uniform
+
+	//ArrayXXf strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
+	//Map<ArrayXXf> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
+	ArrayXXf current_regrets = cf_values_allactions[currentPlayerNorm];
+	ArrayXXf weigtedCurrentRegrets = current_strategy * current_regrets; // weight the regrets by the used strategy
+	node.cf_values.row(currentPlayerNorm) = weigtedCurrentRegrets.colwise().sum();
 
 	//--computing regrets
 	//Map<ArrayXXf> current_regrets = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
-	current_regrets.resize(actions_count, card_count);
 
-	ArrayXXf tempRes2 = node.cf_values.row(currentPlayerNorm);
-	tempRes2.resize(1, card_count);
-	MatrixXf matrixToDiv = tempRes2.replicate(current_regrets.rows(), 1);
-	current_regrets -= matrixToDiv.array();
+	assert(current_strategy.rows() == actions_count && current_strategy.cols() == card_count);
+	//current_regrets.resize(actions_count, card_count); Do we need this resize?
+
+	ArrayXXf cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayerNorm);
+	cfValuesOdCurrentPlayer.resize(1, card_count); 
+	ArrayXXf matrixToSubstract = cfValuesOdCurrentPlayer.replicate(current_regrets.rows(), 1);
+	current_regrets -= matrixToSubstract;
 	return current_regrets;
 }
 
