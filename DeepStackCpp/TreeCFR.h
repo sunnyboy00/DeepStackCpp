@@ -55,6 +55,8 @@ private:
 
 	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
 
+	ArrayXXf ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<float, Dynamic, card_count>* cf_values_allactions);
+
 	void _fillChanceRangesAndStrategy(Node &node, map<int, ArrayXXf> &children_ranges_absolute, ArrayXXf& current_strategy);
 
 	void _fillPlayersRangesAndStrategy(Node & node, map<int, ArrayXXf>& children_ranges_absolute, ArrayXXf & current_strategy);

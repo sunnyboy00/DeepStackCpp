@@ -68,9 +68,6 @@ struct Node
 	// Player regrets. A tensor of (actions_count x card_count) size.
 	ArrayXXf regrets;
 
-	// Player positive regrets. A tensor of (actions_count x card_count) size.
-	ArrayXXf possitive_regrets;
-	
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
 	ArrayXXf ranges_absolute;
