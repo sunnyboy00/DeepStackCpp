@@ -46,7 +46,7 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 #ifdef _DEBUG
 	ArrayXXf hands_mask = _cardTools.get_possible_hand_indexes(node.board);
 	hands_mask.resize(1, card_count);
-	Util::ExpandAs(hands_mask, node.ranges_absolute);
+	hands_mask = Util::ExpandAs(hands_mask, node.ranges_absolute);
 
 	assert((hands_mask * node.ranges_absolute).sum() == node.ranges_absolute.sum()); // Checking that multiplication with possible hands range did not changed anything.
 
@@ -65,8 +65,8 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 	{
 		for (size_t i = 0; i < actions_count; i++)
 		{
-			child_range.row(currentPlayerIndex) = node.ranges_absolute.row(currentPlayerIndex) * node.strategy.row(i);
-			child_range.row(opponentIndex) = node.ranges_absolute.row(opponentIndex) * node.strategy.row(i);
+			child_range.row(0) = node.ranges_absolute.row(0) * node.strategy.row(i);
+			child_range.row(1) = node.ranges_absolute.row(1) * node.strategy.row(i);
 
 			//--go deeper
 			_fill_ranges_dfs(*node.children[i], child_range);
@@ -79,7 +79,7 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 		for (size_t i = 0; i < actions_count; i++)
 		{
 			//--copy the range for the non-acting player  
-			child_range.row(opponentIndex) = node.ranges_absolute.row(opponentIndex) * node.strategy.row(i);
+			child_range.row(opponentIndex) = node.ranges_absolute.row(opponentIndex);
 
 			//  --multiply the range for the acting player using his strategy    
 			child_range.row(currentPlayerIndex) = node.ranges_absolute.row(currentPlayerIndex) * node.strategy.row(i);
