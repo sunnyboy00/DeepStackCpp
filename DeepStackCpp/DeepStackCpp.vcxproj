@@ -181,6 +181,7 @@
     <ClInclude Include="TreeCFR.h" />
     <ClInclude Include="TreeVisualizer.h" />
     <ClInclude Include="tree_builder.h" />
+    <ClInclude Include="tree_values.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +198,7 @@
     <ClCompile Include="TreeCFR.cpp" />
     <ClCompile Include="TreeVisualizer.cpp" />
     <ClCompile Include="tree_builder.cpp" />
+    <ClCompile Include="tree_values.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>

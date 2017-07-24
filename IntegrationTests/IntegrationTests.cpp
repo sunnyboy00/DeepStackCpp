@@ -8,6 +8,7 @@
 #include "TreeBuilderParams.h"
 #include "card_to_string_conversion.h"
 #include "Node.h"
+#include "tree_values.h"
 #include "Constants.h"
 #include "tree_builder.h"
 #include "TreeVisualizer.h"
@@ -69,7 +70,11 @@ void test_tree_cfr()
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 20);
+	tree_cfr.run_cfr(tree, starting_ranges, 1);
+
+	tree_values tv;
+	tv._fill_ranges_dfs(tree, starting_ranges);
+
 }
 
 int main()
