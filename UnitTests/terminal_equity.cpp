@@ -208,3 +208,34 @@ TEST_CASE("tree_node_fold_value")
 	REQUIRE(result(0, 4) == Approx(0.2810).epsilon(myEps));
 	REQUIRE(result(1, 4) == Approx(-1.1250).epsilon(myEps));
 }
+
+TEST_CASE("tree_node_fold_value_integration")
+{
+	ArrayXXf range(2, 6);
+
+	range << 0.0000,0.2000,0.2000,0.2000,0.2000,0.2000,
+		0.0000,0.1000,0.1000,0.1000,0.1000,0.1000;
+
+	MatrixXf result(2, 6);
+	terminal_equity term;
+
+	card_to_string_conversion converter;
+	ArrayXf board = converter.string_to_board("As");
+
+	term.set_board(board);
+	term.tree_node_fold_value(range, result, P2);
+
+	REQUIRE(result(0, 0) == Approx(0).epsilon(myEps));
+	REQUIRE(result(0, 1) == Approx(0.4).epsilon(myEps));
+	REQUIRE(result(0, 2) == Approx(0.4).epsilon(myEps));
+	REQUIRE(result(0, 3) == Approx(0.4).epsilon(myEps));
+	REQUIRE(result(0, 4) == Approx(0.4).epsilon(myEps));
+	REQUIRE(result(0, 5) == Approx(0.4).epsilon(myEps));
+
+	REQUIRE(result(1, 0) == Approx(0).epsilon(myEps));
+	REQUIRE(result(1, 1) == Approx(-0.8).epsilon(myEps));
+	REQUIRE(result(1, 2) == Approx(-0.8).epsilon(myEps));
+	REQUIRE(result(1, 3) == Approx(-0.8).epsilon(myEps));
+	REQUIRE(result(1, 4) == Approx(-0.8).epsilon(myEps));
+	REQUIRE(result(1, 5) == Approx(-0.8).epsilon(myEps));
+}

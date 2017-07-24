@@ -53,7 +53,7 @@ void terminal_equity::_set_call_matrix(const ArrayXf & board)
 
 void terminal_equity::_set_fold_matrix(const ArrayXf & board)
 {
-	_fold_matrix = ArrayXXf(card_count, card_count);
+	_fold_matrix.resize(card_count, card_count);
 	_fold_matrix.fill(1);
 	// --setting cards that block each other to zero - exactly elements on diagonal in leduc variants
 	_fold_matrix -= MatrixXf::Identity(card_count, card_count).array();
@@ -67,6 +67,7 @@ void terminal_equity::call_value(const MatrixXf & ranges, MatrixXf & result)
 
 void terminal_equity::fold_value(const MatrixXf & ranges, MatrixXf & result)
 {
+	assert(_fold_matrix.size() > 0);
 	result.noalias() = ranges * _fold_matrix.matrix();
 }
 
@@ -90,7 +91,6 @@ void terminal_equity::tree_node_fold_value(const MatrixXf & ranges, MatrixXf & r
 {
 	MatrixXf tempResult(result.rows(), result.cols());
 	fold_value(ranges, tempResult);
-	Util::ToString(result);
 	result.row(0) = tempResult.row(1);
 	result.row(1) = tempResult.row(0);
 

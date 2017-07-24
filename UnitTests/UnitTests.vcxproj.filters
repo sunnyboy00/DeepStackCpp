@@ -53,5 +53,8 @@
     <ClCompile Include="terminal_equity.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
+    <ClCompile Include="tree_cfr.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

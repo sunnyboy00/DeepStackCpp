@@ -173,6 +173,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="tree_builder.cpp" />
+    <ClCompile Include="tree_cfr.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

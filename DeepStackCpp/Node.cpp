@@ -20,6 +20,14 @@ Node::Node() : street(1), current_player(chance), bets(2), terminal(false), dept
 {
 }
 
+Node::~Node()
+{
+	for (size_t i = 0; i < children.size(); i++)
+	{
+		delete(children[i]);
+	}
+}
+
 string GetNodeTypeString(const node_types value) {
 	static map<node_types, string> strings;
 	if (strings.size() == 0) {

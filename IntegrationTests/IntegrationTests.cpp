@@ -55,10 +55,10 @@ void test_tree_cfr()
 	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("");
-	params.root_node->street = 1;
+	params.root_node->board = converter.string_to_board("Ks");
+	params.root_node->street = 2;
 	params.root_node->current_player = P1;
-	params.root_node->bets << 100, 100;
+	params.root_node->bets << 1200, 1200;
 
 	tree_builder builder;
 	Node& tree = builder.build_tree(params);
@@ -69,19 +69,19 @@ void test_tree_cfr()
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges);
+	tree_cfr.run_cfr(tree, starting_ranges, 20);
 }
 
 int main()
 {
-	Eigen::Tensor<int, 2> a(4, 3);
-	a.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
-	{ 600, 700, 800 },{ 900, 1000, 1100 } });
-	Eigen::Tensor<int, 1> row_3 = a.chip(2, 0);
-	Eigen::Tensor<int, 1> col_2 = a.chip(1, 1);
-	cout << "a" << endl << a << endl;
-	cout << "row_3" << endl << row_3 << endl;
-	cout << "col_2" << endl << col_2 << endl;
+	//Eigen::Tensor<int, 2> a(4, 3);
+	//a.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
+	//{ 600, 700, 800 },{ 900, 1000, 1100 } });
+	//Eigen::Tensor<int, 1> row_3 = a.chip(2, 0);
+	//Eigen::Tensor<int, 1> col_2 = a.chip(1, 1);
+	//cout << "a" << endl << a << endl;
+	//cout << "row_3" << endl << row_3 << endl;
+	//cout << "col_2" << endl << col_2 << endl;
 
 	//int d1 = 4;
 	//int d2 = 3;
@@ -119,6 +119,7 @@ int main()
 	//ArrayXXf res = data.replicate(2, 4);
 //	cout << map;
 	test_tree_cfr();
+	cout << "Done";
 	//float target[6] = { -1, 1, 5, 5, 6, 6 };
 
 	//float array[40];

@@ -14,7 +14,8 @@ Node CreateNode()
 	return root_node;
 }
 
-TEST_CASE("bet_sizing_300_300") {
+TEST_CASE("bet_sizing_300_300")
+{
 
 	bet_sizing_manager manager;
 	Node root_node = CreateNode();
@@ -30,7 +31,8 @@ TEST_CASE("bet_sizing_300_300") {
 	REQUIRE(bets(1, 1) == 200);
 }
 
-TEST_CASE("bet_sizing_100_100") {
+TEST_CASE("bet_sizing_100_100")
+{
 
 	bet_sizing_manager manager;
 	Node root_node = CreateNode();
@@ -48,7 +50,8 @@ TEST_CASE("bet_sizing_100_100") {
 	REQUIRE(bets.rows() == 2);
 }
 
-TEST_CASE("bet_sizing_100_100_P2") {
+TEST_CASE("bet_sizing_100_100_P2")
+{
 
 	bet_sizing_manager manager;
 	Node root_node = CreateNode();
@@ -66,7 +69,8 @@ TEST_CASE("bet_sizing_100_100_P2") {
 	REQUIRE(bets.rows() == 2);
 }
 
-TEST_CASE("bet_sizing_400_100_P2") {
+TEST_CASE("bet_sizing_400_100_P2")
+{
 
 	bet_sizing_manager manager;
 	Node root_node = CreateNode();
@@ -81,7 +85,8 @@ TEST_CASE("bet_sizing_400_100_P2") {
 	REQUIRE(bets.rows() == 1);
 }
 
-TEST_CASE("bet_sizing_300_600_P1") {
+TEST_CASE("bet_sizing_300_600_P1")
+{
 
 	bet_sizing_manager manager;
 	Node root_node = CreateNode();
@@ -96,7 +101,8 @@ TEST_CASE("bet_sizing_300_600_P1") {
 	REQUIRE(bets.rows() == 1);
 }
 
-TEST_CASE("bet_sizing_100_200_pot_size_0.5_1") {
+TEST_CASE("bet_sizing_100_200_pot_size_0.5_1")
+{
 
 	VectorXf potSize(2);
 	potSize << 0.5, 1.0;

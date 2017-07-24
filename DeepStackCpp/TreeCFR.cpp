@@ -5,8 +5,21 @@
 
 TreeCFR::TreeCFR(){}
 
+
+TreeCFR::~TreeCFR()
+{
+	for (auto itr = _cached_terminal_equities.begin(); itr != _cached_terminal_equities.end(); itr++)
+	{
+		delete itr->second;
+	}
+
+	_cached_terminal_equities.clear();
+}
+
 void TreeCFR::run_cfr(Node& root, const ArrayXXf& starting_ranges, size_t iter_count)
 {
+	Util::ToString(starting_ranges);
+
 	assert(starting_ranges.size() > 0);
 	iter_count = iter_count > 0 ? iter_count : cfr_iters;
 	root.ranges_absolute = starting_ranges;
@@ -100,8 +113,8 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 		//--set new absolute ranges(after the action) for the child
 		child_node->ranges_absolute = ArrayXXf(node.ranges_absolute);
 
-		child_node->ranges_absolute.row(0) = children_ranges_absolute[0](i);
-		child_node->ranges_absolute.row(1) = children_ranges_absolute[1](i);
+		child_node->ranges_absolute.row(0) = children_ranges_absolute[0].row(i);
+		child_node->ranges_absolute.row(1) = children_ranges_absolute[1].row(i);
 		cfrs_iter_dfs(*child_node, iter);
 
 		// Now coping cf_values from children to calculate the regret
@@ -182,11 +195,11 @@ void TreeCFR::update_average_strategy(Node& node, ArrayXXf& current_strategy, si
 			node.iter_weight_sum.fill(0);
 		}
 
-		ArrayXf iter_weight_contribution = node.ranges_absolute.row(node.current_player); // Copy?
+		ArrayXf iter_weight_contribution = node.ranges_absolute.row(node.current_player - 1); // Copy?
 		Util::ClipLow(node.iter_weight_contribution, regret_epsilon);
 		node.iter_weight_sum += iter_weight_contribution;
 
-		ArrayXf iter_weight = iter_weight_contribution / node.iter_weight_sum;
+		ArrayXXf iter_weight = iter_weight_contribution / node.iter_weight_sum;
 		iter_weight.conservativeResize(1, card_count);
 		ArrayXXf expanded_weight = Util::ExpandAs(iter_weight, node.strategy);
 		ArrayXXf old_strategy_scale = (expanded_weight * (-1)) + 1; //--same as 1 - expanded weight

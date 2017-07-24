@@ -8,8 +8,6 @@
 #include <map>
 #include <Eigen/Dense>
 
-void _fillPlayersRangesAndStrategy();
-
 using namespace std;
 using namespace Eigen;
 
@@ -17,6 +15,7 @@ class TreeCFR
 {
 public:
 	TreeCFR();
+	~TreeCFR();
 
 	//	-- - Run CFR to solve the given game tree.
 	//	-- @param root the root node of the tree to solve.

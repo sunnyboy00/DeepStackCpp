@@ -73,9 +73,9 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		static void ToString(ArrayXXf dataArg);
+		static void ToString(const ArrayXXf& dataArg);
 
-		static void ToString(MatrixXf dataArg);
+		static void ToString(const MatrixXf& dataArg);
 
 		//static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
 		//{
