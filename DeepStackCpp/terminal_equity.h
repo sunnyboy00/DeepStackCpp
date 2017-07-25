@@ -63,7 +63,7 @@ public:
 	//-- @param ranges a batch of opponent ranges in an NxK tensor, where N is the batch size
 	//-- and K is the range size
 	//-- @param result a NxK tensor in which to save the cfvs
-	void call_value(const MatrixXf& ranges, MatrixXf& result);
+	void call_value(const ArrayXXf& ranges, ArrayXXf& result);
 
 	//-- - Computes(a batch of) counterfactual values that a player achieves at a terminal node
 	//-- where a player has folded.
@@ -75,7 +75,7 @@ public:
 	//-- and K is the range size
 	//-- @param result A NxK tensor in which to save the cfvs.Positive cfvs are returned, and
 	//--must be negated if the player in question folded.
-	void fold_value(const MatrixXf& ranges, MatrixXf& result);
+	void fold_value(const ArrayXXf & ranges, ArrayXXf& result);
 
 	//-- - Returns the matrix which gives showdown equity for any ranges.
 	//--
@@ -85,7 +85,7 @@ public:
 	//-- @return For nodes in the last betting round, the matrix `A` such that for player ranges
 	//-- `x` and `y`, `x'Ay` is the equity for the first player when no player folds.For nodes
 	//-- in the first betting round, the weighted average of all such possible matrices.
-	MatrixXf get_call_matrix();
+	ArrayXXf get_call_matrix();
 
 	//-- - Computes the counterfactual values that both players achieve at a terminal node
 	//-- where no player has folded.
@@ -95,7 +95,7 @@ public:
 	//--
 	//-- @param ranges a 2xK tensor containing ranges for each player(where K is the range size)
 	//-- @param result a 2xK tensor in which to store the cfvs for each player
-	void tree_node_call_value(const MatrixXf& ranges, MatrixXf& result);
+	void tree_node_call_value(const ArrayXXf& ranges, ArrayXXf& result);
 
 	//	-- - Computes the counterfactual values that both players achieve at a terminal node
 	//-- where either player has folded.
@@ -106,7 +106,7 @@ public:
 	//-- @param ranges a 2xK tensor containing ranges for each player(where K is the range size)
 	//-- @param result a 2xK tensor in which to store the cfvs for each player
 	//-- @param folding_player which player folded
-	void tree_node_fold_value(const MatrixXf& ranges, MatrixXf&  result, int folding_player);
+	void tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& result, int folding_player);
 
 
 //private: ToDo:Remove after testing

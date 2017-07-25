@@ -60,36 +60,36 @@ void terminal_equity::_set_fold_matrix(const ArrayXf & board)
 	_handle_blocking_cards(_fold_matrix, board);
 }
 
-void terminal_equity::call_value(const MatrixXf & ranges, MatrixXf & result)
+void terminal_equity::call_value(const ArrayXXf & ranges, ArrayXXf & result)
 {
-	result.noalias() = ranges * _equity_matrix.matrix();// ToDo: check performance without no alias
+	result = ranges.matrix() * _equity_matrix.matrix();
 }
 
-void terminal_equity::fold_value(const MatrixXf & ranges, MatrixXf & result)
+void terminal_equity::fold_value(const ArrayXXf & ranges, ArrayXXf& result)
 {
 	assert(_fold_matrix.size() > 0);
-	result.noalias() = ranges * _fold_matrix.matrix();
+	result = (ranges.matrix() * _fold_matrix.matrix()).array();
 }
 
-MatrixXf terminal_equity::get_call_matrix()
+ArrayXXf terminal_equity::get_call_matrix()
 {
-	return _equity_matrix.matrix();
+	return _equity_matrix;
 }
 
-void terminal_equity::tree_node_call_value(const MatrixXf& ranges, MatrixXf& result)
+void terminal_equity::tree_node_call_value(const ArrayXXf& ranges, ArrayXXf& result)
 {
 	//ToDo: performance warning maybe just call_value and swap rows? Or Maps as below commented out will be faster?
-	MatrixXf tempResult(result.rows(), result.cols());
+	ArrayXXf tempResult(result.rows(), result.cols());
 	call_value(ranges, tempResult);
 	result.row(0) = tempResult.row(1);
 	result.row(1) = tempResult.row(0);
-	//result.row(0) = Map<MatrixXf>(tempResult.row(1).data(), 1, ranges.cols());
-	//result.row(1) = Map<MatrixXf>(tempResult.row(0).data(), 1, ranges.cols());
+	//result.row(0) = Map<ArrayXXf>(tempResult.row(1).data(), 1, ranges.cols());
+	//result.row(1) = Map<ArrayXXf>(tempResult.row(0).data(), 1, ranges.cols());
 }
 
-void terminal_equity::tree_node_fold_value(const MatrixXf & ranges, MatrixXf & result, int folding_player)
+void terminal_equity::tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& result, int folding_player)
 {
-	MatrixXf tempResult(result.rows(), result.cols());
+	ArrayXXf tempResult(result.rows(), result.cols());
 	fold_value(ranges, tempResult);
 	result.row(0) = tempResult.row(1);
 	result.row(1) = tempResult.row(0);

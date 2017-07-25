@@ -149,7 +149,7 @@ TEST_CASE("tree_node_call_value")
 		}
 	}
 
-	MatrixXf result(2, 6);
+	ArrayXXf result(2, 6);
 	terminal_equity term;
 	term.tree_node_call_value(range, result);
 	REQUIRE(result(0,0) == Approx(0.0963).epsilon(myEps));
@@ -198,7 +198,7 @@ TEST_CASE("tree_node_fold_value")
 	}
 
 
-	MatrixXf result(2, 6);
+	ArrayXXf result(2, 6);
 	terminal_equity term;
 	term.tree_node_fold_value(range, result, P2);
 	REQUIRE(result(0, 0) == Approx(0.2552).epsilon(myEps));
@@ -213,10 +213,10 @@ TEST_CASE("tree_node_fold_value_integration")
 {
 	ArrayXXf range(2, 6);
 
-	range << 0.0000,0.2000,0.2000,0.2000,0.2000,0.2000,
-		0.0000,0.1000,0.1000,0.1000,0.1000,0.1000;
+	range << 0.0000f,0.2000f,0.2000f,0.2000f,0.2000f,0.2000f,
+		0.0000f,0.1000f,0.1000f,0.1000f,0.1000f,0.1000f;
 
-	MatrixXf result(2, 6);
+	ArrayXXf result(2, 6);
 	terminal_equity term;
 
 	card_to_string_conversion converter;

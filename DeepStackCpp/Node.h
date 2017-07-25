@@ -67,7 +67,7 @@ struct Node
 	// Depth of the node inside the tree
 	long long depth;
 
-	// Player regrets. A tensor of (actions_count x card_count) size.
+	// Player regrets. A tensor of [actions_count x card_count] size.
 	ArrayXXf regrets;
 
 	// A 2xK tensor containing the probabilities of each
@@ -76,8 +76,8 @@ struct Node
 
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against
-	//--each other
-	MatrixXf cf_values;
+	//--each other. [players_count X card_count]
+	ArrayXXf cf_values;
 
 	//-- The cfvs for a best response against each player in the profile
 	ArrayXXf cf_values_br;

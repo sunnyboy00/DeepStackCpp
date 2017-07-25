@@ -101,20 +101,48 @@ void tree_values::_compute_values_dfs(Node& node)
 
 		_terminal_equity.set_board(node.board);
 
-		MatrixXf values = MatrixXf::Zero(players_count, card_count);
+		ArrayXXf values = ArrayXXf::Zero(players_count, card_count);
 
 		if (node.type == terminal_fold)
 		{
 			_terminal_equity.tree_node_fold_value(node.ranges_absolute, values, opponent);
 		}
-			else
-				self.terminal_equity : tree_node_call_value(node.ranges_absolute, values)
-				end
+		else
+		{
+			_terminal_equity.tree_node_call_value(node.ranges_absolute, values);
+		}
 
-				--multiply by the pot
-				values = values * node.pot
+		//--multiply by the pot
+		values = values * node.pot;
+		node.cf_values = ArrayXXf(node.ranges_absolute);
+		node.cf_values_br = ArrayXXf(node.ranges_absolute);
+		//node.cf_values = values:viewAs(node.ranges_absolute)
+		//node.cf_values_br = values : viewAs(node.ranges_absolute)
+	}
+	else
+	{
 
-				node.cf_values = values:viewAs(node.ranges_absolute)
-				node.cf_values_br = values : viewAs(node.ranges_absolute)
+		const int actions_count = node.children.size();
+
+		const int ranges_size = card_count; //node.ranges_absolute:size(2)
+
+			//--[[actions, players, ranges]]
+			//local cf_values_allactions = arguments.Tensor(#node.children, 2, ranges_size) : fill(0)
+			//local cf_values_br_allactions = arguments.Tensor(#node.children, 2, ranges_size) : fill(0)
+
+			//[actions_count x card_count][players_count]
+			Array<float, Dynamic, card_count>  cf_values_allactions[players_count];
+			Array<float, Dynamic, card_count>  cf_values_br_allactions[players_count];
+
+			for (size_t i = 0; i < actions_count; i++)
+			{
+				Node* child_node = node.children[i];
+				_compute_values_dfs(*child_node);
+
+				cf_values_allactions[i] = child_node.cf_values
+					cf_values_br_allactions[i] = child_node.cf_values_br
+					end
+			}
+
 	}
 }
