@@ -23,8 +23,8 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 	assert(node.strategy.size() > 0);
 
 	const int actions_count = (int)node.children.size();
-	const int currentPlayerIndex = node.current_player - 1;
-	const int opponentIndex = 2 - node.current_player;
+	const int currentPlayerIndex = node.current_player;
+	const int opponentIndex = 1 - node.current_player;
 
 	//--check that it's a legal strategy
 	ArrayXXf strategy_to_check = node.strategy;
@@ -92,7 +92,7 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 
 void tree_values::_compute_values_dfs(Node& node)
 {
-	const int opponent = 3 - node.current_player;
+	const int opponent = 1 - node.current_player;
 
 	//--compute values using terminal_equity in terminal nodes
 	if (node.terminal)
@@ -122,7 +122,7 @@ void tree_values::_compute_values_dfs(Node& node)
 	else
 	{
 
-		const int actions_count = node.children.size();
+		const int actions_count = (int)node.children.size();
 
 		const int ranges_size = card_count; //node.ranges_absolute:size(2)
 
@@ -134,15 +134,15 @@ void tree_values::_compute_values_dfs(Node& node)
 			Array<float, Dynamic, card_count>  cf_values_allactions[players_count];
 			Array<float, Dynamic, card_count>  cf_values_br_allactions[players_count];
 
-			for (size_t i = 0; i < actions_count; i++)
-			{
-				Node* child_node = node.children[i];
-				_compute_values_dfs(*child_node);
+			//for (size_t i = 0; i < actions_count; i++)
+			//{
+			//	Node* child_node = node.children[i];
+			//	_compute_values_dfs(*child_node);
 
-				cf_values_allactions[i] = child_node.cf_values
-					cf_values_br_allactions[i] = child_node.cf_values_br
-					end
-			}
+			//	cf_values_allactions[i] = child_node.cf_values
+			//		cf_values_br_allactions[i] = child_node.cf_values_br
+			//		end
+			//}
 
 	}
 }

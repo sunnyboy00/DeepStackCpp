@@ -12,7 +12,7 @@ static const int players_count = 2;
 static const int streets_count = 2;
 
 // IDs for each player and chance
-enum players { chance = 0, P1 = 1, P2 = 2 }; 
+enum players { chance = -1, P1 = 0, P2 = 1 }; 
 
 //  IDs for terminal nodes (either after a fold or call action) and nodes that follow a check action
 // @field terminal_fold(terminal node following fold) `-2`

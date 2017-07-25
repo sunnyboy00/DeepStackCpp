@@ -94,7 +94,7 @@ void terminal_equity::tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& res
 	result.row(0) = tempResult.row(1);
 	result.row(1) = tempResult.row(0);
 
-	result.row(folding_player - 1) *= -1;
+	result.row(folding_player) *= -1;
 }
 
 void terminal_equity::_handle_blocking_cards(ArrayXXf& equity_matrix, const ArrayXf& board)

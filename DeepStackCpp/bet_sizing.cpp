@@ -15,17 +15,17 @@ bet_sizing_manager::bet_sizing_manager() : bet_sizing_manager(bet_sizing) {}
 
 ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 {
-	assert(node.current_player == 1 || node.current_player == 2 && "Wrong player for bet size computation");
+	assert(node.current_player == P1 || node.current_player == P2 && "Wrong player for bet size computation");
 
-	int current_player_z = node.current_player - 1; // -1 because in tourch index is 1 based.
-	int opponent = 2 - node.current_player;
+	int current_player = node.current_player; // -1 because in tourch index is 1 based.
+	int opponent = 1 - node.current_player;
 	float opponent_bet = node.bets(opponent);
 
-	assert(node.bets(current_player_z) <= opponent_bet);
+	assert(node.bets(current_player) <= opponent_bet);
 
 	//compute min possible raise size
 	float max_raise_size = stack - opponent_bet;
-	float min_raise_size = opponent_bet - node.bets(current_player_z);
+	float min_raise_size = opponent_bet - node.bets(current_player);
 	min_raise_size = max(min_raise_size, ante);
 	min_raise_size = min(max_raise_size, min_raise_size);
 	if (min_raise_size == 0)
@@ -38,7 +38,7 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 	{
 		ArrayX2f out(1, 2);
 		out.fill((float)opponent_bet);
-		out(0, current_player_z) = (float)(opponent_bet + min_raise_size);
+		out(0, current_player) = (float)(opponent_bet + min_raise_size);
 		return out;
 	}
 	else
@@ -58,12 +58,12 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 			if (raise_size >= min_raise_size && raise_size < max_raise_size)
 			{
 				//used_bets_count++;
-				out(used_bets_count, current_player_z) = opponent_bet + raise_size;
+				out(used_bets_count, current_player) = opponent_bet + raise_size;
 				used_bets_count++;
 			}
 		}
 
-		out(used_bets_count, current_player_z) = (float)(opponent_bet + max_raise_size);
+		out(used_bets_count, current_player) = (float)(opponent_bet + max_raise_size);
 
 		// adding allin
 		used_bets_count++;

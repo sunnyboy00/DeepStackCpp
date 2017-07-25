@@ -58,7 +58,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 	assert(parent_node.current_player != chance);
 
 	auto children = vector<Node*>();
-	int current_player = 3 - parent_node.current_player;
+	int current_player = 1 - parent_node.current_player;
 
 	//1.0 fold action
 	Node* fold_node = new Node();
