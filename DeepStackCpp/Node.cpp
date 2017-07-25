@@ -16,7 +16,7 @@
 //	terminal = terminal;
 //}
 
-Node::Node() : street(1), current_player(chance), bets(2), terminal(false), depth(-1), node_type(uninitialized), board_string(""), pot(0) //ToDo: Perfomance Warning: do we realy need default constructor to save perfomance?
+Node::Node() : street(1), current_player(chance), bets(2), terminal(false), depth(-1), type(uninitialized), board_string(""), pot(0) //ToDo: Perfomance Warning: do we realy need default constructor to save perfomance?
 {
 }
 
@@ -47,7 +47,7 @@ string GetNodeTypeString(const node_types value) {
 void Node::ToString()
 {
 	wostringstream ss;
-	ss << "Type: " << GetNodeTypeString(node_type).c_str();
+	ss << "Type: " << GetNodeTypeString(type).c_str();
 	ss << ". Player: " << current_player;
 	ss << ". Street: " << street;
 	ss << ". Depth: " << depth;

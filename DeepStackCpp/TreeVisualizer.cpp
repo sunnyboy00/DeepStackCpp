@@ -88,11 +88,11 @@ GraphvisNode* TreeVisualizer::node_to_graphviz(const Node & node)
 
 	if (node.terminal)
 	{
-		if (node.node_type == terminal_fold)
+		if (node.type == terminal_fold)
 		{
 			out->Label += "| TERMINAL FOLD";
 		}
-		else if (node.node_type == terminal_call)
+		else if (node.type == terminal_call)
 		{
 			out->Label += "| TERMINAL CALL";
 		}

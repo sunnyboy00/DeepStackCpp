@@ -34,7 +34,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 		string next_board_string = _card_to_string.cards_to_string(next_board);
 		
 		Node* child = new Node();
-		child->node_type = inner_node;
+		child->type = inner_node;
 		child->parent = &parent_node;
 		child->current_player = P1;
 		child->street = parent_node.street + 1;
@@ -62,7 +62,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 
 	//1.0 fold action
 	Node* fold_node = new Node();
-	fold_node->node_type = terminal_fold;
+	fold_node->type = terminal_fold;
 	fold_node->terminal = true;
 	fold_node->current_player = current_player;
 	fold_node->street = parent_node.street;
@@ -76,7 +76,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 	if (parent_node.current_player == P1 && (parent_node.bets(0) == parent_node.bets(1)))
 	{
 		Node* check_node = new Node();
-		check_node->node_type = check;
+		check_node->type = check;
 		check_node->terminal = false;
 		check_node->current_player = current_player;
 		check_node->street = parent_node.street;
@@ -96,7 +96,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		)
 	{
 		Node* chnce_node = new Node();
-		chnce_node->node_type = chance_node;
+		chnce_node->type = chance_node;
 		chnce_node->street = parent_node.street;
 		chnce_node->board = parent_node.board;
 		chnce_node->board_string = parent_node.board_string;
@@ -109,7 +109,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 	{
 		//2.0 terminal call - either last street or allin
 		Node* terminal_call_node = new Node();
-		terminal_call_node->node_type = terminal_call;
+		terminal_call_node->type = terminal_call;
 		terminal_call_node->terminal = true;
 		terminal_call_node->current_player = current_player;
 		terminal_call_node->street = parent_node.street;

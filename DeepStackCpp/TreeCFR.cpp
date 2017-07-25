@@ -47,7 +47,7 @@ void TreeCFR::cfrs_iter_dfs(Node& node, size_t iter)
 
 void TreeCFR::_fillCFvaluesForTerminalNode(Node &node)
 {
-	assert(node.terminal && (node.node_type == terminal_fold || node.node_type == terminal_call));
+	assert(node.terminal && (node.type == terminal_fold || node.type == terminal_call));
 	int opponnent = 3 - node.current_player;
 
 	terminal_equity* termEquity = _get_terminal_equity(node);
@@ -56,7 +56,7 @@ void TreeCFR::_fillCFvaluesForTerminalNode(Node &node)
 	node.cf_values = MatrixXf(node.ranges_absolute);
 	node.cf_values.fill(0);
 
-	if (node.node_type == terminal_fold)
+	if (node.type == terminal_fold)
 	{
 		termEquity->tree_node_fold_value(node.ranges_absolute, node.cf_values, opponnent);
 	}

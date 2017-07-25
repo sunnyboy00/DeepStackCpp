@@ -22,7 +22,7 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 
 	assert(node.strategy.size() > 0);
 
-	const int actions_count = node.children.size();
+	const int actions_count = (int)node.children.size();
 	const int currentPlayerIndex = node.current_player - 1;
 	const int opponentIndex = 2 - node.current_player;
 
@@ -32,10 +32,10 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 	if (node.current_player != chance)
 	{
 		ArrayXf checksum = strategy_to_check.colwise().sum();
-		assert((strategy_to_check > 0).all());
-		assert((strategy_to_check < 1.001).all());
-		assert((checksum > 0.999).all());
-		assert((checksum < 1.001).all());
+		assert((strategy_to_check > 0.f).all());
+		assert((strategy_to_check < 1.001f).all());
+		assert((checksum > 0.999f).all());
+		assert((checksum < 1.001f).all());
 	}
 
 	assert((node.ranges_absolute >= 0).all());
@@ -87,5 +87,34 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 			//--go deeper
 			_fill_ranges_dfs(*node.children[i], child_range);
 		}
+	}
+}
+
+void tree_values::_compute_values_dfs(Node& node)
+{
+	const int opponent = 3 - node.current_player;
+
+	//--compute values using terminal_equity in terminal nodes
+	if (node.terminal)
+	{
+		assert(node.type == terminal_fold || node.type == terminal_call);
+
+		_terminal_equity.set_board(node.board);
+
+		MatrixXf values = MatrixXf::Zero(players_count, card_count);
+
+		if (node.type == terminal_fold)
+		{
+			_terminal_equity.tree_node_fold_value(node.ranges_absolute, values, opponent);
+		}
+			else
+				self.terminal_equity : tree_node_call_value(node.ranges_absolute, values)
+				end
+
+				--multiply by the pot
+				values = values * node.pot
+
+				node.cf_values = values:viewAs(node.ranges_absolute)
+				node.cf_values_br = values : viewAs(node.ranges_absolute)
 	}
 }

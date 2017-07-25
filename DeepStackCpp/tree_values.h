@@ -31,5 +31,15 @@ public:
 	//-- player reaching the current node with each private hand
 	void _fill_ranges_dfs(Node& node, ArrayXXf& ranges_absolute);
 
+	//-- - Recursively calculate the counterfactual values for each player at each
+	//	-- node of the tree using the saved strategy profile.
+	//	--
+	//	--The cfvs for each player in the given strategy profile when playing against
+	//	-- each other is stored in the `cf_values` field for each node.The cfvs for
+	//	--a best response against each player in the profile are stored in the
+	//	-- `cf_values_br` field for each node.
+	//	-- @param node the current node
+	void _compute_values_dfs(Node& node);
+
 };
 
