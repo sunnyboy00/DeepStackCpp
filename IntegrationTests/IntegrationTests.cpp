@@ -57,10 +57,10 @@ void test_tree_cfr()
 	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("Ks");
-	params.root_node->street = 2;
+	params.root_node->board = converter.string_to_board("");
+	params.root_node->street = 1;
 	params.root_node->current_player = P1;
-	params.root_node->bets << 1200, 1200;
+	params.root_node->bets << 100, 100;
 
 	tree_builder builder;
 	Node& tree = builder.build_tree(params);
@@ -71,11 +71,11 @@ void test_tree_cfr()
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1);
+	tree_cfr.run_cfr(tree, starting_ranges, 1000);
 
 	tree_values tv;
-	tv._fill_ranges_dfs(tree, starting_ranges);
-
+	tv.compute_values(tree, &starting_ranges);
+	cout << "Exploitability: " << tree.exploitability << endl;
 }
 
 int main()

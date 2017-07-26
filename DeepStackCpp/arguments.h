@@ -30,7 +30,7 @@ static const long long ante = 100;
 static const long long stack = 1200;
 // the number of iterations that DeepStack runs CFR for
 static const int cfr_iters = 1000;
-// the number of preliminary CFR iterations which DeepStack doesn"t factor into the average strategy (included in cfr_iters)
+// the number of preliminary CFR iterations which DeepStack doesn't factor into the average strategy (included in cfr_iters)
 static const int cfr_skip_iters = 500;
 // how many poker situations are solved simultaneously during data generation
 static const int gen_batch_size = 10;

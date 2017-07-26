@@ -93,14 +93,14 @@
     <ClInclude Include="terminal_equity.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="TreeCFR.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Util.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="TreeCFR.h">
+      <Filter>Header Files\Tree</Filter>
+    </ClInclude>
     <ClInclude Include="tree_values.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Tree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

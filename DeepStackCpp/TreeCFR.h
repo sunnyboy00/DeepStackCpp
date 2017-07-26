@@ -24,7 +24,7 @@ public:
 	//	-- @param[opt] iter_count the number of iterations to run CFR for
 	//	--(default @{arguments.cfr_iters
 	//})
-	void run_cfr(Node& root, const ArrayXXf&  starting_ranges, size_t iter_count = 0);
+	void run_cfr(Node& root, const ArrayXXf&  starting_ranges, size_t iter_count = 0, size_t skip_iters = cfr_skip_iters);
 
 private:
 
@@ -36,6 +36,8 @@ private:
 	const float regret_epsilon = 1.0f / 1000000000;
 
 	map<ArrayXf*, terminal_equity*> _cached_terminal_equities;
+
+	size_t _cfr_skip_iters;
 
 	//-- - Gets an evaluator for player equities at a terminal node.
 	//--

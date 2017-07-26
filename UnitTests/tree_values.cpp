@@ -35,7 +35,7 @@ TEST_CASE("tree_values_Ks_1200_1200_range")
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1);
+	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
 
 	tree_values tv;
 	tv._fill_ranges_dfs(tree, starting_ranges);
@@ -73,7 +73,7 @@ TEST_CASE("tree_values_Ks_100_100_range")
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1);
+	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
 
 	tree_values tv;
 	tv._fill_ranges_dfs(tree, starting_ranges);
@@ -111,7 +111,7 @@ TEST_CASE("tree_values_100_100_range")
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1);
+	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
 
 	tree_values tv;
 	tv._fill_ranges_dfs(tree, starting_ranges);
@@ -129,7 +129,7 @@ TEST_CASE("tree_values_100_100_range")
 	REQUIRE(tree.children[3]->children[0]->ranges_absolute(1, 5) == Approx(0.01 * 8.3333).epsilon(myEps));
 }
 
-TEST_CASE("exploitability_100_100")
+TEST_CASE("exploitability_100_100_1_pass")
 {
 	TreeBuilderParams params;
 	Node node;
@@ -149,7 +149,7 @@ TEST_CASE("exploitability_100_100")
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1);
+	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
 
 	tree_values tv;
 	tv.compute_values(tree, &starting_ranges);
@@ -176,9 +176,36 @@ TEST_CASE("exploitability_As_1200_1200_P2")
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1);
+	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
 
 	tree_values tv;
 	tv.compute_values(tree, &starting_ranges);
 	REQUIRE(tree.exploitability == Approx(240).epsilon(myEps));
+}
+
+TEST_CASE("exploitability_100_100_2_pass")
+{
+	TreeBuilderParams params;
+	Node node;
+	params.root_node = &node;
+	card_to_string_conversion converter;
+	params.root_node->board = converter.string_to_board("Ks");
+	params.root_node->street = 2;
+	params.root_node->current_player = P2;
+	params.root_node->bets << 1200, 1200;
+
+	tree_builder builder;
+	Node& tree = builder.build_tree(params);
+	card_tools cradTools;
+
+	ArrayXXf starting_ranges(players_count, card_count);
+	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
+	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+
+	TreeCFR tree_cfr;
+	tree_cfr.run_cfr(tree, starting_ranges, 2, 0);
+
+	tree_values tv;
+	tv.compute_values(tree, &starting_ranges);
+	REQUIRE(tree.exploitability == Approx(120.0).epsilon(myEps));
 }

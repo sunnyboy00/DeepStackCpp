@@ -16,11 +16,13 @@ TreeCFR::~TreeCFR()
 	_cached_terminal_equities.clear();
 }
 
-void TreeCFR::run_cfr(Node& root, const ArrayXXf& starting_ranges, size_t iter_count)
+void TreeCFR::run_cfr(Node& root, const ArrayXXf& starting_ranges, size_t iter_count, size_t skip_iters)
 {
+	_cfr_skip_iters = skip_iters;
 	Util::ToString(starting_ranges);
 
 	assert(starting_ranges.size() > 0);
+	assert(iter_count >= _cfr_skip_iters);
 	iter_count = iter_count > 0 ? iter_count : cfr_iters;
 	root.ranges_absolute = starting_ranges;
 
@@ -175,33 +177,29 @@ void TreeCFR::update_regrets(Node& node, const ArrayXXf& current_regrets)
 
 void TreeCFR::update_average_strategy(Node& node, ArrayXXf& current_strategy, size_t iter)
 {
-	if (iter > cfr_skip_iters)
+	if (iter >= _cfr_skip_iters)
 	{
 		if (node.strategy.size() == 0)
 		{
-			int actions_count = (int)node.children.size();
-			node.strategy = ArrayXXf(actions_count, card_count);
-			node.strategy.fill(0);
+			const int actions_count = (int)node.children.size();
+			node.strategy = ArrayXXf::Zero(actions_count, card_count);
 		}
 
 		if (node.iter_weight_sum.size() == 0)
 		{
-			int actions_count = (int)node.children.size();
-			node.iter_weight_sum = ArrayXf(card_count);
-			node.iter_weight_sum.fill(0);
+			node.iter_weight_sum = ArrayXf::Zero(card_count);
 		}
 
-		ArrayXf iter_weight_contribution = node.ranges_absolute.row(node.current_player - 1); // Copy?
-		Util::ClipLow(node.iter_weight_contribution, regret_epsilon);
+		ArrayXf iter_weight_contribution = node.ranges_absolute.row(node.current_player); 
+		Util::ClipLow(iter_weight_contribution, regret_epsilon);
 		node.iter_weight_sum += iter_weight_contribution;
 
 		ArrayXXf iter_weight = iter_weight_contribution / node.iter_weight_sum;
-		iter_weight.conservativeResize(1, card_count);
+		iter_weight.resize(1, card_count);
 		ArrayXXf expanded_weight = Util::ExpandAs(iter_weight, node.strategy);
 		ArrayXXf old_strategy_scale = (expanded_weight * (-1)) + 1; //--same as 1 - expanded weight
 		node.strategy *= old_strategy_scale;
-		ArrayXXf strategy_addition = current_strategy  * expanded_weight;
-		node.strategy += strategy_addition;
+		node.strategy += (current_strategy  * expanded_weight);
 	}
 }
 

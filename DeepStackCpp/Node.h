@@ -88,7 +88,7 @@ struct Node
 	// CFV-BR values weighted by the reach prob
 	ArrayXXf cfv_br_infset;
 
-	//Weighted sum card ranges
+	//Weighted sum of card ranges
 	ArrayXf iter_weight_sum;
 
 	//Weighted current card ranges contribution;

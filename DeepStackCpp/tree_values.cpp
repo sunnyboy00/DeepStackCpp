@@ -132,7 +132,7 @@ void tree_values::_compute_values_dfs(Node& node)
 			}
 			else
 			{
-				node.cf_values.row(current_player) += child_node->cf_values.row(current_player) * node.strategy.row(current_player);
+				node.cf_values.row(current_player) += child_node->cf_values.row(current_player) * node.strategy.row(i);
 				node.cf_values.row(opponent) += child_node->cf_values.row(opponent);
 
 				node.cf_values_br.row(opponent) += child_node->cf_values_br.row(opponent);
