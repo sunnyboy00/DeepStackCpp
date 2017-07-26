@@ -14,7 +14,6 @@ class tree_values
 {
 public:
 	tree_values();
-	~tree_values();
 
 //private:
 	terminal_equity _terminal_equity;
@@ -41,5 +40,18 @@ public:
 	//	-- @param node the current node
 	void _compute_values_dfs(Node& node);
 
+	//-- - Compute the self play and best response values of a strategy profile on
+	//	-- the given game tree.
+	//	--
+	//	--The cfvs for each player in the given strategy profile when playing against
+	//	-- each other is stored in the `cf_values` field for each node.The cfvs for
+	//	--a best response against each player in the profile are stored in the
+	//	-- `cf_values_br` field for each node.
+	//	--
+	//	-- @param root The root of the game tree.Each node of the tree is assumed to
+	//	-- have a strategy saved in the `strategy` field.
+	//	-- @param[opt] starting_ranges probability vectors over player private hands
+	//	-- at the root node(default uniform)
+	void compute_values(Node& root, ArrayXXf* starting_ranges = nullptr);
 };
 

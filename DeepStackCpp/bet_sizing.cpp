@@ -17,7 +17,7 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 {
 	assert(node.current_player == P1 || node.current_player == P2 && "Wrong player for bet size computation");
 
-	int current_player = node.current_player; // -1 because in tourch index is 1 based.
+	int current_player = node.current_player; 
 	int opponent = 1 - node.current_player;
 	float opponent_bet = node.bets(opponent);
 

@@ -4,6 +4,7 @@
 #include "card_to_string_conversion.h"
 #include <string>
 
+
 Node CreateNode()
 {
 	card_to_string_conversion converter;
@@ -14,9 +15,9 @@ Node CreateNode()
 	return root_node;
 }
 
+
 TEST_CASE("bet_sizing_300_300")
 {
-
 	bet_sizing_manager manager;
 	Node root_node = CreateNode();
 	root_node.current_player = P1;

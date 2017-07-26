@@ -103,6 +103,9 @@ struct Node
 	// gp_id - he index of the current node's grandparent.
 	Tensor<float, 3> lookahead_coordinates;
 
+	// Node exploitability mean of node.epsilon.
+	float exploitability;
+
 	void ToString();
 	//Node(const Node &node);
 };

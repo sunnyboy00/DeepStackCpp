@@ -1,15 +1,9 @@
+#define NOMINMAX
+
 #include "tree_values.h"
 
 
-
-tree_values::tree_values()
-{
-}
-
-
-tree_values::~tree_values()
-{
-}
+tree_values::tree_values(){}
 
 void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 {
@@ -93,6 +87,7 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 void tree_values::_compute_values_dfs(Node& node)
 {
 	const int opponent = 1 - node.current_player;
+	const int current_player = node.current_player;
 
 	//--compute values using terminal_equity in terminal nodes
 	if (node.terminal)
@@ -114,35 +109,84 @@ void tree_values::_compute_values_dfs(Node& node)
 
 		//--multiply by the pot
 		values = values * node.pot;
-		node.cf_values = ArrayXXf(node.ranges_absolute);
-		node.cf_values_br = ArrayXXf(node.ranges_absolute);
-		//node.cf_values = values:viewAs(node.ranges_absolute)
-		//node.cf_values_br = values : viewAs(node.ranges_absolute)
+		node.cf_values = ArrayXXf(values);
+		node.cf_values_br = ArrayXXf(values);
 	}
 	else
 	{
 
 		const int actions_count = (int)node.children.size();
+		//[players_count x card_count][actions_count]
+		node.cf_values = ArrayXXf::Zero(players_count, card_count);
+		node.cf_values_br = ArrayXXf::Zero(players_count, card_count); 
 
-		const int ranges_size = card_count; //node.ranges_absolute:size(2)
+		for (size_t i = 0; i < actions_count; i++)
+		{
+			Node* child_node = node.children[i];
+			_compute_values_dfs(*child_node);
 
-			//--[[actions, players, ranges]]
-			//local cf_values_allactions = arguments.Tensor(#node.children, 2, ranges_size) : fill(0)
-			//local cf_values_br_allactions = arguments.Tensor(#node.children, 2, ranges_size) : fill(0)
+			if (current_player == chance) // ToDo: move check outside the loop and check performance
+			{
+				node.cf_values += child_node->cf_values;
+				node.cf_values_br += child_node->cf_values_br;
+			}
+			else
+			{
+				node.cf_values.row(current_player) += child_node->cf_values.row(current_player) * node.strategy.row(current_player);
+				node.cf_values.row(opponent) += child_node->cf_values.row(opponent);
 
-			//[actions_count x card_count][players_count]
-			Array<float, Dynamic, card_count>  cf_values_allactions[players_count];
-			Array<float, Dynamic, card_count>  cf_values_br_allactions[players_count];
+				node.cf_values_br.row(opponent) += child_node->cf_values_br.row(opponent);
 
-			//for (size_t i = 0; i < actions_count; i++)
-			//{
-			//	Node* child_node = node.children[i];
-			//	_compute_values_dfs(*child_node);
-
-			//	cf_values_allactions[i] = child_node.cf_values
-			//		cf_values_br_allactions[i] = child_node.cf_values_br
-			//		end
-			//}
-
+				if (i == 0)
+				{
+					node.cf_values_br.row(current_player) = child_node->cf_values_br.row(current_player);
+				}
+				else
+				{
+					node.cf_values_br.row(current_player) = node.cf_values_br.row(current_player).max(child_node->cf_values_br.row(current_player));
+				}
+			}
+		}
 	}
+
+	//--counterfactual values weighted by the reach prob
+	node.cfv_infset = ArrayXf(players_count);
+	node.cfv_infset.row(P1) = node.cf_values.row(P1).matrix().dot(node.ranges_absolute.row(P1).matrix());
+	node.cfv_infset.row(P2) = node.cf_values.row(P2).matrix().dot(node.ranges_absolute.row(P2).matrix());
+
+	//--compute CFV - BR values weighted by the reach prob
+	node.cfv_br_infset = ArrayXf(players_count);
+	node.cfv_br_infset.row(P1) = node.cf_values_br.row(P1).matrix().dot(node.ranges_absolute.row(P1).matrix());
+	node.cfv_br_infset.row(P2) = node.cf_values_br.row(P2).matrix().dot(node.ranges_absolute.row(P2).matrix());
+	
+	node.epsilon = node.cfv_br_infset - node.cfv_infset;
+	node.exploitability = node.epsilon.mean();
+}
+
+void tree_values::compute_values(Node& root, ArrayXXf* starting_ranges)
+{
+	ArrayXXf range;
+
+	//--1.0 set the starting range
+	if (starting_ranges == nullptr)
+	{
+		range = ArrayXXf::Constant(players_count, card_count, 1.0f / card_count);
+	}
+	else
+	{
+		range = *starting_ranges;
+	}
+
+	//--2.0 check the starting ranges
+#ifdef _DEBUG
+
+	ArrayXf checksum = range.rowwise().sum();
+	assert(abs(checksum(P1) - 1) < 0.0001 && "starting range does not sum to 1");
+	assert(abs(checksum(P2) - 1) < 0.0001 && "starting range does not sum to 1");
+	assert((range >= 0).all());
+#endif
+
+	//--3.0 compute the values
+	_fill_ranges_dfs(root, range);
+	_compute_values_dfs(root);
 }
