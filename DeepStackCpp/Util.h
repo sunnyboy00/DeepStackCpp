@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "CustomSettings.h"
 
 using namespace Eigen;
 using namespace std;
@@ -56,6 +57,32 @@ class Util
 			target = (target >= lowLimin).select(
 				target,
 				ArrayXf::Constant(target.rows(), target.cols(), lowLimin)
+			);
+		}
+
+		static inline void Clip(ArrayXXf& target, float lowLimin, float maxValue)
+		{
+			target = (target >= lowLimin).select(
+				target,
+				ArrayXXf::Constant(target.rows(), target.cols(), lowLimin)
+			);
+
+			target = (target < maxValue).select(
+				target,
+				ArrayXXf::Constant(target.rows(), target.cols(), maxValue)
+			);
+		}
+
+		static inline void Clip(CardArray& target, float lowLimin, float maxValue)
+		{
+			target = (target >= lowLimin).select(
+				target,
+				CardArray::Constant(target.rows(), target.cols(), lowLimin)
+			);
+
+			target = (target < maxValue).select(
+				target,
+				CardArray::Constant(target.rows(), target.cols(), maxValue)
 			);
 		}
 

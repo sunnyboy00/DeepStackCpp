@@ -31,6 +31,21 @@
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{de61f6e7-9398-4051-8879-746b0d7e4e9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Resolving">
+      <UniqueIdentifier>{71c0fd1d-8761-46ad-82ca-72494306682d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resolving">
+      <UniqueIdentifier>{9571b00f-c0d3-4a7f-9b61-741d51041f57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Misc">
+      <UniqueIdentifier>{8f665370-b954-4062-a84f-cbfe39d9bd45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NN">
+      <UniqueIdentifier>{c20aa6e2-c909-426a-a0c2-cfd91d7c9d3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NN">
+      <UniqueIdentifier>{211bc78b-e871-4f1f-a08b-62e9e9aae3f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -102,12 +117,27 @@
     <ClInclude Include="tree_values.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
+    <ClInclude Include="cfrd_gadget.h">
+      <Filter>Header Files\Resolving</Filter>
+    </ClInclude>
+    <ClInclude Include="Resolving.h">
+      <Filter>Header Files\Resolving</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueNn.h">
+      <Filter>Header Files\NN</Filter>
+    </ClInclude>
+    <ClInclude Include="lookahead.h">
+      <Filter>Header Files\Resolving</Filter>
+    </ClInclude>
+    <ClInclude Include="LookaheadBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LookaheadManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DeepStackCpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="card_to_string_conversion.cpp">
@@ -128,9 +158,6 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="terminal_equity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LeducEvaluator.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -140,13 +167,34 @@
     <ClCompile Include="TreeVisualizer.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="TreeCFR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="cfrd_gadget.cpp">
+      <Filter>Source Files\Resolving</Filter>
     </ClCompile>
     <ClCompile Include="tree_values.cpp">
+      <Filter>Source Files\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeCFR.cpp">
+      <Filter>Source Files\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="terminal_equity.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Resolving.cpp">
+      <Filter>Source Files\Resolving</Filter>
+    </ClCompile>
+    <ClCompile Include="ValueNn.cpp">
+      <Filter>Source Files\NN</Filter>
+    </ClCompile>
+    <ClCompile Include="lookahead.cpp">
+      <Filter>Source Files\Resolving</Filter>
+    </ClCompile>
+    <ClCompile Include="LookaheadBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LookaheadManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

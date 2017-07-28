@@ -71,7 +71,7 @@ void test_tree_cfr()
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 1000);
+	tree_cfr.run_cfr(tree, starting_ranges, 100000, 499);
 
 	tree_values tv;
 	tv.compute_values(tree, &starting_ranges);

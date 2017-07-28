@@ -165,13 +165,18 @@
     <ClInclude Include="bet_sizing.h" />
     <ClInclude Include="card_tools.h" />
     <ClInclude Include="card_to_string_conversion.h" />
+    <ClInclude Include="cfrd_gadget.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSettings.h" />
     <ClInclude Include="game_settings.h" />
     <ClInclude Include="GraphvizConnection.h" />
     <ClInclude Include="GraphvizNode.h" />
     <ClInclude Include="LeducEvaluator.h" />
+    <ClInclude Include="lookahead.h" />
+    <ClInclude Include="LookaheadBuilder.h" />
+    <ClInclude Include="LookaheadManager.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Resolving.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="strategy_filling.h" />
@@ -183,14 +188,19 @@
     <ClInclude Include="tree_builder.h" />
     <ClInclude Include="tree_values.h" />
     <ClInclude Include="Util.h" />
+    <ClInclude Include="ValueNn.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bet_sizing.cpp" />
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
-    <ClCompile Include="DeepStackCpp.cpp" />
+    <ClCompile Include="cfrd_gadget.cpp" />
     <ClCompile Include="LeducEvaluator.cpp" />
+    <ClCompile Include="lookahead.cpp" />
+    <ClCompile Include="LookaheadBuilder.cpp" />
+    <ClCompile Include="LookaheadManager.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Resolving.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="strategy_filling.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
@@ -200,6 +210,7 @@
     <ClCompile Include="tree_builder.cpp" />
     <ClCompile Include="tree_values.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="ValueNn.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

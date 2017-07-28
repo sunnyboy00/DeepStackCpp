@@ -55,8 +55,7 @@ void TreeCFR::_fillCFvaluesForTerminalNode(Node &node)
 	terminal_equity* termEquity = _get_terminal_equity(node);
 
 	// CF values  2p X each private hand.
-	node.cf_values = MatrixXf(node.ranges_absolute);
-	node.cf_values.fill(0);
+	node.cf_values = ArrayXXf::Zero(players_count, card_count);
 
 	if (node.type == terminal_fold)
 	{
