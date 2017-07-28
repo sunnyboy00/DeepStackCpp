@@ -305,14 +305,14 @@ void LookaheadBuilder::construct_data_structures()
 			_lookahead->placeholder_data[d] = _lookahead->ranges_data[d] : clone()
 			_lookahead->pot_size[d] = _lookahead->ranges_data[d] : clone() : fill(arguments.stack)
 
-			//--data structures[actions x parent_action x grandparent_id x batch x 1 x range]
+			// --data structures[actions x parent_action x grandparent_id x batch x 1 x range]
 			_lookahead->average_strategies_data[d] = arguments.Tensor(_lookahead->actions_count[d - 1], _lookahead->bets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], game_settings.card_count) : fill(0)
 			_lookahead->current_strategy_data[d] = _lookahead->average_strategies_data[d] : clone()
 			_lookahead->regrets_data[d] = _lookahead->average_strategies_data[d] : clone() : fill(_lookahead->regret_epsilon)
 			_lookahead->current_regrets_data[d] = _lookahead->average_strategies_data[d] : clone() : fill(0)
 			_lookahead->empty_action_mask[d] = _lookahead->average_strategies_data[d] : clone() : fill(1)
 			_lookahead->positive_regrets_data[d] = _lookahead->regrets_data[d] : clone()
-
+			
 			//--data structures[1 x parent_action x grandparent_id x batch x players x range]
 			_lookahead->regrets_sum[d] = arguments.Tensor(1, _lookahead->bets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], constants.players_count, game_settings.card_count) : fill(0)
 
