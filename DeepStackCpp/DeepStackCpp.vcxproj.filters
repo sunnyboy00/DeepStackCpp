@@ -129,11 +129,11 @@
     <ClInclude Include="lookahead.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
-    <ClInclude Include="LookaheadBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LookaheadManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LookaheadBuilder.h">
+      <Filter>Header Files\Resolving</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -191,11 +191,11 @@
     <ClCompile Include="lookahead.cpp">
       <Filter>Source Files\Resolving</Filter>
     </ClCompile>
-    <ClCompile Include="LookaheadBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LookaheadManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LookaheadBuilder.cpp">
+      <Filter>Source Files\Resolving</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.h"
 #include "assert.h"
+#include "arguments.h"
 #include "Util.h"
 #include <Eigen/Dense>
 #include "terminal_equity.h"
@@ -21,7 +22,7 @@ public:
 
 
 	// Game tree
-	Node& tree;
+	Node tree;
 
 	// Depth
 	int depth;
@@ -49,7 +50,6 @@ public:
 	vector<Tf5> ranges_data;
 	vector<Tf5> cfvs_data;
 	vector<Tf5> average_cfvs_data;
-	vector<Tf5> placeholder_data;
 	vector<Tf5> placeholder_data;
 
 	//--data structures for one player[actions x parent_action x grandparent_id x 1 x range]

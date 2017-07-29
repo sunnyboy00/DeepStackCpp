@@ -80,6 +80,20 @@ void test_tree_cfr()
 
 int main()
 {
+	Eigen::Tensor<float, 2> a(2, 1);
+	//a.setZero();
+	//Eigen::array<int, 2> action_dims_2{ { 2, 2 } };
+	std::array<DenseIndex, 2> ar = { 2, 2 };
+	//Eigen::array<Index, 2> dd(ar);
+
+
+
+	Util::ResizeAndFill(a, ar);
+	auto s = a.size();
+	cout << a;
+	cout << a;
+
+
 	//Eigen::Tensor<int, 2> a(4, 3);
 	//a.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
 	//{ 600, 700, 800 },{ 900, 1000, 1100 } });

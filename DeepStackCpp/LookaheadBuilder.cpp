@@ -252,76 +252,111 @@ void LookaheadBuilder::construct_data_structures()
 	//--create the data structure for the first two layers
 
 	//--data structures[actions x parent_action x grandparent_id x batch x players x range]
-	_lookahead->ranges_data[0].resize(1, 1, 1, players_count, card_count);
-	_lookahead->ranges_data[0].setConstant(1.0f / card_count);
+	Eigen::array<DenseIndex, 5> ranges_data_0_dims{ { 1, 1, 1, players_count, card_count } };
+	Eigen::array<DenseIndex, 5> ranges_data_1_dims{ { _lookahead->actions_count[0], 1, 1, players_count, card_count } };
 
-	_lookahead->ranges_data[1].resize(_lookahead->actions_count[1], 1, 1, players_count, card_count);
-	_lookahead->ranges_data[1].setConstant(1.0f / card_count);
-	_lookahead->pot_size[1].setZero();
-	_lookahead->pot_size[2].setZero();
-	_lookahead->cfvs_data[1].setZero();
-	_lookahead->cfvs_data[2].setZero();
-	_lookahead->average_cfvs_data[1].setZero();
-	_lookahead->average_cfvs_data[2].setZero();
-	_lookahead->placeholder_data[1].setZero();
-	_lookahead->placeholder_data[2].setZero();
+	Util::ResizeAndFill(_lookahead->ranges_data[0], ranges_data_0_dims, 1.0f / card_count);
+	Util::ResizeAndFill(_lookahead->ranges_data[1], ranges_data_1_dims, 1.0f / card_count);
+
+	Util::ResizeAndFill(_lookahead->pot_size[0], ranges_data_0_dims);
+	Util::ResizeAndFill(_lookahead->pot_size[1], ranges_data_1_dims);
+
+	Util::ResizeAndFill(_lookahead->cfvs_data[0], ranges_data_0_dims);
+	Util::ResizeAndFill(_lookahead->cfvs_data[1], ranges_data_1_dims);
+
+	Util::ResizeAndFill(_lookahead->average_cfvs_data[0], ranges_data_0_dims);
+	Util::ResizeAndFill(_lookahead->average_cfvs_data[1], ranges_data_1_dims);
+
+	Util::ResizeAndFill(_lookahead->placeholder_data[0], ranges_data_0_dims);
+	Util::ResizeAndFill(_lookahead->placeholder_data[1], ranges_data_1_dims);
+
 
 	//--data structures for one player[actions x parent_action x grandparent_id x 1 x range]
-	_lookahead->average_strategies_data[1] = nil
-	_lookahead->average_strategies_data[2] = arguments.Tensor(_lookahead->actions_count[1], 1, 1, game_settings.card_count) : fill(0)
-	_lookahead->current_strategy_data[1] = nil
-	_lookahead->current_strategy_data[2] = _lookahead->average_strategies_data[2] : clone() : fill(0)
-	_lookahead->regrets_data[1] = nil
-	_lookahead->regrets_data[2] = _lookahead->average_strategies_data[2] : clone() : fill(0)
-	_lookahead->current_regrets_data[1] = nil
-	_lookahead->current_regrets_data[2] = _lookahead->average_strategies_data[2] : clone() : fill(0)
-	_lookahead->positive_regrets_data[1] = nil
-	_lookahead->positive_regrets_data[2] = _lookahead->average_strategies_data[2] : clone() : fill(0)
-	_lookahead->empty_action_mask[1] = nil
-	_lookahead->empty_action_mask[2] = _lookahead->average_strategies_data[2] : clone() : fill(1)
+	Eigen::array<DenseIndex, 4> one_pl_dims{ { _lookahead->actions_count[0], 1, 1, card_count } };
+
+	Util::ResizeAndFill(_lookahead->average_strategies_data[1], one_pl_dims);
+	Util::ResizeAndFill(_lookahead->current_strategy_data[1], one_pl_dims);
+	Util::ResizeAndFill(_lookahead->regrets_data[1], one_pl_dims);
+	Util::ResizeAndFill(_lookahead->current_regrets_data[1], one_pl_dims);
+	Util::ResizeAndFill(_lookahead->positive_regrets_data[1], one_pl_dims);
+	Util::ResizeAndFill(_lookahead->empty_action_mask[1], one_pl_dims, 1.0f);
+
 
 	//--data structures for summing over the actions[1 x parent_action x grandparent_id x range]
-	_lookahead->regrets_sum[1] = arguments.Tensor(1, 1, 1, game_settings.card_count) : fill(0)
-	_lookahead->regrets_sum[2] = arguments.Tensor(1, _lookahead->bets_count[1], 1, game_settings.card_count) : fill(0)
+	Util::ResizeAndFill(_lookahead->regrets_sum[0], { 1, 1, 1, card_count });
+
+	Util::ResizeAndFill(_lookahead->regrets_sum[1], { 1, _lookahead->bets_count[0], 1, card_count });
 
 	//--data structures for inner nodes(not terminal nor allin)[bets_count x parent_nonallinbetscount x gp_id x batch x players x range]
-	_lookahead->inner_nodes[1] = arguments.Tensor(1, 1, 1, constants.players_count, game_settings.card_count) : fill(0)
-	_lookahead->swap_data[1] = _lookahead->inner_nodes[1] : transpose(2, 3) : clone()
-	_lookahead->inner_nodes_p1[1] = arguments.Tensor(1, 1, 1, 1, game_settings.card_count) : fill(0)
+	Util::ResizeAndFill(_lookahead->inner_nodes[0], { 1, 1, 1, players_count, card_count });
+	
+	_lookahead->swap_data[0] = Util::Transpose(_lookahead->inner_nodes[0], 2, 3);
+	Util::ResizeAndFill(_lookahead->inner_nodes_p1[0], { 1, 1, 1, 1, card_count });
 
-	if _lookahead->depth > 2 then
-		_lookahead->inner_nodes[2] = arguments.Tensor(_lookahead->bets_count[1], 1, 1, constants.players_count, game_settings.card_count) :fill(0)
-		_lookahead->swap_data[2] = _lookahead->inner_nodes[2] : transpose(2, 3) : clone()
-		_lookahead->inner_nodes_p1[2] = arguments.Tensor(_lookahead->bets_count[1], 1, 1, 1, game_settings.card_count) : fill(0)
-		end
+	if (_lookahead->depth > 1)
+	{
+		Eigen::array<DenseIndex, 5> inner_dims{ { _lookahead->bets_count[0], 1, 1, players_count, card_count } };
+
+		Util::ResizeAndFill(_lookahead->inner_nodes[1], inner_dims);
+		Util::ResizeAndFill(_lookahead->swap_data[1], inner_dims);
+		_lookahead->swap_data[1] = Util::Transpose(_lookahead->inner_nodes[1], 2, 3);
+		Util::ResizeAndFill(_lookahead->inner_nodes_p1[1], { _lookahead->bets_count[0], 1, 1, 1, card_count });
+	}
 
 
 		//--create the data structures for the rest of the layers
-		for d = 3, _lookahead->depth do
+	for (size_t d = 2; d < _lookahead->depth; d++)
+	{
+		//--data structures[actions x parent_action x grandparent_id x batch x players x range]
+		Eigen::array<DenseIndex, 5> deep_dims = { _lookahead->actions_count[d - 1],
+			_lookahead->bets_count[d - 2],
+			_lookahead->nonterminal_nonallin_nodes_count[d - 2],
+			players_count, card_count };
 
-			//--data structures[actions x parent_action x grandparent_id x batch x players x range]
-			_lookahead->ranges_data[d] = arguments.Tensor(_lookahead->actions_count[d - 1], _lookahead->bets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], constants.players_count, game_settings.card_count) :fill(0)
-			_lookahead->cfvs_data[d] = _lookahead->ranges_data[d] : clone()
-			_lookahead->placeholder_data[d] = _lookahead->ranges_data[d] : clone()
-			_lookahead->pot_size[d] = _lookahead->ranges_data[d] : clone() : fill(arguments.stack)
+		Util::ResizeAndFill(_lookahead->ranges_data[d], deep_dims);
+		Util::ResizeAndFill(_lookahead->cfvs_data[d], deep_dims);
+		Util::ResizeAndFill(_lookahead->placeholder_data[d], deep_dims);
+		Util::ResizeAndFill(_lookahead->pot_size[d], deep_dims, stack);
 
-			// --data structures[actions x parent_action x grandparent_id x batch x 1 x range]
-			_lookahead->average_strategies_data[d] = arguments.Tensor(_lookahead->actions_count[d - 1], _lookahead->bets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], game_settings.card_count) : fill(0)
-			_lookahead->current_strategy_data[d] = _lookahead->average_strategies_data[d] : clone()
-			_lookahead->regrets_data[d] = _lookahead->average_strategies_data[d] : clone() : fill(_lookahead->regret_epsilon)
-			_lookahead->current_regrets_data[d] = _lookahead->average_strategies_data[d] : clone() : fill(0)
-			_lookahead->empty_action_mask[d] = _lookahead->average_strategies_data[d] : clone() : fill(1)
-			_lookahead->positive_regrets_data[d] = _lookahead->regrets_data[d] : clone()
-			
-			//--data structures[1 x parent_action x grandparent_id x batch x players x range]
-			_lookahead->regrets_sum[d] = arguments.Tensor(1, _lookahead->bets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], constants.players_count, game_settings.card_count) : fill(0)
 
-			//--data structures for the layers except the last one
-			if d < _lookahead->depth then
-				_lookahead->inner_nodes[d] = arguments.Tensor(_lookahead->bets_count[d - 1], _lookahead->nonallinbets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], constants.players_count, game_settings.card_count) : fill(0)
-				_lookahead->inner_nodes_p1[d] = arguments.Tensor(_lookahead->bets_count[d - 1], _lookahead->nonallinbets_count[d - 2], _lookahead->nonterminal_nonallin_nodes_count[d - 2], 1, game_settings.card_count) : fill(0)
+		// --data structures[actions x parent_action x grandparent_id x batch x 1 x range]
+		Eigen::array<DenseIndex, 4> deep_player_dims = { _lookahead->actions_count[d - 1],
+			_lookahead->bets_count[d - 2],
+			_lookahead->nonterminal_nonallin_nodes_count[d - 2],
+			card_count };
 
-				_lookahead->swap_data[d] = _lookahead->inner_nodes[d] : transpose(2, 3) : clone()
-				end
+		Util::ResizeAndFill(_lookahead->average_strategies_data[d], deep_player_dims);
+		Util::ResizeAndFill(_lookahead->current_strategy_data[d], deep_player_dims);
+		Util::ResizeAndFill(_lookahead->regrets_data[d], deep_player_dims);
+		Util::ResizeAndFill(_lookahead->current_regrets_data[d], deep_player_dims);
+		Util::ResizeAndFill(_lookahead->empty_action_mask[d], deep_player_dims, 1.0f);
+		Util::ResizeAndFill(_lookahead->positive_regrets_data[d], deep_player_dims);
+
+		//--data structures[1 x parent_action x grandparent_id x batch x players x range]
+		Util::ResizeAndFill(_lookahead->regrets_sum[d], { _lookahead->bets_count[d - 2],
+			_lookahead->nonterminal_nonallin_nodes_count[d - 2],
+			players_count,
+			card_count });
+
+
+		//--data structures for the layers except the last one
+		if (d < _lookahead->depth)
+		{
+			Util::ResizeAndFill(_lookahead->inner_nodes[d], { _lookahead->bets_count[d - 1],
+				_lookahead->nonallinbets_count[d - 2],
+				_lookahead->nonterminal_nonallin_nodes_count[d - 2],
+				players_count,
+				card_count });
+
+			Util::ResizeAndFill(_lookahead->inner_nodes_p1[d], { _lookahead->bets_count[d - 1],
+				_lookahead->nonallinbets_count[d - 2],
+				_lookahead->nonterminal_nonallin_nodes_count[d - 2],
+				1,
+				card_count });
+
+
+			_lookahead->swap_data[d] = Util::Transpose(_lookahead->inner_nodes[d], 2, 3);
+		}
+	}
 
 }

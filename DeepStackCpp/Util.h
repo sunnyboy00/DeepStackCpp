@@ -34,6 +34,21 @@ class Util
 			return data.replicate(as.rows(), as.cols());
 		}
 
+		template <int N>
+		static inline void ResizeAndFill(Tensor<float, N> &target, std::array<DenseIndex, N> const &dims, float value = 0)
+		{
+			target.resize(dims);
+			target.setConstant(value);
+		}
+
+		template <int N>
+		static inline Tensor<float, N> Transpose(const Tensor<float, N> &target, int dim1, int dim2)
+		{
+			Eigen::array<int, 2> contraction_indices = { dim1, dim2 };
+			Eigen::Tensor<int, N> result = A.contract(B, contraction_indices);
+			return result;
+		}
+
 		//static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as)
 		//{
 		//	return data.replicate(as.rows(), as.cols());
