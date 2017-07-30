@@ -42,11 +42,11 @@ class Util
 		}
 
 		template <int N>
-		static inline Tensor<float, N> Transpose(const Tensor<float, N> &target, int dim1, int dim2)
+		static inline Tensor<float, N> Transpose(const Tensor<float, N> &target, std::array<DenseIndex, N> const &dims)
 		{
-			Eigen::array<int, 2> contraction_indices = { dim1, dim2 };
-			Eigen::Tensor<int, N> result = A.contract(B, contraction_indices);
-			return result;
+			//Eigen::array<DenseIndex, 3> shuffling{ { 1, 2, 0 } };
+			Tensor<float, N> output = target.shuffle(dims);
+			return output;
 		}
 
 		//static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as)

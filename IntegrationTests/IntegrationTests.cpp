@@ -80,6 +80,27 @@ void test_tree_cfr()
 
 int main()
 {
+	//// Shuffle all dimensions to the left by 1.
+	//Tensor<float, 5> i2(2, 2, 2, 2, 2);
+	//std::array<DenseIndex, 5> ssss = { 0, 1, 3, 2, 4 };
+	//Tensor<float, 5> output33 = i2.shuffle({ { 0, 1, 3, 2, 4 } });
+	//Tensor<float, 5> output2 = Util::Transpose(i2, ssss);
+
+	
+	Tensor<float, 5> input(20, 30, 50, 1, 1);
+
+	//Tensor<float, 5> output = Util::Transpose(input, { 0, 2, 1, 3, 4});
+
+	//// ... set some values in input.
+	std::array<DenseIndex, 5> test = { 0, 1, 3, 2, 4 };
+	//Eigen::array<DenseIndex, 5> ff = test;
+	Tensor<float, 5> output2 = Util::Transpose(input, { 0, 1, 3, 2, 4 });
+	Tensor<float, 5> output = input.shuffle(test);
+
+	eigen_assert(output.dimension(0) == 20);
+	eigen_assert(output.dimension(1) == 50);
+	eigen_assert(output.dimension(2) == 30);
+
 	Eigen::Tensor<float, 2> a(2, 1);
 	//a.setZero();
 	//Eigen::array<int, 2> action_dims_2{ { 2, 2 } };
@@ -88,10 +109,10 @@ int main()
 
 
 
-	Util::ResizeAndFill(a, ar);
-	auto s = a.size();
-	cout << a;
-	cout << a;
+	//Util::ResizeAndFill(a, ar);
+	//auto s = a.size();
+	//cout << m;
+	//cout << m;
 
 
 	//Eigen::Tensor<int, 2> a(4, 3);

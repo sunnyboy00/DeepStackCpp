@@ -32,7 +32,7 @@ public:
 	//-- fit in the same tensor.
 	//-- @param current_layer a list of tree nodes at the current depth
 	//-- @param current_depth the depth of the current tree nodes
-	void _compute_tree_structures(vector<Node&> current_layer, int current_depth);
+	void _compute_tree_structures(const vector<Node*>& current_layer, int current_depth);
 
 	//-- - Traverses the tree to fill in lookahead data structures that summarize data
 	//	-- contained in the tree.
