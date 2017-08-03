@@ -53,6 +53,10 @@ public:
 	//-- - Builds the tensors that store lookahead data during re - solving.
 	void construct_data_structures();
 
+	//-- - Builds the neural net query boxes which estimate counterfactual values
+	//-- at depth - limited states of the lookahead.
+	void _construct_transition_boxes();
+
 private:
 
 	// NN that is used to get approximate values

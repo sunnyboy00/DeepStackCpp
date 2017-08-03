@@ -108,7 +108,7 @@ void tree_values::_compute_values_dfs(Node& node)
 		}
 
 		//--multiply by the pot
-		values = values * node.pot;
+		values *= node.pot;
 		node.cf_values = ArrayXXf(values);
 		node.cf_values_br = ArrayXXf(values);
 	}

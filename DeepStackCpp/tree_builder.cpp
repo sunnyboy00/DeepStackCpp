@@ -87,7 +87,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		children.push_back(check_node);
 	}
 
-	// Transition call. That is any not terminal call i.e. any call not on the last street becase after any of this call the chance occur(flop, turn, river).
+	// Transition call. That is any not terminal call i.e. any call not on the last street because after any of this call the chance occur(flop, turn, river).
 	else if (
 		(parent_node.street == 1) &&
 		(
@@ -131,6 +131,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		{
 				Node* child = new Node();
 				child->parent = &parent_node;
+				child->type = bet;
 				child->current_player = current_player;
 				child->street = parent_node.street;
 				child->board = parent_node.board;
@@ -174,10 +175,10 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 	vector<Node*> children = _get_children_nodes(current_node);
 	current_node.children = children;
 
-	long long depth = 0;
+	long long depth = -1;
 
 	current_node.actions = ArrayXf(children.size());
-	for (unsigned long long i = 0; i < children.size(); i++)
+	for (size_t i = 0; i < children.size(); i++)
 	{
 		Node* cur_children = children[i];
 		cur_children->parent = &current_node;

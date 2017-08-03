@@ -39,10 +39,10 @@ void test_tree_visualiser()
 	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("");
-	params.root_node->street = 1;
-	params.root_node->current_player = P1;
-	params.root_node->bets << 100, 100;
+	params.root_node->board = converter.string_to_board("Ks");
+	params.root_node->street = 2;
+	params.root_node->current_player = P2;
+	params.root_node->bets << 300, 300;
 
 	tree_builder builder;
 	Node& tree = builder.build_tree(params);
@@ -80,31 +80,50 @@ void test_tree_cfr()
 
 int main()
 {
+	test_tree_visualiser();
+
+	Tensor<float, 5> test(2, 1, 1, 2, 6);
+	RemoveF3D(test, 0, 0, 0).setConstant(1);
+	//test_tree_visualiser();
 	//// Shuffle all dimensions to the left by 1.
 	//Tensor<float, 5> i2(2, 2, 2, 2, 2);
 	//std::array<DenseIndex, 5> ssss = { 0, 1, 3, 2, 4 };
 	//Tensor<float, 5> output33 = i2.shuffle({ { 0, 1, 3, 2, 4 } });
 	//Tensor<float, 5> output2 = Util::Transpose(i2, ssss);
 
-	
-	Tensor<float, 5> input(20, 30, 50, 1, 1);
+	//Tensor<float, 2> input(2, 2);
+	//Tensor<float, res> currentRes = input.chip(0, 0);
+
+	//Util::MultiSliceFill(input, { 0 }, { 0, 1 }, 8);
+//	int offset = Util::ConvertOffset(input, -1, 0);
+	//Remove2D(input, 0).setConstant(1);
+	cout << test;
 
 	//Tensor<float, 5> output = Util::Transpose(input, { 0, 2, 1, 3, 4});
 
 	//// ... set some values in input.
-	std::array<DenseIndex, 5> test = { 0, 1, 3, 2, 4 };
-	//Eigen::array<DenseIndex, 5> ff = test;
-	Tensor<float, 5> output2 = Util::Transpose(input, { 0, 1, 3, 2, 4 });
-	Tensor<float, 5> output = input.shuffle(test);
+	//std::array<DenseIndex, 5> test = { 0, 1, 3, 2, 4 };
+	////Eigen::array<DenseIndex, 5> ff = test;
+	//Tensor<float, 5> output2 = Util::Transpose(input, { 0, 1, 3, 2, 4 });
+	//Tensor<float, 5> output = input.shuffle(test);
 
-	eigen_assert(output.dimension(0) == 20);
-	eigen_assert(output.dimension(1) == 50);
-	eigen_assert(output.dimension(2) == 30);
+	//eigen_assert(output.dimension(0) == 20);
+	//eigen_assert(output.dimension(1) == 50);
+	//eigen_assert(output.dimension(2) == 30);
 
-	Eigen::Tensor<float, 2> a(2, 1);
-	//a.setZero();
-	//Eigen::array<int, 2> action_dims_2{ { 2, 2 } };
-	std::array<DenseIndex, 2> ar = { 2, 2 };
+	//Eigen::Tensor<float, 2> a(2, 1);
+	//a.setConstant(1);
+	//Eigen::Tensor<float, 2> b(2, 1);
+
+	////a.setZero();
+	////Eigen::array<int, 2> action_dims_2{ { 2, 2 } };
+	//Tensor<bool, 0> eq = (a < Eigen::Tensor<float, 2>(a).setZero()).all();
+	//bool rr = eq.coeff();
+
+	//std::array<DenseIndex, 2> ar = { 2, 2 };
+	//cout << a;
+	cout << "Done";
+
 	//Eigen::array<Index, 2> dd(ar);
 
 
@@ -159,7 +178,7 @@ int main()
 
 	//ArrayXXf res = data.replicate(2, 4);
 //	cout << map;
-	test_tree_cfr();
+	//test_tree_cfr();
 	cout << "Done";
 	//float target[6] = { -1, 1, 5, 5, 6, 6 };
 

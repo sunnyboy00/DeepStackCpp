@@ -19,40 +19,40 @@ LookaheadBuilder::~LookaheadBuilder()
 
 void LookaheadBuilder::build_from_tree(Node& tree)
 {
-	//_lookahead->tree = tree;
-	//_lookahead->depth = tree.depth;
+	_lookahead->tree = tree;
+	_lookahead->depth = tree.depth;
 
-	//vector<Node&> treeVec;
-	//treeVec.push_back(tree);
-	//_compute_tree_structures(treeVec, 1);
+	vector<Node*> treeVec;
+	treeVec.push_back(&tree);
+	_compute_tree_structures(treeVec, 0);
 
-	//	//--construct the initial data structures using the bet counts
-	//construct_data_structures();
+	//--construct the initial data structures using the bet counts
+	construct_data_structures();
 
-	//	//--traverse the tree and fill the datastructures(pot sizes, non - existin actions, ...)
-	//	//--node, layer, action, parent_action, gp_id
-	//set_datastructures_from_tree_dfs(tree, 1, 1, 1, 1);
+		//--traverse the tree and fill the data structures(pot sizes, non - existing actions, ...)
+		//--node, layer, action, parent_action, gp_id
+	set_datastructures_from_tree_dfs(tree, 0, 0, 0, 0);
 
-	//	//--set additional info
-	//assert(_lookahead->terminal_actions_count[1] == 1 || _lookahead->terminal_actions_count[1] == 2);
+		//--set additional info
+	assert(_lookahead->terminal_actions_count[0] == 1 || _lookahead->terminal_actions_count[0] == 2);
 
-	//_lookahead->first_call_terminal = _lookahead->tree.children[2].terminal;
-	//_lookahead->first_call_transition = _lookahead->tree.children[2].current_player == chance;
-	//_lookahead->first_call_check = (not _lookahead->first_call_terminal) && (not _lookahead->first_call_transition);
+	_lookahead->first_call_terminal = _lookahead->tree.children[1]->terminal;
+	_lookahead->first_call_transition = _lookahead->tree.children[1]->current_player == chance;
+	_lookahead->first_call_check = (!_lookahead->first_call_terminal) && (!_lookahead->first_call_transition);
 
 
-	//	//--we mask out fold as a possible action when check is for free, due to
-	//	//--1) fewer actions means faster convergence
-	//	//--2) we need to make sure prob of free fold is zero because ACPC dealer changes such action to check
-	//if (_lookahead->tree.bets[1] == _lookahead->tree.bets[2])
-	//{
-	//	_lookahead->empty_action_mask[2][1]:fill(0);
-	//}
+	//--we mask out fold as a possible action when check is for free, due to
+	//--1) fewer actions means faster convergence
+	//--2) we need to make sure prob of free fold is zero because ACPC dealer changes such action to check
+	if (_lookahead->tree.bets[0] == _lookahead->tree.bets[1])
+	{
+		RemoveF1D(_lookahead->empty_action_mask[1], 0).setZero();
+	}
 
-	////--construct the neural net query boxes
-	//_construct_transition_boxes();
+	//--construct the neural net query boxes
+	_construct_transition_boxes();
 
-	//_lookahead->_terminal_equity.set_board(tree.board);
+	_lookahead->_terminal_equity.set_board(tree.board);
 }
 
 void LookaheadBuilder::_compute_tree_structures(const vector<Node*>& current_layer, int current_depth)
@@ -68,7 +68,7 @@ void LookaheadBuilder::_compute_tree_structures(const vector<Node*>& current_lay
 
 		int node_terminal_actions_count = 0;
 
-		for (size_t c = 0; c < current_layer[n]->children.size(); c++)
+		for (size_t c = 0; c < node->children.size(); c++)
 		{
 			if (node->children[c]->terminal || node->children[c]->current_player == chance)
 			{
@@ -121,74 +121,100 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 	//--fill the potsize
 	assert(node.pot);
 
-	_lookahead->pot_size[layer][{action_id, parent_id, gp_id, {}, {}}] = node.pot;
+	RemoveF3D(_lookahead->pot_size[layer], action_id, parent_id, gp_id).setConstant(node.pot);
+	node.lookahead_coordinates.resize(action_id, parent_id, gp_id);
 
-	node.lookahead_coordinates = arguments.Tensor({ action_id, parent_id, gp_id });
+	//--transition call cannot be allin call
 
-		//--transition call cannot be allin call
-		if node.current_player == constants.players.chance then
-			assert(parent_id <= _lookahead->nonallinbets_count[layer - 2])
-			end
+#ifdef _DEBUG
+	if (node.current_player == chance)
+	{
+		assert(parent_id <= _lookahead->nonallinbets_count[layer - 2]);
+	}
+#endif
 
-			if layer < _lookahead->depth + 1 then
-				local gp_nonallinbets_count = _lookahead->nonallinbets_count[layer - 2]
-				local prev_layer_terminal_actions_count = _lookahead->terminal_actions_count[layer - 1]
-				local gp_terminal_actions_count = _lookahead->terminal_actions_count[layer - 2]
-				local prev_layer_bets_count = 0
+	if (layer < _lookahead->depth + 1)
+	{
+		int gp_nonallinbets_count = _lookahead->nonallinbets_count[layer - 2];
+		int prev_layer_terminal_actions_count = _lookahead->terminal_actions_count[layer - 1];
+		int gp_terminal_actions_count = _lookahead->terminal_actions_count[layer - 2];
+		int prev_layer_bets_count = 0;
 
-				prev_layer_bets_count = _lookahead->bets_count[layer - 1]
+		prev_layer_bets_count = _lookahead->bets_count[layer - 1];
 
-				//--compute next coordinates for parent and grandparent
-				local next_parent_id = action_id - prev_layer_terminal_actions_count
-				local next_gp_id = (gp_id - 1) * gp_nonallinbets_count + (parent_id)
+		//--compute next coordinates for parent and grandparent
+		int next_parent_id = action_id - prev_layer_terminal_actions_count; // We are substructing prev_layer_terminal_actions_count because that is prev_layer_terminal_actions_count the zero reference point. Actions with children begins after the prev_layer_terminal_actions_count.
+		int next_gp_id = gp_id * gp_nonallinbets_count + (parent_id);
+		//int next_gp_id = (gp_id - 1) * gp_nonallinbets_count + (parent_id);
 
-				if (not node.terminal) and (node.current_player ~= constants.players.chance) then
+		if (!node.terminal && node.current_player != chance)
+		{
+			//--parent is not an allin raise
+			assert(parent_id <= _lookahead->nonallinbets_count[layer - 2]);
 
-					//--parent is not an allin raise
-					assert(parent_id <= _lookahead->nonallinbets_count[layer - 2])
+			//--do we need to mask some actions for that node ? (that is, does the node have fewer children than the max number of children for any node on this layer)
+			bool node_with_empty_actions = (node.children.size() < _lookahead->actions_count[layer]);
 
-					//--do we need to mask some actions for that node ? (that is, does the node have fewer children than the max number of children for any node on this layer)
-					local node_with_empty_actions = (#node.children < _lookahead->actions_count[layer])
+			if (node_with_empty_actions)
+			{
+				//--we need to mask non existing padded bets
+				assert(layer > 0);
 
-					if node_with_empty_actions then
-						//--we need to mask nonexisting padded bets
-						assert(layer > 1)
+				int terminal_actions_count = _lookahead->terminal_actions_count[layer];
+				assert(terminal_actions_count == 2);
 
-						local terminal_actions_count = _lookahead->terminal_actions_count[layer]
-						assert(terminal_actions_count == 2)
+				int existing_bets_count = (int)node.children.size() - terminal_actions_count;
 
-						local existing_bets_count = #node.children - terminal_actions_count
+#ifdef _DEBUG
+				//--allin situations
+				if (existing_bets_count == 0)
+				{
+					assert(action_id == _lookahead->actions_count[layer - 1] - 1);
+				}
+#endif
 
-						//--allin situations
-						if existing_bets_count == 0 then
-							assert(action_id == _lookahead->actions_count[layer - 1])
-							end
+				for (int child_id = 0; child_id < terminal_actions_count; child_id++)
+				{
+					Node* child_node = node.children[child_id];
+					//--go deeper
+					set_datastructures_from_tree_dfs(*child_node, layer + 1, child_id, next_parent_id, next_gp_id);
+				}
 
-							for child_id = 1, terminal_actions_count do
-								local child_node = node.children[child_id]
-								//--go deeper
-								self : set_datastructures_from_tree_dfs(child_node, layer + 1, child_id, next_parent_id, next_gp_id)
-								end
+				//--we need to make sure that even though there are fewer actions, the last action / allin
+				//  is has the same last index as if we had full number of actions
+				//--we manually set the action_id as the last action(allin)
+				for (int b = 0; b < existing_bets_count; b++)
+				{
+					int childIndex = node.children.size() - b + 1;
+					set_datastructures_from_tree_dfs(*node.children[childIndex], layer + 1,
+						_lookahead->actions_count[layer] - b + 1,
+						next_parent_id,
+						next_gp_id);
+				}
+				int dim1 = _lookahead->empty_action_mask[layer + 1].dimension(1);
+				int res1 = _lookahead->empty_action_mask[layer + 1].dimension(1) - existing_bets_count;
+				for (size_t i = terminal_actions_count; i <= _lookahead->empty_action_mask[layer + 1].dimension(1) - existing_bets_count; i++)
+				{
+					RemoveF3D(_lookahead->empty_action_mask[layer + 1], terminal_actions_count, next_parent_id, next_gp_id).setZero(); //--mask out empty actions. ToDo:check correctness
+					_lookahead->empty_action_mask[layer + 1].chip(terminal_actions_count, 0).chip(next_parent_id, 0).chip(next_gp_id, 0).setZero();
+					int val = _lookahead->empty_action_mask[layer + 1](terminal_actions_count, next_parent_id, next_gp_id, 0);
+					val = 5;
+				}
 
-								//--we need to make sure that even though there are fewer actions, the last action / allin is has the same last index as if we had full number of actions
-								//--we manually set the action_id as the last action(allin)
-								for b = 1, existing_bets_count do
-									self : set_datastructures_from_tree_dfs(node.children[#node.children - b + 1], layer + 1, _lookahead->actions_count[layer] - b + 1, next_parent_id, next_gp_id)
-									end
 
-									//--mask out empty actions
-									_lookahead->empty_action_mask[layer + 1][{ {terminal_actions_count + 1, -(existing_bets_count + 1)}, next_parent_id, next_gp_id, {}}] = 0
-
-								else
-									//--node has full action count, easy to handle
-								for child_id = 1, #node.children do
-									local child_node = node.children[child_id]
-									//--go deeper
-									self : set_datastructures_from_tree_dfs(child_node, layer + 1, child_id, next_parent_id, next_gp_id)
-									end
-									end
-									end
-									end
+			}
+			else
+			{
+				//--node has full action count, easy to handle
+				for (size_t child_id = 0; child_id < node.children.size(); child_id++)
+				{
+					Node* child_node = node.children[child_id];
+					//--go deeper
+					set_datastructures_from_tree_dfs(*child_node, layer + 1, child_id, next_parent_id, next_gp_id);
+				}
+			}
+		}
+	}
 }
 
 void LookaheadBuilder::_compute_structure()
@@ -198,43 +224,42 @@ void LookaheadBuilder::_compute_structure()
 	_lookahead->regret_epsilon = 1.0f / 1000000000;
 
 	//--which player acts at particular depth
-	_lookahead->acting_player.resize(_lookahead->depth + 1);
-	_lookahead->acting_player.fill(-1);
+	_lookahead->acting_player.resize(_lookahead->depth + 2);
+	_lookahead->acting_player.setConstant(-1);
 
-	_lookahead->acting_player[1] = 0; //--in lookahead, 0 does not stand for player IDs, it's just the first player to act. 
+	_lookahead->acting_player[0] = 0; //--in lookahead, 0 does not stand for player IDs, it's just the first player to act. 
 
 
-	for (int d = 1; d < _lookahead->depth; d++)
+	for (int d = 1; d <= _lookahead->depth + 1; d++)
 	{
 		_lookahead->acting_player[d] = 1 - _lookahead->acting_player[d - 1];
 	}
 
-
+	_lookahead->bets_count[-2] = 1;
 	_lookahead->bets_count[-1] = 1;
-	_lookahead->bets_count[0] = 1;
+	_lookahead->nonallinbets_count[-2] = 1;
 	_lookahead->nonallinbets_count[-1] = 1;
-	_lookahead->nonallinbets_count[0] = 1;
+	_lookahead->terminal_actions_count[-2] = 0;
 	_lookahead->terminal_actions_count[-1] = 0;
-	_lookahead->terminal_actions_count[0] = 0;
+	_lookahead->actions_count[-2] = 1;
 	_lookahead->actions_count[-1] = 1;
-	_lookahead->actions_count[0] = 1;
 
 	//--compute the node counts
-	_lookahead->nonterminal_nodes_count[1] = 1;
-	_lookahead->nonterminal_nodes_count[2] = _lookahead->bets_count[1];
+	_lookahead->nonterminal_nodes_count[0] = 1;
+	_lookahead->nonterminal_nodes_count[1] = _lookahead->bets_count[0];
+	_lookahead->nonterminal_nonallin_nodes_count[-1] = 1;
 	_lookahead->nonterminal_nonallin_nodes_count[0] = 1;
-	_lookahead->nonterminal_nonallin_nodes_count[1] = 1;
-	_lookahead->nonterminal_nonallin_nodes_count[2] = _lookahead->nonterminal_nodes_count[2] - 1;
-	_lookahead->all_nodes_count[1] = 1;
-	_lookahead->all_nodes_count[2] = _lookahead->actions_count[1];
-	_lookahead->terminal_nodes_count[1] = 0;
-	_lookahead->terminal_nodes_count[2] = 2;
-	_lookahead->allin_nodes_count[1] = 0;
-	_lookahead->allin_nodes_count[2] = 1;
+	_lookahead->nonterminal_nonallin_nodes_count[1] = _lookahead->nonterminal_nodes_count[1] - 1;
+	_lookahead->all_nodes_count[0] = 1;
+	_lookahead->all_nodes_count[1] = _lookahead->actions_count[0];
+	_lookahead->terminal_nodes_count[0] = 0;
+	_lookahead->terminal_nodes_count[1] = 2;
+	_lookahead->allin_nodes_count[0] = 0;
+	_lookahead->allin_nodes_count[1] = 1;
+	_lookahead->inner_nodes_count[0] = 1;
 	_lookahead->inner_nodes_count[1] = 1;
-	_lookahead->inner_nodes_count[2] = 1;
 
-	for (int d = 2; d < _lookahead->depth; d++)
+	for (int d = 1; d <= _lookahead->depth; d++)
 	{
 		_lookahead->all_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->bets_count[d - 1] * _lookahead->actions_count[d];
 		_lookahead->allin_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->bets_count[d - 1] * 1;
@@ -305,8 +330,8 @@ void LookaheadBuilder::construct_data_structures()
 	}
 
 
-		//--create the data structures for the rest of the layers
-	for (int d = 2; d < _lookahead->depth; d++)
+	//--create the data structures for the rest of the layers
+	for (int d = 2; d <= _lookahead->depth; d++)
 	{
 		//--data structures[actions x parent_action x grandparent_id x batch x players x range]
 		Eigen::array<DenseIndex, 5> deep_dims = { _lookahead->actions_count[d - 1],
@@ -360,4 +385,24 @@ void LookaheadBuilder::construct_data_structures()
 		}
 	}
 
+}
+
+void LookaheadBuilder::_construct_transition_boxes()
+{
+	if (_lookahead->tree.street == 2)
+	{
+		return;
+	}
+
+	//ToDo: Fix after adding NN
+
+	//--load neural net if not already loaded
+	//neural_net = neural_net or ValueNn()
+
+	//_lookahead->next_street_boxes = {}
+	//for (int d = 1; d < _lookahead->depth; d++)
+	//{
+	//	_lookahead->next_street_boxes[d] = NextRoundValue(neural_net);
+	//	_lookahead->next_street_boxes[d]:start_computation(self.lookahead.pot_size[d][{2, {}, {}, 1, 1}]:clone() : view(-1));
+	//}
 }

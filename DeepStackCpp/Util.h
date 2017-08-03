@@ -54,6 +54,73 @@ class Util
 		//	return data.replicate(as.rows(), as.cols());
 		//}
 
+		template <int N>
+		static inline int ConvertOffset(Tensor<float, N>& target, int offset, int dim)
+		{
+			if (offset < 0)
+			{
+				assert(abs(offset) < target.dimension(dim));
+				return offset + target.dimension(dim);
+			}
+
+			return offset;
+		}
+
+		//template <int N>
+		//static void MultiSliceFill(Tensor<float, N>& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &dims, float value)
+		//{
+		//	std::array<int, N> convertedOffsets;
+		//	std::array<int, N> convertedDims;
+
+		//	for (size_t i = 0; i < offsets.size(); i++)
+		//	{
+		//		if (dims[i] < 0)
+		//		{
+		//			assert(abs(dims[i]) < target.dimension(i));
+		//			convertedOffsets[i] = dims[i] + target.dimension(i);
+		//		}
+		//		else
+		//		{
+		//			convertedOffsets[i] = dims[i];
+		//		}
+		//	}
+
+		//	Tensor<float, N> currentRes = target;
+
+		//	bool inited = false;
+
+		//	int missedAxes = 0;
+
+		//	vector<void*> op;
+
+		//	for (size_t i = 0; i < dims.size(); i++)
+		//	{
+		//		if (dims[i] == 0)
+		//		{
+		//			Tensor<float, N - 1> currentRes = target.chip(0, 0);
+		//			//Tensor<float, N - 1> currentRes = target.chip(convertedOffsets[i], missedAxes);
+
+
+		//			//if (!inited)
+		//			//{
+		//			//	currentRes = target.chip(convertedOffsets[i], missedAxes);
+		//			//	inited = true;
+		//			//}
+		//			//else
+		//			//{
+		//			//	currentRes = currentRes.chip(convertedOffsets[i], missedAxes);
+		//			//}
+		//		}
+		//		else
+		//		{
+		//			assert(dims[i] == 1);
+		//			missedAxes++;
+		//		}
+		//	}
+
+		//	currentRes.setConstant(value);
+		//};
+
 		static inline MatrixXf ExpandAs(VectorXf data, MatrixXf as)
 		{
 			return data.replicate(as.rows(), as.cols());
@@ -144,4 +211,5 @@ class Util
 		//}
 
 };
+
 

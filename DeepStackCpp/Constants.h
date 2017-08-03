@@ -20,7 +20,7 @@ enum players { chance = -1, P1 = 0, P2 = 1 };
 // @field chance_node(node for the chance player) `0`
 // @field check(node following check) `-1`
 // @field inner_node(any other node) `2`
-enum node_types { uninitialized = -100, terminal_fold = -2, terminal_call = -1, check = -1, chance_node = 0, inner_node = 1 };
+enum node_types { uninitialized = -100, bet = -4, terminal_fold = -3, terminal_call = -2, check = -1, chance_node = 0, inner_node = 1 };
 
 
 

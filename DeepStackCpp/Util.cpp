@@ -26,3 +26,4 @@ void Util::ToString(const MatrixXf& dataArg)
 	result << string_to_wstring(ss.str());
 	OutputDebugString(result.str().c_str());
 }
+
