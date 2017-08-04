@@ -80,10 +80,37 @@ void test_tree_cfr()
 
 int main()
 {
-	test_tree_visualiser();
+	CardArray cardArray;
+	cardArray << 1, 2, 3, 4, 5, 6;
 
-	Tensor<float, 5> test(2, 1, 1, 2, 6);
-	RemoveF3D(test, 0, 0, 0).setConstant(1);
+	TensorMap<Eigen::Tensor<float, 1>> cardMap(cardArray.data(), card_count);
+	Tf1 resultTensor = cardMap;
+	cardMap(0) = 22;
+
+	cout << cardArray.data() << endl;
+	cout << cardMap.data() << endl;
+
+	cout << resultTensor.data();
+
+	Tensor<int, 3, Eigen::RowMajor> matrix(1, 2, 3);
+	matrix.setValues({ { { 1, 2, 3} , { 4, 5, 6} } });
+
+	Tensor<int, 1, Eigen::RowMajor> vector(3);
+	vector.setValues({ 10, 10, 10  });
+	matrix.chip(0, 0).chip(0, 0) = vector;
+
+	cout << matrix;
+	cout << "Done";
+	
+
+
+
+	//test_tree_visualiser();
+
+	//Tensor<float, 5> test(2, 1, 1, 2, 6);
+	//RemoveF3D(test, 0, 0, 0).setConstant(1);
+
+	
 	//test_tree_visualiser();
 	//// Shuffle all dimensions to the left by 1.
 	//Tensor<float, 5> i2(2, 2, 2, 2, 2);
@@ -97,7 +124,7 @@ int main()
 	//Util::MultiSliceFill(input, { 0 }, { 0, 1 }, 8);
 //	int offset = Util::ConvertOffset(input, -1, 0);
 	//Remove2D(input, 0).setConstant(1);
-	cout << test;
+	//cout << test;
 
 	//Tensor<float, 5> output = Util::Transpose(input, { 0, 2, 1, 3, 4});
 

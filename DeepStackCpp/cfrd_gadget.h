@@ -15,7 +15,7 @@ using namespace Eigen;
 class cfrd_gadget
 {
 public:
-	cfrd_gadget(ArrayXf& board, CardArray player_range, CardArray opponent_cfvs);
+	cfrd_gadget(ArrayXf& board, Tf1& player_range, Tf1& opponent_cfvs);
 
 	//-- - Uses one iteration of the gadget game to generate an opponent range for
 	//	-- the current re-solving iteration.
@@ -23,7 +23,7 @@ public:
 	//	-- with the current strategy in the re - solve game
 	//	-- @param iteration the current iteration number of re-solving
 	//	-- @return the opponent range vector for this iteration
-	CardArray compute_opponent_range(const CardArray& current_opponent_cfvs, size_t iteration);
+	Tf1 compute_opponent_range(const Tf1& current_opponent_cfvs, size_t iteration);
 
 private:
 	const float regret_epsilon = 1.0f / 100000000;
@@ -31,39 +31,39 @@ private:
 	// Arbitrarily large number used for clamping regrets.
 	const float max_number = 999999;
 
-	CardArray _input_opponent_range;
+	Tf1 _input_opponent_range;
 
-	CardArray _input_opponent_value;
+	Tf1 _input_opponent_value;
 
-	CardArray _curent_opponent_values;
+	Tf1 _curent_opponent_values;
 
 	// 2 stands for 2 actions: play/terminate
-	CardArray _opponent_reconstruction_regret;
+	Tf2 _opponent_reconstruction_regret;
 
-	CardArray _play_current_strategy;
+	Tf1 _play_current_strategy;
 
-	CardArray _terminate_current_strategy;
+	Tf1 _terminate_current_strategy;
 
-	CardArray _play_current_regret;
-	CardArray _terminate_current_regret;
+	Tf1 _play_current_regret;
+	Tf1 _terminate_current_regret;
 
-	CardArray _regret_sum;
+	Tf1 _regret_sum;
 
 
 	// Holds achieved CFVs for both players at each iteration so that we can compute regret
-	ArrayXf _total_values;
+	Tf1 _total_values;
 
 	// Holds achieved CFVs for p2
-	ArrayXf _total_values_p2;
+	Tf1 _total_values_p2;
 
-	CardArray _terminate_regrets;
-	CardArray _terminate_possitive_regrets;
+	Tf1 _terminate_regrets;
+	Tf1 _terminate_possitive_regrets;
 
-	CardArray _play_regrets;
-	CardArray _play_possitive_regrets;
+	Tf1 _play_regrets;
+	Tf1 _play_possitive_regrets;
 
 	//masking out impossible hands
-	CardArray _range_mask;
+	Tf1 _range_mask;
 
 	card_tools _card_tools;
 };

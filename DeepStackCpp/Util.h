@@ -49,23 +49,59 @@ class Util
 			return output;
 		}
 
-		//static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as)
-		//{
-		//	return data.replicate(as.rows(), as.cols());
-		//}
 
 		template <int N>
 		static inline int ConvertOffset(Tensor<float, N>& target, int offset, int dim)
 		{
 			if (offset < 0)
 			{
-				assert(false);  // Check that it works as in torch. -1 should be the last element.
-
+				// ToDo: Check that it works as in torch. -1 should be the last element.
 				assert(abs(offset) < target.dimension(dim));
 				return offset + (int)target.dimension(dim);
 			}
 
 			return offset;
+		}
+
+		template <int N>
+		static inline Tensor<float, N> Slice(const Tensor<float, N> &target, std::array<std::array<DenseIndex, 2>, N> const &offsets)
+		{
+			Eigen::array<int, N> offsets[N];
+			Eigen::array<int, N> extents[N];
+
+			for (size_t dim = 0; dim < length; dim++)
+			{
+				std::array<DenseIndex, 2> currentExtent = offsets[dim];
+				DenseIndex offset = currentExtent[0];
+				DenseIndex extent = currentExtent[1];
+
+				if (offset == 0 && extent == 0) // Means that we will not slice this dimension
+				{
+					offsets[dim] = 0;
+					extents[dim] = target.dimension(dim);
+				}
+				else
+				{
+					assert(offset > 0);
+					offsets[dim] = ConvertOffset(target, offset, dim);
+					extents[dim] = ConvertOffset(target, extent, dim);
+				}
+			}
+
+			Tensor<float, N> output = target.slice(offsets, extents);
+			return output;
+		}
+
+		//static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as)
+		//{
+		//	return data.replicate(as.rows(), as.cols());
+		//}
+
+		static Tf1 CardArrayToTensor(CardArray cardArray)
+		{
+			TensorMap<Eigen::Tensor<float, 1>> cardMap(cardArray.data(), card_count);
+			Tf1 resultTensor = cardMap;
+			return resultTensor;
 		}
 
 		//template <int N>
@@ -167,6 +203,29 @@ class Util
 			target = (target < maxValue).select(
 				target,
 				CardArray::Constant(target.rows(), target.cols(), maxValue)
+			);
+		}
+
+		template <int N>
+		static inline void Clip(Tensor<float, N>& target, float lowLimin, float maxValue)
+		{
+			target = (target >= lowLimin).select(
+				target,
+				target.setConstant(lowLimin)
+			);
+
+			target = (target < maxValue).select(
+				target,
+				target.setConstant(maxValue)
+			);
+		}
+
+		template <int N>
+		static inline void ClipLow(Tensor<float, N>& target, float lowLimin)
+		{
+			target = (target >= lowLimin).select(
+				target,
+				target.setConstant(lowLimin)
 			);
 		}
 

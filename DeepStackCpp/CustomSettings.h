@@ -1,10 +1,14 @@
 #pragma once
 #include <Eigen/Dense>
 #include "game_settings.h"
+#include <unsupported/Eigen/CXX11/Tensor>
 
 typedef float mainDataType;
 
+
+//typedef Eigen::TensorFixedSize<float, Sizes<1>> Tf1;
 typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic for a lot of cards to avoid usage of stack!
+
 
 #define Tf5 Tensor<float, 5>
 #define Tf4 Tensor<float, 4>

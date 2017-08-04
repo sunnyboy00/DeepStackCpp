@@ -5,13 +5,14 @@
 #include "Util.h"
 #include <Eigen/Dense>
 #include "terminal_equity.h"
+#include "cfrd_gadget.h"
 
 using namespace std;
 using namespace Eigen;
 
 class lookahead
 {
-// 	-- - A depth - limited lookahead of the game tree used for re - solving.
+	// 	-- - A depth - limited lookahead of the game tree used for re - solving.
 public:
 	lookahead();
 	~lookahead();
@@ -78,7 +79,7 @@ public:
 	//--data structures for summing over the actions [1 x parent_action x grandparent_id x range]
 	map<int, Tf4> regrets_sum;
 
-	
+
 	//--used to hold and swap inner(nonterminal) nodes when doing some transpose operations
 	// --data structures for inner nodes (not terminal nor allin) [bets_count x parent_nonallinbetscount x gp_id x batch x players x range]
 	map<int, Tf5> inner_nodes;
@@ -91,5 +92,48 @@ public:
 	bool first_call_terminal;
 	bool first_call_transition;
 	bool first_call_check;
-};
 
+
+	//	--- Re - solves the lookahead using input ranges.
+	//	--
+	//	--Uses the input range for the opponent instead of a gadget range, so only
+	//	-- appropriate for re - solving the root node of the game tree(where ranges
+	//	-- are fixed).
+	//	--
+	//	-- @{build_lookahead
+	//} must be called first.
+	//--
+	//-- @param player_range a range vector for the re - solving player
+	//-- @param opponent_range a range vector for the opponent
+	void resolve_first_node(Tf1& player_range, Tf1& opponent_range);
+
+	//-- - Re - solves the lookahead using an input range for the player and
+	//--the @{cfrd_gadget | CFRDGadget
+	//} to generate ranges for the opponent.
+	//--
+	//-- @{build_lookahead} must be called first.
+	//--
+	//-- @param player_range a range vector for the re - solving player
+	//-- @param opponent_cfvs a vector of cfvs achieved by the opponent
+	//-- before re - solving
+	void resolve(Tf1& player_range, Tf1& opponent_cfvs);
+
+private:
+	cfrd_gadget* _reconstruction_gadget;
+
+	Tf1 _reconstruction_opponent_cfvs;
+
+	// Lookahead depth to solve
+	int _depth;
+
+	//-- - Re - solves the lookahead.
+	void _compute();
+
+	//-- - Uses regret matching to generate the players' current strategies.
+	//-- @local
+	void _compute_current_strategies();
+
+	//-- - Using the players' current strategies, computes their probabilities of
+	//--reaching each state of the lookahead.
+	void _compute_ranges();
+};
