@@ -24,39 +24,37 @@ public:
 	// Depth
 	long long depth;
 
-	//--per layer information about tree actions
+	const float regret_epsilon = 1.0f / 1000000000;
+
+	//-----------------------------------------------------------------------
+	//--Per layer information about tree actions
 	//--per layer actions are the max number of actions for any of the nodes on the layer
 
-	// Number of bet actions per layer:
-	// bets_count = total_actions - terminal_actions
-	map<int, int> bets_count;
-
-	// Total number of possible actions per layer. This includes: terminal actions (fold + check) and bets(with allin):
-	// actions_count = bets_count + terminal_actions_count = bets_count + 2
+	// Max number of actions per layer. That is max number of children for all layer nodes. 
 	map<int, int> actions_count;
 
-	// Terminal actions per layer:
-	// terminal_actions = 2 (fold + check).
+	// Max terminal actions per layer:
+	// For the final layer: terminal_actions = 2 (fold + check).
+	// For the non-final layer: terminal_actions = 2 + chance_nodes_count(1) = 3. (?)
 	map<int, int> terminal_actions_count;
+
+	// Bet actions per layer:
+	// bets_count = max(total_actions) - max(terminal_actions)
+	map<int, int> bets_count;
 
 	// Total bets except allin:
 	// nonallinbets_count = bets_count - 1
 	map<int, int> nonallinbets_count;
 
-	// All actions per layer except terminal actions:
-	// nonterminal_nodes_count = actions_count - terminal_actions_count = (bets_count + 2) - (2) = bets_count.
-	map<int, int> nonterminal_nodes_count;
 
-	// Bets per layer without allin bet:
+	//--------------------------------------------------------------------
+	// The node counts per layer: 
+
+	// Nodes per layer without allin node:
 	// nonterminal_nonallin_nodes_count = bets - 1
 	map<int, int> nonterminal_nonallin_nodes_count;
-	map<int, int> all_nodes_count;
-	map<int, int> terminal_nodes_count;
-	map<int, int> allin_nodes_count;
-	map<int, int> inner_nodes_count;
 
-
-
+	// ----------------------------------------------------------------
 	map<int, Tf5> pot_size;
 
 	//--lookahead main data structures
@@ -87,8 +85,7 @@ public:
 	map<int, Tf5> inner_nodes_p1;
 	map<int, Tf5> swap_data;
 
-
-	float regret_epsilon;
+	// Which player acts at particular depth. 0 - first player to act. 1 - second player to act.
 	ArrayXf acting_player;
 
 	bool first_call_terminal;

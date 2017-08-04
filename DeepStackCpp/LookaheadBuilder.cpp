@@ -1,5 +1,9 @@
 #include "LookaheadBuilder.h"
 
+#include <cstdio>
+#include <iostream>
+using namespace std;
+
 
 
 LookaheadBuilder::LookaheadBuilder(lookahead& ahead)
@@ -100,7 +104,7 @@ void LookaheadBuilder::_compute_tree_structures(const vector<Node*>& current_lay
 		assert(layer_actions_count == layer_terminal_actions_count);
 		_lookahead->nonallinbets_count[current_depth] = 0;
 	}
-	else
+	else if (_lookahead->bets_count[current_depth] > 0)
 	{
 		_lookahead->nonallinbets_count[current_depth] = _lookahead->bets_count[current_depth] - 1; //--remove allin
 	}
@@ -133,14 +137,10 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 	}
 #endif
 
-	if (layer < _lookahead->depth + 1)
+	if (layer < _lookahead->depth + 1) //ToDo: combine with nex if
 	{
 		int gp_nonallinbets_count = _lookahead->nonallinbets_count[layer - 2];
 		int prev_layer_terminal_actions_count = _lookahead->terminal_actions_count[layer - 1];
-		int gp_terminal_actions_count = _lookahead->terminal_actions_count[layer - 2];
-		int prev_layer_bets_count = 0;
-
-		prev_layer_bets_count = _lookahead->bets_count[layer - 1];
 
 		//--compute next coordinates for parent and grandparent
 		int next_parent_id = action_id - prev_layer_terminal_actions_count; // We are substructing prev_layer_terminal_actions_count because that is prev_layer_terminal_actions_count the zero reference point. Actions with children begins after the prev_layer_terminal_actions_count.
@@ -162,18 +162,18 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 
 				int terminal_actions_count = _lookahead->terminal_actions_count[layer];
 				assert(terminal_actions_count == 2);
-
-				int existing_bets_count = (int)node.children.size() - terminal_actions_count;
+				int actions_count = (int)node.children.size();
+				int existing_bets_count = actions_count - terminal_actions_count;
 
 #ifdef _DEBUG
 				//--allin situations
 				if (existing_bets_count == 0)
 				{
-					assert(action_id == _lookahead->actions_count[layer - 1] - 1);
+					assert(action_id == _lookahead->actions_count[layer - 1] - 1); // Allin is always the last action. And action_id is zero based. Thats why -1;
 				}
 #endif
 
-				for (int child_id = 0; child_id < terminal_actions_count; child_id++)
+				for (int child_id = 0; child_id < terminal_actions_count; child_id++) // First two actions are terminal actions 
 				{
 					Node* child_node = node.children[child_id];
 					//--go deeper
@@ -183,25 +183,22 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 				//--we need to make sure that even though there are fewer actions, the last action / allin
 				//  is has the same last index as if we had full number of actions
 				//--we manually set the action_id as the last action(allin)
-				for (int b = 0; b < existing_bets_count; b++)
+				for (int b = 0; b < existing_bets_count; b++) // After the first two actions there are bets 
 				{
-					int childIndex = node.children.size() - b + 1;
-					set_datastructures_from_tree_dfs(*node.children[childIndex], layer + 1,
-						_lookahead->actions_count[layer] - b + 1,
+					int childIndex = node.children.size() - b - 1;
+					set_datastructures_from_tree_dfs(*node.children[childIndex],
+						layer + 1,
+						_lookahead->actions_count[layer] - b - 1, // Action id. We go in reverse direction here from the allin which is always possible. -1 because we want zero based action id.
 						next_parent_id,
 						next_gp_id);
 				}
-				int dim1 = _lookahead->empty_action_mask[layer + 1].dimension(1);
-				int res1 = _lookahead->empty_action_mask[layer + 1].dimension(1) - existing_bets_count;
-				for (size_t i = terminal_actions_count; i <= _lookahead->empty_action_mask[layer + 1].dimension(1) - existing_bets_count; i++)
+
+				// We are masking out as 0 all impossible actions except allin(empty actions).
+				int upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
+				for (size_t actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
 				{
-					RemoveF3D(_lookahead->empty_action_mask[layer + 1], terminal_actions_count, next_parent_id, next_gp_id).setZero(); //--mask out empty actions. ToDo:check correctness
-					_lookahead->empty_action_mask[layer + 1].chip(terminal_actions_count, 0).chip(next_parent_id, 0).chip(next_gp_id, 0).setZero();
-					int val = _lookahead->empty_action_mask[layer + 1](terminal_actions_count, next_parent_id, next_gp_id, 0);
-					val = 5;
+					RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero(); 
 				}
-
-
 			}
 			else
 			{
@@ -221,58 +218,49 @@ void LookaheadBuilder::_compute_structure()
 {
 	assert(_lookahead->tree.street >= 1 && _lookahead->tree.street <= 2);
 
-	_lookahead->regret_epsilon = 1.0f / 1000000000;
-
 	//--which player acts at particular depth
 	_lookahead->acting_player.resize(_lookahead->depth + 2);
 	_lookahead->acting_player.setConstant(-1);
 
 	_lookahead->acting_player[0] = 0; //--in lookahead, 0 does not stand for player IDs, it's just the first player to act. 
-
-
 	for (int d = 1; d <= _lookahead->depth + 1; d++)
 	{
 		_lookahead->acting_player[d] = 1 - _lookahead->acting_player[d - 1];
 	}
 
+	// Setting previous fake layers data for the root node. 
+	// We 'creating' two layers with one not allin bet. Just for the calculation of nodes count below. (?)
 	_lookahead->bets_count[-2] = 1;
 	_lookahead->bets_count[-1] = 1;
+
 	_lookahead->nonallinbets_count[-2] = 1;
 	_lookahead->nonallinbets_count[-1] = 1;
+
 	_lookahead->terminal_actions_count[-2] = 0;
 	_lookahead->terminal_actions_count[-1] = 0;
+
 	_lookahead->actions_count[-2] = 1;
 	_lookahead->actions_count[-1] = 1;
 
-	//--compute the node counts
-	_lookahead->nonterminal_nodes_count[0] = 1;
-	_lookahead->nonterminal_nodes_count[1] = _lookahead->bets_count[0];
-	_lookahead->nonterminal_nonallin_nodes_count[-1] = 1;
-	_lookahead->nonterminal_nonallin_nodes_count[0] = 1;
-	_lookahead->nonterminal_nonallin_nodes_count[1] = _lookahead->nonterminal_nodes_count[1] - 1;
-	_lookahead->all_nodes_count[0] = 1;
-	_lookahead->all_nodes_count[1] = _lookahead->actions_count[0];
-	_lookahead->terminal_nodes_count[0] = 0;
-	_lookahead->terminal_nodes_count[1] = 2;
-	_lookahead->allin_nodes_count[0] = 0;
-	_lookahead->allin_nodes_count[1] = 1;
-	_lookahead->inner_nodes_count[0] = 1;
-	_lookahead->inner_nodes_count[1] = 1;
+	//--compute the node counts:
+
+	_lookahead->nonterminal_nonallin_nodes_count[-1] = 1; // Fake layer, mb chance?
+	_lookahead->nonterminal_nonallin_nodes_count[0] = 1; // The root node
+	_lookahead->nonterminal_nonallin_nodes_count[1] = _lookahead->bets_count[0] - 1;
 
 	for (int d = 1; d <= _lookahead->depth; d++)
 	{
-		_lookahead->all_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->bets_count[d - 1] * _lookahead->actions_count[d];
-		_lookahead->allin_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->bets_count[d - 1] * 1;
-		_lookahead->nonterminal_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->nonallinbets_count[d - 1] * _lookahead->bets_count[d];
-		_lookahead->nonterminal_nonallin_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->nonallinbets_count[d - 1] * _lookahead->nonallinbets_count[d];
-		_lookahead->terminal_nodes_count[d + 1] = _lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->bets_count[d - 1] * _lookahead->terminal_actions_count[d];
+		// nonterminal_nonallin_nodes_count = 
+		// [count of all non terminal not allinn nodes in all layers before] *  [nonallinbets_count in layer before] * [nonallinbets_count in current layer].
+
+		_lookahead->nonterminal_nonallin_nodes_count[d + 1] = 
+			_lookahead->nonterminal_nonallin_nodes_count[d - 1] * _lookahead->nonallinbets_count[d - 1] * _lookahead->nonallinbets_count[d];
 	}
 }
 
 
 void LookaheadBuilder::construct_data_structures()
 {
-
 	_compute_structure();
 
 	//--create the data structure for the first two layers
@@ -322,7 +310,6 @@ void LookaheadBuilder::construct_data_structures()
 	if (_lookahead->depth > 1)
 	{
 		Eigen::array<DenseIndex, 5> inner_dims{ { _lookahead->bets_count[0], 1, 1, players_count, card_count } };
-
 		Util::ResizeAndFill(_lookahead->inner_nodes[1], inner_dims);
 		Util::ResizeAndFill(_lookahead->swap_data[1], inner_dims);
 		_lookahead->swap_data[1] = Util::Transpose(_lookahead->inner_nodes[1], { 0, 1, 3, 2, 4 });
@@ -344,7 +331,6 @@ void LookaheadBuilder::construct_data_structures()
 		Util::ResizeAndFill(_lookahead->placeholder_data[d], deep_dims);
 		Util::ResizeAndFill(_lookahead->pot_size[d], deep_dims, stack);
 
-
 		// --data structures[actions x parent_action x grandparent_id x batch x 1 x range]
 		Eigen::array<DenseIndex, 4> deep_player_dims = { _lookahead->actions_count[d - 1],
 			_lookahead->bets_count[d - 2],
@@ -364,7 +350,6 @@ void LookaheadBuilder::construct_data_structures()
 			players_count,
 			card_count });
 
-
 		//--data structures for the layers except the last one
 		if (d < _lookahead->depth)
 		{
@@ -379,7 +364,6 @@ void LookaheadBuilder::construct_data_structures()
 				_lookahead->nonterminal_nonallin_nodes_count[d - 2],
 				1,
 				card_count });
-
 
 			_lookahead->swap_data[d] = Util::Transpose(_lookahead->inner_nodes[d], { 0, 1, 3, 2, 4 });
 		}

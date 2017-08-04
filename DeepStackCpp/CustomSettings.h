@@ -9,6 +9,8 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define Tf5 Tensor<float, 5>
 #define Tf4 Tensor<float, 4>
 #define Tf3 Tensor<float, 3>
+#define Tf2 Tensor<float, 2>
+#define Tf1 Tensor<float, 1>
 
 // Removes tensor first dim
 #define RemoveF1D(tensor, offset) tensor.chip(Util::ConvertOffset(tensor, offset, 0), 0)

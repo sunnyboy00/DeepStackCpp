@@ -41,8 +41,8 @@ void test_tree_visualiser()
 	card_to_string_conversion converter;
 	params.root_node->board = converter.string_to_board("Ks");
 	params.root_node->street = 2;
-	params.root_node->current_player = P2;
-	params.root_node->bets << 300, 300;
+	params.root_node->current_player = P1;
+	params.root_node->bets << 300, 900;
 
 	tree_builder builder;
 	Node& tree = builder.build_tree(params);
