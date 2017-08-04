@@ -129,15 +129,15 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 
 		for (int i = 0; i < possible_bets.rows(); i++)
 		{
-				Node* child = new Node();
-				child->parent = &parent_node;
-				child->type = bet;
-				child->current_player = current_player;
-				child->street = parent_node.street;
-				child->board = parent_node.board;
-				child->board_string = parent_node.board_string;
-				child->bets = possible_bets.row(i);
-				children.push_back(child);
+			Node* child = new Node();
+			child->parent = &parent_node;
+			child->type = bet;
+			child->current_player = current_player;
+			child->street = parent_node.street;
+			child->board = parent_node.board;
+			child->board_string = parent_node.board_string;
+			child->bets = possible_bets.row(i);
+			children.push_back(child);
 		}
 				
 	}

@@ -59,8 +59,10 @@ class Util
 		{
 			if (offset < 0)
 			{
+				assert(false);  // Check that it works as in torch. -1 should be the last element.
+
 				assert(abs(offset) < target.dimension(dim));
-				return offset + target.dimension(dim);
+				return offset + (int)target.dimension(dim);
 			}
 
 			return offset;

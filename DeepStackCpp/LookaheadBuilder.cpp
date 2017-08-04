@@ -185,7 +185,8 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 				//--we manually set the action_id as the last action(allin)
 				for (int b = 0; b < existing_bets_count; b++) // After the first two actions there are bets 
 				{
-					int childIndex = node.children.size() - b - 1;
+					assert(node.children.size() > b + 1);
+					size_t childIndex = node.children.size() - b - 1;
 					set_datastructures_from_tree_dfs(*node.children[childIndex],
 						layer + 1,
 						_lookahead->actions_count[layer] - b - 1, // Action id. We go in reverse direction here from the allin which is always possible. -1 because we want zero based action id.
@@ -194,8 +195,8 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 				}
 
 				// We are masking out as 0 all impossible actions except allin(empty actions).
-				int upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
-				for (size_t actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
+				size_t upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
+				for (int actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
 				{
 					RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero(); 
 				}
@@ -203,7 +204,7 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 			else
 			{
 				//--node has full action count, easy to handle
-				for (size_t child_id = 0; child_id < node.children.size(); child_id++)
+				for (int child_id = 0; child_id < node.children.size(); child_id++)
 				{
 					Node* child_node = node.children[child_id];
 					//--go deeper
@@ -329,7 +330,7 @@ void LookaheadBuilder::construct_data_structures()
 		Util::ResizeAndFill(_lookahead->ranges_data[d], deep_dims);
 		Util::ResizeAndFill(_lookahead->cfvs_data[d], deep_dims);
 		Util::ResizeAndFill(_lookahead->placeholder_data[d], deep_dims);
-		Util::ResizeAndFill(_lookahead->pot_size[d], deep_dims, stack);
+		Util::ResizeAndFill(_lookahead->pot_size[d], deep_dims, (float)stack);
 
 		// --data structures[actions x parent_action x grandparent_id x batch x 1 x range]
 		Eigen::array<DenseIndex, 4> deep_player_dims = { _lookahead->actions_count[d - 1],
