@@ -137,81 +137,81 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 	}
 #endif
 
-	if (layer < _lookahead->depth + 1) //ToDo: combine with nex if
+	if ((layer < _lookahead->depth + 1) && !(node.terminal || node.current_player == chance))
 	{
+		//--parent is not an allin raise
+		assert(parent_id <= _lookahead->nonallinbets_count[layer - 2]);
+
 		int gp_nonallinbets_count = _lookahead->nonallinbets_count[layer - 2];
 		int prev_layer_terminal_actions_count = _lookahead->terminal_actions_count[layer - 1];
 
 		//--compute next coordinates for parent and grandparent
 		int next_parent_id = action_id - prev_layer_terminal_actions_count; // We are substructing prev_layer_terminal_actions_count because that is prev_layer_terminal_actions_count the zero reference point. Actions with children begins after the prev_layer_terminal_actions_count.
 		int next_gp_id = gp_id * gp_nonallinbets_count + (parent_id);
-		//int next_gp_id = (gp_id - 1) * gp_nonallinbets_count + (parent_id);
 
-		if (!node.terminal && node.current_player != chance)
+		//--do we need to mask some actions for that node ? 
+		// (that is, does the node have fewer children than the max number of children for any node on this layer)
+		if (node.children.size() < _lookahead->actions_count[layer])
 		{
-			//--parent is not an allin raise
-			assert(parent_id <= _lookahead->nonallinbets_count[layer - 2]);
-
-			//--do we need to mask some actions for that node ? (that is, does the node have fewer children than the max number of children for any node on this layer)
-			bool node_with_empty_actions = (node.children.size() < _lookahead->actions_count[layer]);
-
-			if (node_with_empty_actions)
+			ProcessNodeWithEmptyActions(node, layer, action_id, next_parent_id, next_gp_id);
+		}
+		else
+		{
+			//--node has full action count, easy to handle
+			for (int child_id = 0; child_id < node.children.size(); child_id++)
 			{
-				//--we need to mask non existing padded bets
-				assert(layer > 0);
-
-				int terminal_actions_count = _lookahead->terminal_actions_count[layer];
-				assert(terminal_actions_count == 2);
-				int actions_count = (int)node.children.size();
-				int existing_bets_count = actions_count - terminal_actions_count;
-
-#ifdef _DEBUG
-				//--allin situations
-				if (existing_bets_count == 0)
-				{
-					assert(action_id == _lookahead->actions_count[layer - 1] - 1); // Allin is always the last action. And action_id is zero based. Thats why -1;
-				}
-#endif
-
-				for (int child_id = 0; child_id < terminal_actions_count; child_id++) // First two actions are terminal actions 
-				{
-					Node* child_node = node.children[child_id];
-					//--go deeper
-					set_datastructures_from_tree_dfs(*child_node, layer + 1, child_id, next_parent_id, next_gp_id);
-				}
-
-				//--we need to make sure that even though there are fewer actions, the last action / allin
-				//  is has the same last index as if we had full number of actions
-				//--we manually set the action_id as the last action(allin)
-				for (int b = 0; b < existing_bets_count; b++) // After the first two actions there are bets 
-				{
-					assert(node.children.size() > b + 1);
-					size_t childIndex = node.children.size() - b - 1;
-					set_datastructures_from_tree_dfs(*node.children[childIndex],
-						layer + 1,
-						_lookahead->actions_count[layer] - b - 1, // Action id. We go in reverse direction here from the allin which is always possible. -1 because we want zero based action id.
-						next_parent_id,
-						next_gp_id);
-				}
-
-				// We are masking out as 0 all impossible actions except allin(empty actions).
-				size_t upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
-				for (int actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
-				{
-					RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero(); 
-				}
-			}
-			else
-			{
-				//--node has full action count, easy to handle
-				for (int child_id = 0; child_id < node.children.size(); child_id++)
-				{
-					Node* child_node = node.children[child_id];
-					//--go deeper
-					set_datastructures_from_tree_dfs(*child_node, layer + 1, child_id, next_parent_id, next_gp_id);
-				}
+				Node* child_node = node.children[child_id];
+				//--go deeper
+				set_datastructures_from_tree_dfs(*child_node, layer + 1, child_id, next_parent_id, next_gp_id);
 			}
 		}
+	}
+}
+
+void LookaheadBuilder::ProcessNodeWithEmptyActions(Node &node, int layer, int action_id, int next_parent_id, int next_gp_id)
+{
+	//--we need to mask non existing padded bets
+	assert(layer > 0);
+
+	int terminal_actions_count = _lookahead->terminal_actions_count[layer];
+	assert(terminal_actions_count == 2);
+	int actions_count = (int)node.children.size();
+	int existing_bets_count = actions_count - terminal_actions_count;
+
+#ifdef _DEBUG
+	//--allin situations
+	if (existing_bets_count == 0)
+	{
+		assert(action_id == _lookahead->actions_count[layer - 1] - 1); // Allin is always the last action. And action_id is zero based. Thats why -1;
+	}
+#endif
+
+	for (int child_id = 0; child_id < terminal_actions_count; child_id++) // First two actions are terminal actions 
+	{
+		Node* child_node = node.children[child_id];
+		//--go deeper
+		set_datastructures_from_tree_dfs(*child_node, layer + 1, child_id, next_parent_id, next_gp_id);
+	}
+
+	//--we need to make sure that even though there are fewer actions, the last action / allin
+	//  is has the same last index as if we had full number of actions
+	//--we manually set the action_id as the last action(allin)
+	for (int b = 0; b < existing_bets_count; b++) // After the first two actions there are bets 
+	{
+		assert(node.children.size() > b + 1);
+		size_t childIndex = node.children.size() - b - 1;
+		set_datastructures_from_tree_dfs(*node.children[childIndex],
+			layer + 1,
+			_lookahead->actions_count[layer] - b - 1, // Action id. We go in reverse direction here from the allin which is always possible. -1 because we want zero based action id.
+			next_parent_id,
+			next_gp_id);
+	}
+
+	// We are masking out as 0 all impossible actions except allin(empty actions).
+	size_t upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
+	for (int actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
+	{
+		RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero();
 	}
 }
 

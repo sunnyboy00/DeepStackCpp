@@ -46,6 +46,8 @@ public:
 	//	-- @param gp_id the index of the current node's grandparent
 	void set_datastructures_from_tree_dfs(Node& node, int layer, int action_id, int parent_id, int gp_id);
 
+	void ProcessNodeWithEmptyActions(Node &node, int layer, int action_id, int next_parent_id, int next_gp_id);
+
 	//-- - Computes the number of nodes at each depth of the tree.
 	//--Used to find the size for the tensors which store lookahead data.
 	void _compute_structure();
