@@ -14,6 +14,24 @@ using namespace std;
 class Util
 {
 	public:
+		template <int N>
+		static inline Tensor<float, N> ExpandAs(Tensor<float, N> data, Tensor<float, N> as)
+		{
+			std::array<ptrdiff_t, N> broadcasts;
+
+			//ToDo: remove during optimization for performance reasons
+			for (size_t dim = 0; dim < N; dim++)
+			{
+				float difDim = (float)as.dimension(dim) / data.dimension(dim);
+				assert(difDim >= 1.0);
+				assert(ceilf(difDim) == difDim && "The coefficients must be integers");
+				broadcasts[dim] = (int)difDim;
+			}
+
+			Tensor<float, N> res = data.broadcast(broadcasts);
+			return res;
+		}
+
 		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as)
 		{
 			//ToDo: remove during optimization for performance reasons

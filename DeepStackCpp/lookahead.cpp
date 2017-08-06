@@ -49,7 +49,7 @@ void lookahead::_compute()
 
 void lookahead::_compute_current_strategies()
 {
-	for (size_t d = 0; d < _depth; d++)
+	for (int d = 0; d < _depth; d++)
 	{
 		positive_regrets_data[d] = regrets_data[d];
 		Util::ClipLow(positive_regrets_data[d], regret_epsilon);
@@ -59,12 +59,14 @@ void lookahead::_compute_current_strategies()
 
 		//--1.1  regret matching
 		//--note that the regrets as well as the CFVs have switched player indexing
-		regrets_sum[d] = positive_regrets_data[d].sum(0);
+		std::array<int, 1> dims = { 0 };
+		regrets_sum[d].chip(0, 0) = positive_regrets_data[d].sum(dims);
+
 		Tf4 player_current_strategy = current_strategy_data[d];
 		Tf4 player_regrets = positive_regrets_data[d];
 		Tf4 player_regrets_sum = regrets_sum[d];
 
-		player_current_strategy = player_regrets / player_regrets_sum.broadcast(player_regrets);
+		player_current_strategy = player_regrets / Util::ExpandAs(player_regrets_sum, player_regrets);
 	}
 }
 

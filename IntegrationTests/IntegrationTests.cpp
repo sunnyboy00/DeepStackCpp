@@ -39,10 +39,10 @@ void test_tree_visualiser()
 	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("Ks");
-	params.root_node->street = 2;
+	params.root_node->board = converter.string_to_board("");
+	params.root_node->street = 1;
 	params.root_node->current_player = P1;
-	params.root_node->bets << 300, 900;
+	params.root_node->bets << 100, 100;
 
 	tree_builder builder;
 	Node& tree = builder.build_tree(params);
@@ -80,77 +80,36 @@ void test_tree_cfr()
 
 int main()
 {
-	CardArray cardArray;
-	cardArray << 1, 2, 3, 4, 5, 6;
-
-	TensorMap<Eigen::Tensor<float, 1>> cardMap(cardArray.data(), card_count);
-	Tf1 resultTensor = cardMap;
-	cardMap(0) = 22;
-
-	cout << cardArray.data() << endl;
-	cout << cardMap.data() << endl;
-
-	cout << resultTensor.data();
-
-	Tensor<int, 3, Eigen::RowMajor> matrix(1, 2, 3);
-	matrix.setValues({ { { 1, 2, 3} , { 4, 5, 6} } });
-
-	Tensor<int, 1, Eigen::RowMajor> vector(3);
-	vector.setValues({ 10, 10, 10  });
-	matrix.chip(0, 0).chip(0, 0) = vector;
-
-	cout << matrix;
-	cout << "Done";
-	
-
-
-
-	//test_tree_visualiser();
-
-	//Tensor<float, 5> test(2, 1, 1, 2, 6);
-	//RemoveF3D(test, 0, 0, 0).setConstant(1);
-
-	
-	//test_tree_visualiser();
 	//// Shuffle all dimensions to the left by 1.
 	//Tensor<float, 5> i2(2, 2, 2, 2, 2);
 	//std::array<DenseIndex, 5> ssss = { 0, 1, 3, 2, 4 };
 	//Tensor<float, 5> output33 = i2.shuffle({ { 0, 1, 3, 2, 4 } });
 	//Tensor<float, 5> output2 = Util::Transpose(i2, ssss);
-
-	//Tensor<float, 2> input(2, 2);
-	//Tensor<float, res> currentRes = input.chip(0, 0);
-
-	//Util::MultiSliceFill(input, { 0 }, { 0, 1 }, 8);
-//	int offset = Util::ConvertOffset(input, -1, 0);
-	//Remove2D(input, 0).setConstant(1);
-	//cout << test;
-
-	//Tensor<float, 5> output = Util::Transpose(input, { 0, 2, 1, 3, 4});
-
-	//// ... set some values in input.
-	//std::array<DenseIndex, 5> test = { 0, 1, 3, 2, 4 };
-	////Eigen::array<DenseIndex, 5> ff = test;
-	//Tensor<float, 5> output2 = Util::Transpose(input, { 0, 1, 3, 2, 4 });
-	//Tensor<float, 5> output = input.shuffle(test);
-
-	//eigen_assert(output.dimension(0) == 20);
-	//eigen_assert(output.dimension(1) == 50);
-	//eigen_assert(output.dimension(2) == 30);
-
-	//Eigen::Tensor<float, 2> a(2, 1);
-	//a.setConstant(1);
-	//Eigen::Tensor<float, 2> b(2, 1);
-
-	////a.setZero();
-	////Eigen::array<int, 2> action_dims_2{ { 2, 2 } };
-	//Tensor<bool, 0> eq = (a < Eigen::Tensor<float, 2>(a).setZero()).all();
-	//bool rr = eq.coeff();
-
-	//std::array<DenseIndex, 2> ar = { 2, 2 };
-	//cout << a;
+	Eigen::Tensor<float, 2> a(2, 3);
+	a.setValues({ { 0, 100, 200 },{ 300, 400, 500 } });
+	Eigen::array<float, 2> bcast = { 3, 2 };
+	Eigen::Tensor<float, 2> b = a.broadcast(bcast);
+	cout << "a" << endl << a << endl << "b" << endl << b << endl;
+	cout << "Done";
+	    
+	Eigen::Tensor<float, 2> c = Util::ExpandAs(a, b);
+	cout << c;
 	cout << "Done";
 
+	//Eigen::array<DenseIndex, 2> offsets = { 1, 0 };
+	//Eigen::array<DenseIndex, 2> extents = { 2, 3 };
+	//auto slice = a.slice(offsets, extents);
+	//slice = 1;
+	//cout << "a" << endl << a << endl;
+	//cout << "slice" << endl << slice << endl;
+
+	//Tensor<float, 5> input(20, 30, 50, 1, 1);
+
+
+
+//	Eigen::Tensor<float, 2> a(2, 1);
+	//a.setZero();
+	//Eigen::array<int, 2> action_dims_2{ { 2, 2 } };
 	//Eigen::array<Index, 2> dd(ar);
 
 
@@ -205,7 +164,7 @@ int main()
 
 	//ArrayXXf res = data.replicate(2, 4);
 //	cout << map;
-	//test_tree_cfr();
+	test_tree_cfr();
 	cout << "Done";
 	//float target[6] = { -1, 1, 5, 5, 6, 6 };
 
