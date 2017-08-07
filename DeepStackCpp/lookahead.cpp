@@ -84,18 +84,21 @@ void lookahead::_compute_ranges()
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 
 
+		//for (size_t action = prev_layer_terminal_actions_count; action < current_level_ranges.dimension(0); action++)
+		//{
+		//	for (size_t parentAction = 0; parentAction < gp_layer_nonallin_bets_count; parentAction++)
+		//	{
+
+		//	}
+		//}
+
 		//--copy the ranges of inner nodes and transpose
-		for (size_t action = prev_layer_terminal_actions_count; action < current_level_ranges.dimension(0); action++)
-		{
-			for (size_t parentAction = 0; parentAction < gp_layer_nonallin_bets_count; parentAction++)
-			{
+		Tf5 betActionsRanges = Util::Slice(current_level_ranges,
+		{ { { prev_layer_terminal_actions_count, -1 } ,{ 1, gp_layer_nonallin_bets_count },{},{},{} } });
+		inner_nodes[d] = Util::Transpose(betActionsRanges, { 1 , 2 }); // Shuffle parent and gp axis;
+		std::array<int, 5> sizes = { { 1, prev_layer_bets_count, -1, players_count, card_count } };
 
-			}
-		}
-
-
-
-		//inner_nodes[d]:copy(current_level_ranges[{ {prev_layer_terminal_actions_count + 1, -1}, { 1, gp_layer_nonallin_bets_count }, {}, {}, {}}]:transpose(2, 3))
+		//TensorMap<float, 5> super_view(inner_nodes[d].data(), { { 1, prev_layer_bets_count, -1, players_count, card_count } });
 
 		//	local super_view = inner_nodes[d]
 		//	super_view = super_view : view(1, prev_layer_bets_count, -1, constants.players_count, game_settings.card_count)

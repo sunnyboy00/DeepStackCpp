@@ -69,38 +69,40 @@ class Util
 
 
 		template <int N>
-		static inline int ConvertOffset(Tensor<float, N>& target, int offset, int dim)
+		static inline DenseIndex ConvertOffset(const Tensor<float, N>& target, DenseIndex offset, DenseIndex dim)
 		{
 			if (offset < 0)
 			{
 				// ToDo: Check that it works as in torch. -1 should be the last element.
-				assert(abs(offset) < target.dimension(dim));
-				return offset + (int)target.dimension(dim);
+				assert(abs(offset) <= target.dimension(dim));
+				return offset + (DenseIndex)target.dimension(dim);
 			}
 
 			return offset;
 		}
 
+		// Emulates slices in Torch. Takes array of array of two elements: offset and extent. 
+		// Extent may be negative- that means negative index from the end of dimension.
+		// If extent is zero - that dimension is not sliced.
 		template <int N>
-		static inline Tensor<float, N> Slice(const Tensor<float, N> &target, std::array<std::array<DenseIndex, 2>, N> const &offsets)
+		static inline Tensor<float, N> Slice(const Tensor<float, N> &target, std::array<std::array<DenseIndex, 2>, N> const &slices)
 		{
-			Eigen::array<int, N> offsets[N];
-			Eigen::array<int, N> extents[N];
+			Eigen::array<DenseIndex, N> offsets;
+			Eigen::array<DenseIndex, N> extents;
 
-			for (size_t dim = 0; dim < length; dim++)
+			for (DenseIndex dim = 0; dim < N; dim++)
 			{
-				std::array<DenseIndex, 2> currentExtent = offsets[dim];
+				std::array<DenseIndex, 2> currentExtent = slices[dim];
 				DenseIndex offset = currentExtent[0];
 				DenseIndex extent = currentExtent[1];
 
-				if (offset == 0 && extent == 0) // Means that we will not slice this dimension
+				if (extent == 0) // Means that we will not slice this dimension
 				{
 					offsets[dim] = 0;
 					extents[dim] = target.dimension(dim);
 				}
 				else
 				{
-					assert(offset > 0);
 					offsets[dim] = ConvertOffset(target, offset, dim);
 					extents[dim] = ConvertOffset(target, extent, dim);
 				}
@@ -110,10 +112,102 @@ class Util
 			return output;
 		}
 
-		//static inline MatrixXf ExpandAs(MatrixXf data, MatrixXf as)
+		////Creates a view with different dimensions of the storage associated with tensor.
+		////If one of the dimensions is - 1, the size of that dimension is inferred from the rest of the elements.
+		//template <int N>
+		//static inline TensorMap<TfN, N> View(TfN &target, std::array<int, N>& sizes)
 		//{
-		//	return data.replicate(as.rows(), as.cols());
-		//}
+		//	int negativeIndex = -1;
+		//	int sizeLeft = target.size();
+		//	for (int dim = 0; dim < N; dim++)
+		//	{
+		//		int curDimSize = sizes[dim];
+		//		if (curDimSize == -1)
+		//		{
+		//			assert(negativeIndex == -1);
+		//			negativeIndex = curDimSize;
+		//		}
+		//		else
+		//		{
+		//			assert(curDimSize > 0);
+		//			sizeLeft -= curDimSize;
+		//			assert(sizeLeft >= 0);
+		//		}
+		//	}
+
+		//	if (negativeIndex > 0)
+		//	{
+		//		sizes[negativeIndex] = sizeLeft;
+		//	}
+
+
+		//	switch (N)
+		//	{
+		//	case 1:
+		//		return TensorMap<TfN, 1>(target.data(), sizes[0]);
+		//	case 2:
+		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1]);
+		//	case 3:
+		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2]);
+		//	case 4:
+		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
+		//	case 5:
+		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
+		//	default:
+		//		throw std::invalid_argument("Invalid tensor size");
+		//	};
+		//};
+
+		template <int N>
+		static inline void ProcessSizes(int targetSize, std::array<int, N>& sizes)
+		{
+			int negativeIndex = -1;
+			int sizeLeft = targetSize;
+			for (int dim = 0; dim < N; dim++)
+			{
+				int curDimSize = sizes[dim];
+				if (curDimSize == -1)
+				{
+					assert(negativeIndex == -1);
+					negativeIndex = curDimSize;
+				}
+				else
+				{
+					assert(curDimSize > 0);
+					sizeLeft -= curDimSize;
+					assert(sizeLeft >= 0);
+				}
+			}
+
+			if (negativeIndex > 0)
+			{
+				sizes[negativeIndex] = sizeLeft;
+			}
+		};
+
+		static inline TensorMap<Tf2, 2> View(Tf2 &target, std::array<int, 2>& sizes)
+		{
+			Util::ProcessSizes((int)target.size(), sizes);
+			return TensorMap<Tf2, 2>(target.data(), sizes[0], sizes[1]);
+		}
+
+		static inline TensorMap<Tf3, 3> View(Tf3 &target, std::array<int, 3>& sizes)
+		{
+			Util::ProcessSizes((int)target.size(), sizes);
+			return TensorMap<Tf3, 3>(target.data(), sizes[0], sizes[1], sizes[2]);
+		}
+
+		static inline TensorMap<Tf4, 4> View(Tf4 &target, std::array<int, 3>& sizes)
+		{
+			Util::ProcessSizes((int)target.size(), sizes);
+			return TensorMap<Tf4, 4>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
+		}
+
+		static inline TensorMap<Tf5, 5> View(Tf5 &target, std::array<int, 5>& sizes)
+		{
+			Util::ProcessSizes((int)target.size(), sizes);
+			return TensorMap<Tf5, 5>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
+		}
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)
 		{
@@ -122,6 +216,7 @@ class Util
 			return resultTensor;
 		}
 
+		//// Makes 
 		//template <int N>
 		//static void MultiSliceFill(Tensor<float, N>& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &dims, float value)
 		//{

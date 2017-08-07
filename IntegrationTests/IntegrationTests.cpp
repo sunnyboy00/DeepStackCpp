@@ -78,14 +78,64 @@ void test_tree_cfr()
 	cout << "Exploitability: " << tree.exploitability << endl;
 }
 
+
+
+static inline TensorMap<Tf2, 2> View2(const Tf2 &target, std::array<int, 2>& sizes)
+{
+	//int negativeIndex = -1;
+	//int sizeLeft = target.size();
+	//for (int dim = 0; dim < N; dim++)
+	//{
+	//	int curDimSize = sizes[dim];
+	//	if (curDimSize == -1)
+	//	{
+	//		assert(negativeIndex == -1);
+	//		negativeIndex = curDimSize;
+	//	}
+	//	else
+	//	{
+	//		assert(curDimSize > 0);
+	//		sizeLeft -= curDimSize;
+	//		assert(sizeLeft >= 0);
+	//	}
+	//}
+
+	//if (negativeIndex > 0)
+	//{
+	//	sizes[negativeIndex] = sizeLeft;
+	//}
+	float dat[64];
+	return TensorMap<Tf2, 2>(dat, 2, 2);
+
+	//switch (N)
+	//{
+	//case 1:
+	//	return TensorMap<TfN, 1>(target.data(), sizes[0]);
+	////case 2:
+	////	return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1]);
+	////case 3:
+	////	return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2]);
+	////case 4:
+	////	return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
+	////case 5:
+	////	return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
+	//default:
+	//	throw std::invalid_argument("Invalid tensor size");
+	//};
+};
+
 int main()
 {
+	Tf2 temp(2, 2);
+	std::array<int, 2> sizes = { 1, 2 };
+	auto ress = Util::View(temp, sizes);
 	//// Shuffle all dimensions to the left by 1.
 	//Tensor<float, 5> i2(2, 2, 2, 2, 2);
 	//std::array<DenseIndex, 5> ssss = { 0, 1, 3, 2, 4 };
 	//Tensor<float, 5> output33 = i2.shuffle({ { 0, 1, 3, 2, 4 } });
 	//Tensor<float, 5> output2 = Util::Transpose(i2, ssss);
 	Eigen::Tensor<float, 2> a(2, 3);
+
 	a.setValues({ { 0, 100, 200 },{ 300, 400, 500 } });
 	Eigen::array<float, 2> bcast = { 3, 2 };
 	Eigen::Tensor<float, 2> b = a.broadcast(bcast);
