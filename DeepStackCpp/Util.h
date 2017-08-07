@@ -15,7 +15,7 @@ class Util
 {
 	public:
 		template <int N>
-		static inline Tensor<float, N> ExpandAs(Tensor<float, N> data, Tensor<float, N> as)
+		static inline TfN ExpandAs(TfN data, TfN as)
 		{
 			std::array<ptrdiff_t, N> broadcasts;
 
@@ -28,7 +28,7 @@ class Util
 				broadcasts[dim] = (int)difDim;
 			}
 
-			Tensor<float, N> res = data.broadcast(broadcasts);
+			TfN res = data.broadcast(broadcasts);
 			return res;
 		}
 
@@ -53,23 +53,23 @@ class Util
 		}
 
 		template <int N>
-		static inline void ResizeAndFill(Tensor<float, N> &target, std::array<DenseIndex, N> const &dims, float value = 0)
+		static inline void ResizeAndFill(TfN &target, std::array<DenseIndex, N> const &dims, float value = 0)
 		{
 			target.resize(dims);
 			target.setConstant(value);
 		}
 
 		template <int N>
-		static inline Tensor<float, N> Transpose(const Tensor<float, N> &target, std::array<DenseIndex, N> const &dims)
+		static inline TfN Transpose(const TfN &target, std::array<DenseIndex, N> const &dims)
 		{
 			//Eigen::array<DenseIndex, 3> shuffling{ { 1, 2, 0 } };
-			Tensor<float, N> output = target.shuffle(dims);
+			TfN output = target.shuffle(dims);
 			return output;
 		}
 
 
 		template <int N>
-		static inline DenseIndex ConvertOffset(const Tensor<float, N>& target, DenseIndex offset, DenseIndex dim)
+		static inline DenseIndex ConvertOffset(const TfN& target, DenseIndex offset, DenseIndex dim)
 		{
 			if (offset < 0)
 			{
@@ -81,35 +81,44 @@ class Util
 			return offset;
 		}
 
+		template <int N>
+		static void PreprocessExtents(std::array<std::array<DenseIndex, 2>, N> const & slices, 
+			const TfN &target, 
+			Eigen::array<DenseIndex, N> &extentsStarts,
+			Eigen::array<DenseIndex, N> &extentsLen)
+		{
+			for (DenseIndex dim = 0; dim < N; dim++)
+			{
+				extentsStarts[dim] = ConvertOffset(target, slices[dim][0], dim);
+				DenseIndex extentEnd = ConvertOffset(target, slices[dim][1], dim); // Inclusive!
+				assert(extentEnd >= extentsStarts[dim]);
+				extentsLen[dim] = extentEnd - slices[dim][0] + 1; // Extent length +1 because end is inclusive
+				assert(extentsLen[dim] > 0);
+			}
+		}
 		// Emulates slices in Torch. Takes array of array of two elements: offset and extent. 
 		// Extent may be negative- that means negative index from the end of dimension.
 		// If extent is zero - that dimension is not sliced.
+		// Returns THE NEW TENSOR. WITH COPY. ToDo: Check all usages for perf optimization
 		template <int N>
-		static inline Tensor<float, N> Slice(const Tensor<float, N> &target, std::array<std::array<DenseIndex, 2>, N> const &slices)
+		static inline TfN Slice(const TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices)
 		{
 			Eigen::array<DenseIndex, N> offsets;
-			Eigen::array<DenseIndex, N> extents;
+			Eigen::array<DenseIndex, N> extentsLen;
 
-			for (DenseIndex dim = 0; dim < N; dim++)
-			{
-				std::array<DenseIndex, 2> currentExtent = slices[dim];
-				DenseIndex offset = currentExtent[0];
-				DenseIndex extent = currentExtent[1];
+			PreprocessExtents(slices, target, offsets, extentsLen);
+			return target.slice(offsets, extentsLen);
+		}
 
-				if (extent == 0) // Means that we will not slice this dimension
-				{
-					offsets[dim] = 0;
-					extents[dim] = target.dimension(dim);
-				}
-				else
-				{
-					offsets[dim] = ConvertOffset(target, offset, dim);
-					extents[dim] = ConvertOffset(target, extent, dim);
-				}
-			}
+		// Fill the slice
+		template <int N>
+		static inline void FillSlice(TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices, float value)
+		{
+			Eigen::array<DenseIndex, N> offsets;
+			Eigen::array<DenseIndex, N> extentsLen;
 
-			Tensor<float, N> output = target.slice(offsets, extents);
-			return output;
+			PreprocessExtents(slices, target, offsets, extentsLen);
+			target.slice(offsets, extentsLen).setConstant(value);
 		}
 
 		////Creates a view with different dimensions of the storage associated with tensor.
@@ -211,14 +220,75 @@ class Util
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)
 		{
-			TensorMap<Eigen::Tensor<float, 1>> cardMap(cardArray.data(), card_count);
+			TensorMap<Tf1> cardMap(cardArray.data(), card_count);
 			Tf1 resultTensor = cardMap;
 			return resultTensor;
 		}
 
+		// Makes 
+		//template <int N>
+		//static void MultiSliceFill(TfN& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &slices, float value)
+		//{
+		//	Eigen::array<DenseIndex, N> offsets;
+		//	Eigen::array<DenseIndex, N> extents;
+
+		//	for (DenseIndex dim = 0; dim < N; dim++)
+		//	{
+		//		std::array<DenseIndex, 2> currentExtent = slices[dim];
+		//		DenseIndex offset = currentExtent[0];
+		//		DenseIndex extent = currentExtent[1];
+
+		//		if (extent != 0) // Means that we will not slice this dimension
+		//		{
+		//			offsets[dim] = 0;
+		//			extents[dim] = target.dimension(dim);
+		//		}
+		//		else
+		//		{
+		//			offsets[dim] = ConvertOffset(target, offset, dim);
+		//			extents[dim] = ConvertOffset(target, extent, dim);
+		//		}
+		//	}
+
+		//	TfN currentRes = target;
+
+		//	bool inited = false;
+
+		//	int missedAxes = 0;
+
+		//	vector<void*> op;
+
+		//	for (size_t i = 0; i < dims.size(); i++)
+		//	{
+		//		if (dims[i] == 0)
+		//		{
+		//			Tensor<float, N - 1> currentRes = target.chip(0, 0);
+		//			//Tensor<float, N - 1> currentRes = target.chip(convertedOffsets[i], missedAxes);
+
+
+		//			//if (!inited)
+		//			//{
+		//			//	currentRes = target.chip(convertedOffsets[i], missedAxes);
+		//			//	inited = true;
+		//			//}
+		//			//else
+		//			//{
+		//			//	currentRes = currentRes.chip(convertedOffsets[i], missedAxes);
+		//			//}
+		//		}
+		//		else
+		//		{
+		//			assert(dims[i] == 1);
+		//			missedAxes++;
+		//		}
+		//	}
+
+		//	currentRes.setConstant(value);
+		////};
+
 		//// Makes 
 		//template <int N>
-		//static void MultiSliceFill(Tensor<float, N>& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &dims, float value)
+		//static void MultiSliceFill(TfN& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &dims, float value)
 		//{
 		//	std::array<int, N> convertedOffsets;
 		//	std::array<int, N> convertedDims;
@@ -236,7 +306,7 @@ class Util
 		//		}
 		//	}
 
-		//	Tensor<float, N> currentRes = target;
+		//	TfN currentRes = target;
 
 		//	bool inited = false;
 
@@ -320,7 +390,7 @@ class Util
 		}
 
 		template <int N>
-		static inline void Clip(Tensor<float, N>& target, float lowLimin, float maxValue)
+		static inline void Clip(TfN& target, float lowLimin, float maxValue)
 		{
 			target = (target >= lowLimin).select(
 				target,
@@ -334,7 +404,7 @@ class Util
 		}
 
 		template <int N>
-		static inline void ClipLow(Tensor<float, N>& target, float lowLimin)
+		static inline void ClipLow(TfN& target, float lowLimin)
 		{
 			target = (target >= lowLimin).select(
 				target,

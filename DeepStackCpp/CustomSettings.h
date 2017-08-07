@@ -9,12 +9,13 @@ typedef float mainDataType;
 //typedef Eigen::TensorFixedSize<float, Sizes<1>> Tf1;
 typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic for a lot of cards to avoid usage of stack!
 
-#define TfN Tensor<float, N>
-#define Tf5 Tensor<float, 5>
-#define Tf4 Tensor<float, 4>
-#define Tf3 Tensor<float, 3>
-#define Tf2 Tensor<float, 2>
-#define Tf1 Tensor<float, 1>
+#define TensorLayoutType RowMajor//RowMajor
+#define TfN Tensor<float, N, TensorLayoutType>
+#define Tf5 Tensor<float, 5, TensorLayoutType>
+#define Tf4 Tensor<float, 4, TensorLayoutType>
+#define Tf3 Tensor<float, 3, TensorLayoutType>
+#define Tf2 Tensor<float, 2, TensorLayoutType>
+#define Tf1 Tensor<float, 1, TensorLayoutType>
 
 // Removes tensor first dim
 #define RemoveF1D(tensor, offset) tensor.chip(Util::ConvertOffset(tensor, offset, 0), 0)

@@ -208,11 +208,20 @@ void LookaheadBuilder::ProcessNodeWithEmptyActions(Node &node, int layer, int ac
 	}
 
 	// We are masking out as 0 all impossible actions except allin(empty actions).
-	size_t upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
-	for (int actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
-	{
-		RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero();
-	}
+	//size_t upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
+	//for (int actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
+	//{
+	//	RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero();
+	//}
+
+	Util::FillSlice(_lookahead->empty_action_mask[layer + 1],
+	{{ 
+		{ terminal_actions_count,-(existing_bets_count + 1) },
+		{next_parent_id, next_parent_id},
+		{next_gp_id, next_gp_id},
+		{0, -1}
+	}},
+	0);
 }
 
 void LookaheadBuilder::_compute_structure()
