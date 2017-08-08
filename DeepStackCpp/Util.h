@@ -14,6 +14,7 @@ using namespace std;
 class Util
 {
 	public:
+		// Expands one tensor as other one
 		template <int N>
 		static inline TfN ExpandAs(TfN data, TfN as)
 		{
@@ -32,6 +33,7 @@ class Util
 			return res;
 		}
 
+		// Expands one array as other one
 		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as)
 		{
 			//ToDo: remove during optimization for performance reasons
@@ -47,11 +49,13 @@ class Util
 			return res;
 		}
 
+		// Expands one array as other one
 		static inline ArrayXXf ExpandAs(ArrayXf data, ArrayXXf as)
 		{
 			return data.replicate(as.rows(), as.cols());
 		}
 
+		// Resizes the tensor and fills it with some value
 		template <int N>
 		static inline void ResizeAndFill(TfN &target, std::array<DenseIndex, N> const &dims, float value = 0)
 		{
@@ -59,15 +63,15 @@ class Util
 			target.setConstant(value);
 		}
 
+		// Transpose (or shuffle) tensor dims
 		template <int N>
 		static inline TfN Transpose(const TfN &target, std::array<DenseIndex, N> const &dims)
 		{
-			//Eigen::array<DenseIndex, 3> shuffling{ { 1, 2, 0 } };
 			TfN output = target.shuffle(dims);
 			return output;
 		}
 
-
+		// Converters negative indexes offsets to positive zero indexes.
 		template <int N>
 		static inline DenseIndex ConvertOffset(const TfN& target, DenseIndex offset, DenseIndex dim)
 		{
@@ -81,6 +85,7 @@ class Util
 			return offset;
 		}
 
+		// Converters if negative indexes of {fromOffsetDN, toInclusiveOffsetD1N} are negative to positive zero based indexes.
 		template <int N>
 		static void PreprocessExtents(std::array<std::array<DenseIndex, 2>, N> const & slices, 
 			const TfN &target, 
@@ -96,10 +101,12 @@ class Util
 				assert(extentsLen[dim] > 0);
 			}
 		}
+
 		// Emulates slices in Torch. Takes array of array of two elements: offset and extent. 
 		// Extent may be negative- that means negative index from the end of dimension.
 		// If extent is zero - that dimension is not sliced.
 		// Returns THE NEW TENSOR. WITH COPY. ToDo: Check all usages for perf optimization
+		// Example Util::Slice(target, {{ {fromOffsetD1, toInclusiveOffsetD1}, {fromOffsetD2, toInclusiveOffsetD12}, ... {fromOffsetDN, toInclusiveOffsetD1N} }})
 		template <int N>
 		static inline TfN Slice(const TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices)
 		{
@@ -143,13 +150,10 @@ class Util
 		//			assert(sizeLeft >= 0);
 		//		}
 		//	}
-
 		//	if (negativeIndex > 0)
 		//	{
 		//		sizes[negativeIndex] = sizeLeft;
 		//	}
-
-
 		//	switch (N)
 		//	{
 		//	case 1:
@@ -167,6 +171,7 @@ class Util
 		//	};
 		//};
 
+		// Calculates and replaces one -1 dimension of tensor from sizes basing on the targetSize.
 		template <int N>
 		static inline void ProcessSizes(int targetSize, std::array<int, N>& sizes)
 		{
@@ -178,7 +183,7 @@ class Util
 				if (curDimSize == -1)
 				{
 					assert(negativeIndex == -1);
-					negativeIndex = curDimSize;
+					negativeIndex = dim;
 				}
 				else
 				{
@@ -196,6 +201,7 @@ class Util
 
 		static inline TensorMap<Tf2, 2> View(Tf2 &target, std::array<int, 2>& sizes)
 		{
+			assert(target.size() == sizes[0] * sizes[1]);
 			Util::ProcessSizes((int)target.size(), sizes);
 			return TensorMap<Tf2, 2>(target.data(), sizes[0], sizes[1]);
 		}

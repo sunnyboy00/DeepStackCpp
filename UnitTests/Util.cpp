@@ -78,32 +78,31 @@ TEST_CASE("Slice")
 	REQUIRE(res(1, 0) == 3);
 }
 
+TEST_CASE("View")
+{
+	
+	Tf2 tensor(2, 3);
 
-//TEST_CASE("View")
-//{
-//	Tf2 tensor(2, 3);
-//	FillTensor(tensor);
-//	cout << tensor << endl;
-//	//TensorMap<float, 2> t_2d(tensor.data(), 16, 8);
-//	//int storage[128];  // 2 x 4 x 2 x 8 = 128
-//	//TensorMap<int, 4> t_4d(storage, 2, 4, 2, 8);
-//	std::array<int, 2> sizes = { 3, 2 };
-//	TensorMap<Tf2, 2> res = Util::View(tensor, sizes);
-//	cout << res;
-//
-//	REQUIRE(res(0, 0) == 1);
-//	REQUIRE(res(0, 1) == 1);
-//
-//	REQUIRE(res(1, 0) == 2);
-//	REQUIRE(res(1, 1) == 3);
-//
-//	//res = Util::View(tensor, { 3, -1 });
-//	REQUIRE(res.dimension(0) == 3);
-//	REQUIRE(res.dimension(1) == 2);
-//
-//	REQUIRE(res(0, 0) == 1);
-//	REQUIRE(res(0, 1) == 1);
-//
-//	REQUIRE(res(1, 0) == 2);
-//	REQUIRE(res(1, 1) == 3);
-//}
+	FillTensor(tensor);
+	std::array<int, 2> sizes = { 3, 2 };
+	TensorMap<Tf2, 2> res = Util::View(tensor, sizes);
+
+	REQUIRE(res.dimension(0) == 3);
+	REQUIRE(res.dimension(1) == 2);
+
+	REQUIRE(res(0, 0) == 0);
+	REQUIRE(res(0, 1) == 1);
+
+	REQUIRE(res(1, 0) == 2);
+	REQUIRE(res(1, 1) == 3);
+
+	REQUIRE(res(2, 0) == 4);
+	REQUIRE(res(2, 1) == 5);
+
+	Tf3 tensor2(1, 2, 3);
+	std::array<int, 3> sizes2 = { 2, 1, -1 };
+	TensorMap<Tf3, 3> res2 = Util::View(tensor2, sizes2);
+	REQUIRE(res2.dimension(0) == 2);
+	REQUIRE(res2.dimension(1) == 1);
+	REQUIRE(res2.dimension(2) == 3);
+}
