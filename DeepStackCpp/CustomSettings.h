@@ -17,6 +17,29 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define Tf2 Tensor<float, 2, TensorLayoutType>
 #define Tf1 Tensor<float, 1, TensorLayoutType>
 
+#define TbN TensorBase<float, N>
+#define Tb5 TensorBase<float, 5>
+#define Tb4 TensorBase<float, 4>
+#define Tb3 TensorBase<float, 3>
+#define Tb2 TensorBase<float, 2>
+#define Tb1 TensorBase<float, 1>
+
+#define TmN TensorMap<TfN, N>
+#define Tm5 TensorMap<Tf5, 5>
+#define Tm4 TensorMap<Tf4, 4>
+#define Tm3 TensorMap<Tf3, 3>
+#define Tm2 TensorMap<Tf2, 2>
+#define Tm1 TensorMap<Tf1, 1>
+
+#define TmAxx Eigen::Map<ArrayXXf>
+#define TmAxx Eigen::Map<ArrayXXf>
+
+#define ToTmxx(tensor, rows, cols) Eigen::Map<ArrayXXf>(tensor.data(), rows, cols)
+#define ToTmx(tensor, len) Eigen::Map<ArrayXf>(tensor.data(), len)
+
+// Removes tensor second dim
+#define Reshape(tensorBase, sizes) tensorBase.reshape(tensorBase, Util::ProcessSizes(tensorBase.size(), sizes))
+
 // Removes tensor first dim
 #define RemoveF1D(tensor, offset) tensor.chip(Util::ConvertOffset(tensor, offset, 0), 0)
 
@@ -40,3 +63,6 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 
 // Removes tensor fifth dim
 #define Remove5D(tensor, offset) tensor.chip(Util::ConvertOffset(tensor, offset, 4), 4)
+
+//Coping source tensor to the target tensor when target and source dimensions number are difference
+#define CopyDif(target, source) assert(target.size() >= source.size()); memcpy(target.data(), source.data(), source.size() * sizeof(float));

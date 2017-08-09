@@ -138,7 +138,7 @@ TEST_CASE("call_matrix_with_board")
 
 TEST_CASE("tree_node_call_value")
 {
-	Matrix2Xf range(2, 6);
+	ArrayXXf range(2, 6);
 	int i = 0;
 	for (size_t r = 0; r < 2; r++)
 	{
@@ -151,7 +151,7 @@ TEST_CASE("tree_node_call_value")
 
 	ArrayXXf result(2, 6);
 	terminal_equity term;
-	term.tree_node_call_value(range, result);
+	term.tree_node_call_value(range.array(), result);
 	REQUIRE(result(0,0) == Approx(0.0963).epsilon(myEps));
 	REQUIRE(result(1,1) == Approx(0.2375).epsilon(myEps));
 	REQUIRE(result(0,3) == Approx(-0.0234).epsilon(myEps));
@@ -186,7 +186,7 @@ TEST_CASE("tree_node_fold_value")
 	//Eigen::Tensor<int, 1> col_2 = a.chip(1, 1);
 	//cout << "a" << endl << a << endl;
 	//cout << "row_3" << endl << row_3 << endl;
-	Matrix2Xf range(2, 6);
+	ArrayXXf range(2, 6);
 	int i = 0;
 	for (size_t r = 0; r < 2; r++)
 	{

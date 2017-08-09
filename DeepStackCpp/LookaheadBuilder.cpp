@@ -276,8 +276,8 @@ void LookaheadBuilder::construct_data_structures()
 	//--create the data structure for the first two layers
 
 	//--data structures[actions x parent_action x grandparent_id x batch x players x range]
-	Eigen::array<DenseIndex, 5> ranges_data_0_dims{ { 1, 1, 1, players_count, card_count } };
-	Eigen::array<DenseIndex, 5> ranges_data_1_dims{ { _lookahead->actions_count[0], 1, 1, players_count, card_count } };
+	const Eigen::array<DenseIndex, 5> ranges_data_0_dims{ { 1, 1, 1, players_count, card_count } };
+	const Eigen::array<DenseIndex, 5> ranges_data_1_dims{ { _lookahead->actions_count[0], 1, 1, players_count, card_count } };
 
 	Util::ResizeAndFill(_lookahead->ranges_data[0], ranges_data_0_dims, 1.0f / card_count);
 	Util::ResizeAndFill(_lookahead->ranges_data[1], ranges_data_1_dims, 1.0f / card_count);

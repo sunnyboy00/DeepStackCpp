@@ -81,18 +81,17 @@ void test_tree_cfr()
 
 int main()
 {
-	Tf2 a(4, 3);
-	a.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
+	Tf2 a1(4, 3);
+	a1.setZero();
+
+	Tf2 a2(4, 3);
+	a2.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
 	{ 600, 700, 800 },{ 900, 1000, 1100 } });
-	
 
-	//Eigen::array<DenseIndex, 2> offsets = { 0, 0 };
-	//Eigen::array<DenseIndex, 2> extents = { 2, 2 };
-	//a.slice(offsets, extents).setConstant(2);
+	Tf2& a3 = a1;
 
-	Util::FillSlice(a, { { { 1, 2 } ,{ 0, 2 } } }, 2);
-	//auto slice = a.slice(offsets, extents);
-	cout << "a" << endl << a << endl;
+	cout << "a1" << endl << a1.data() << endl;
+	cout << "a3" << endl << a3.data() << endl;
 
 	cout << "Done";
 }

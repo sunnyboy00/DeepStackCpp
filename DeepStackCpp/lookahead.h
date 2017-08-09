@@ -1,9 +1,11 @@
 #pragma once
+#include <vector>
+#include <Eigen/Dense>
+
 #include "Node.h"
 #include "assert.h"
 #include "arguments.h"
 #include "Util.h"
-#include <Eigen/Dense>
 #include "terminal_equity.h"
 #include "cfrd_gadget.h"
 
@@ -118,7 +120,27 @@ public:
 	//-- before re - solving
 	void resolve(Tf1& player_range, Tf1& opponent_cfvs);
 
+	//-- - Gives the average counterfactual values for the opponent during re - solving
+	//	-- after a chance event(the betting round changes and more cards are dealt).
+	//	--
+	//	--Used during continual re - solving to track opponent cfvs.The lookahead must
+	//	-- first be re - solved with @{resolve} or @{resolve_first_node}.
+	//	--
+	//	-- @param action_index the action taken by the re - solving player at the start
+	//	-- of the lookahead
+	//	-- @param board a tensor of board cards, updated by the chance event
+	//	-- @return a vector of cfvs
+	Tf1 get_chance_action_cfv(int action_index, Tf2& board);
+
+
 private:
+
+	vector<Tf3> _next_street_boxes_inputs;
+
+	vector<Tf3> _next_street_boxes_outputs;
+
+	vector<Tf3> _next_street_boxes; // ??
+
 	cfrd_gadget* _reconstruction_gadget;
 
 	Tf1 _reconstruction_opponent_cfvs;
@@ -136,4 +158,27 @@ private:
 	//-- - Using the players' current strategies, computes their probabilities of
 	//--reaching each state of the lookahead.
 	void _compute_ranges();
+
+
+	//-- - Using the players' reach probabilities, calls the neural net to compute the
+	//--players' counterfactual values at the depth-limited states of the lookahead.
+	void _compute_terminal_equities_next_street_box();
+
+	//-- - Updates the players' average strategies with their current strategies.
+	//-- @param iter the current iteration number of re - solving
+	void _compute_update_average_strategies(size_t iter);
+
+	//-- - Using the players' reach probabilities, computes their counterfactual
+	//--values at each lookahead state which is a terminal state of the game.
+	void _compute_terminal_equities_terminal_equity();
+
+	//-- - Using the players' reach probabilities, computes their counterfactual
+	//	--values at all terminal states of the lookahead.
+	//	--
+	//	--These include terminal states of the game and depth - limited states.
+	void _compute_terminal_equities();
+
+	//-- - Using the players' reach probabilities and terminal counterfactual
+	//--values, computes their cfvs at all states of the lookahead.
+	void _compute_cfvs();
 };

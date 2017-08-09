@@ -14,9 +14,40 @@ using namespace std;
 class Util
 {
 	public:
-		// Expands one tensor as other one
+
+		////Coping source tensor to the target tensor when target and source dimensions number are difference
+		//template <int N1>
+		//template <int N2>
+		//static inline void CopyDif(Tensor<float, N1> & target, const Tensor<float, N2>& source)
+		//{
+		//	assert(target.size() >= source.size());
+		//	memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		//}
+
+		//Coping source tensor to the target tensor
 		template <int N>
-		static inline TfN ExpandAs(TfN data, TfN as)
+		static inline void Copy(TfN& target, const TfN& source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		// Coping source tensor map to the target tensor
+		template <int N>
+		static inline void Copy(TfN& target, const TmN& source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayXXf & target, ArrayXXf & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		template <int N>
+		static inline TfN ExpandAs(TfN& data, const TfN& as)
 		{
 			std::array<ptrdiff_t, N> broadcasts;
 
@@ -32,6 +63,43 @@ class Util
 			TfN res = data.broadcast(broadcasts);
 			return res;
 		}
+
+		template <int N>
+		static inline TfN ExpandAs(TmN& data, const TfN& as)
+		{
+			std::array<ptrdiff_t, N> broadcasts;
+
+			//ToDo: remove during optimization for performance reasons
+			for (size_t dim = 0; dim < N; dim++)
+			{
+				float difDim = (float)as.dimension(dim) / data.dimension(dim);
+				assert(difDim >= 1.0);
+				assert(ceilf(difDim) == difDim && "The coefficients must be integers");
+				broadcasts[dim] = (int)difDim;
+			}
+
+			TfN res = data.broadcast(broadcasts);
+			return res;
+		}
+
+		//// Expands one tensor as other one
+		//template<typename Derived, typename OtherDerived>
+		//static inline TensorBase<Derived> ExpandAs(TensorBase<Derived>& data, const TensorBase<OtherDerived>& as)
+		//{
+		//	std::array<ptrdiff_t, data.NumDimensions> broadcasts;
+		//	
+		//	//ToDo: remove during optimization for performance reasons
+		//	for (size_t dim = 0; dim < data.NumDimensions; dim++)
+		//	{
+		//		float difDim = (float)as.dimension(dim) / data.dimension(dim);
+		//		assert(difDim >= 1.0);
+		//		assert(ceilf(difDim) == difDim && "The coefficients must be integers");
+		//		broadcasts[dim] = (int)difDim;
+		//	}
+
+		//	TensorBase<Derived> res = data.broadcast(broadcasts);
+		//	return res;
+		//}
 
 		// Expands one array as other one
 		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as)
@@ -199,29 +267,29 @@ class Util
 			}
 		};
 
-		static inline TensorMap<Tf2, 2> View(Tf2 &target, std::array<int, 2>& sizes)
+		static inline Tm2 View(Tf2 &target, std::array<int, 2>& sizes)
 		{
 			assert(target.size() == sizes[0] * sizes[1]);
 			Util::ProcessSizes((int)target.size(), sizes);
-			return TensorMap<Tf2, 2>(target.data(), sizes[0], sizes[1]);
+			return Tm2(target.data(), sizes[0], sizes[1]);
 		}
 
-		static inline TensorMap<Tf3, 3> View(Tf3 &target, std::array<int, 3>& sizes)
+		static inline Tm3 View(Tf3 &target, std::array<int, 3>& sizes)
 		{
 			Util::ProcessSizes((int)target.size(), sizes);
-			return TensorMap<Tf3, 3>(target.data(), sizes[0], sizes[1], sizes[2]);
+			return Tm3(target.data(), sizes[0], sizes[1], sizes[2]);
 		}
 
-		static inline TensorMap<Tf4, 4> View(Tf4 &target, std::array<int, 3>& sizes)
+		static inline Tm4 View(Tf4 &target, std::array<int, 3>& sizes)
 		{
 			Util::ProcessSizes((int)target.size(), sizes);
-			return TensorMap<Tf4, 4>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
+			return Tm4(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
 		}
 
-		static inline TensorMap<Tf5, 5> View(Tf5 &target, std::array<int, 5>& sizes)
+		static inline Tm5 View(Tf5 &target, std::array<int, 5>& sizes)
 		{
 			Util::ProcessSizes((int)target.size(), sizes);
-			return TensorMap<Tf5, 5>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
+			return Tm5(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
 		}
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)
@@ -425,12 +493,6 @@ class Util
 		//		MatrixXf::Constant(target.rows(), target.cols(), lowLimin)
 		//	);
 		//}
-
-		static inline void CopyTo(ArrayXXf & target, ArrayXXf & source)
-		{
-			assert(target.size() >= source.size());
-			memcpy(target.data(), source.data(), source.size() * sizeof(float));
-		}
 
 		static void ToString(const ArrayXXf& dataArg);
 

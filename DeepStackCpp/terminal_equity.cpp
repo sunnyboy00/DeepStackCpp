@@ -60,15 +60,27 @@ void terminal_equity::_set_fold_matrix(const ArrayXf & board)
 	_handle_blocking_cards(_fold_matrix, board);
 }
 
-void terminal_equity::call_value(const ArrayXXf & ranges, ArrayXXf & result)
+template <typename Derived>
+void terminal_equity::call_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
 {
 	result = ranges.matrix() * _equity_matrix.matrix();
 }
 
-void terminal_equity::fold_value(const ArrayXXf & ranges, ArrayXXf& result)
+template <typename Derived>
+void terminal_equity::fold_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
 {
 	assert(_fold_matrix.size() > 0);
 	result = (ranges.matrix() * _fold_matrix.matrix()).array();
+}
+
+void terminal_equity::tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& result, int folding_player)
+{
+	ArrayXXf tempResult(result.rows(), result.cols());
+	fold_value(ranges, tempResult);
+	result.row(0) = tempResult.row(1);
+	result.row(1) = tempResult.row(0);
+
+	result.row(folding_player) *= -1;
 }
 
 ArrayXXf terminal_equity::get_call_matrix()
@@ -85,16 +97,6 @@ void terminal_equity::tree_node_call_value(const ArrayXXf& ranges, ArrayXXf& res
 	result.row(1) = tempResult.row(0);
 	//result.row(0) = Map<ArrayXXf>(tempResult.row(1).data(), 1, ranges.cols());
 	//result.row(1) = Map<ArrayXXf>(tempResult.row(0).data(), 1, ranges.cols());
-}
-
-void terminal_equity::tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& result, int folding_player)
-{
-	ArrayXXf tempResult(result.rows(), result.cols());
-	fold_value(ranges, tempResult);
-	result.row(0) = tempResult.row(1);
-	result.row(1) = tempResult.row(0);
-
-	result.row(folding_player) *= -1;
 }
 
 void terminal_equity::_handle_blocking_cards(ArrayXXf& equity_matrix, const ArrayXf& board)
