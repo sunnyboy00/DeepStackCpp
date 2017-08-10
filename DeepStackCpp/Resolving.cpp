@@ -4,11 +4,13 @@
 
 Resolving::Resolving()
 {
+	_lookBuilder = new LookaheadBuilder(_lookahead);
 }
 
 
 Resolving::~Resolving()
 {
+	delete(_lookBuilder);
 }
 
 void Resolving::_create_lookahead_tree(Node & node)
@@ -20,15 +22,19 @@ void Resolving::_create_lookahead_tree(Node & node)
 	Node& root = builder.build_tree(build_tree_params);
 }
 
-void Resolving::resolve_first_node(Node& node, CardArray player_range, CardArray opponent_range)
+LookaheadResult Resolving::resolve_first_node(Node& node, const Tf1& player_range, const Tf1& opponent_range)
 {
-//self:_create_lookahead_tree(node)
-//
-//	self.lookahead = Lookahead()
-//	self.lookahead : build_lookahead(self.lookahead_tree)
-//
-//	self.lookahead : resolve_first_node(player_range, opponent_range)
-//
-//	self.resolve_results = self.lookahead : get_results()
-//	return self.resolve_results
+	_create_lookahead_tree(node);
+	_lookBuilder->build_from_tree(node);
+
+	_lookahead.resolve_first_node(player_range, opponent_range);
+
+	_resolve_results = _lookahead.get_results();
+	return _resolve_results;
 }
+
+void Resolving::resolve(const Node& node, const Tf1& player_range, const Tf1& opponent_cfvs)
+{
+
+}
+

@@ -54,30 +54,18 @@ public:
 	//	-- @param board a possibly empty vector of board cards
 	void _set_fold_matrix(const ArrayXf& board);
 
-	//-- - Computes(a batch of) counterfactual values that a player achieves at a terminal node
-	//-- where no player has folded.
-	//--
-	//-- @{set_board
-	//} must be called before this function.
-	//--
-	//-- @param ranges a batch of opponent ranges in an NxK tensor, where N is the batch size
-	//-- and K is the range size
-	//-- @param result a NxK tensor in which to save the cfvs
 	template <typename Derived>
-	void call_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result);
+	void call_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
+	{
+		result = ranges.matrix() * _equity_matrix.matrix();
+	}
 
-	//-- - Computes(a batch of) counterfactual values that a player achieves at a terminal node
-	//-- where a player has folded.
-	//--
-	//-- @{set_board
-	//} must be called before this function.
-	//--
-	//-- @param ranges a batch of opponent ranges in an NxK tensor, where N is the batch size
-	//-- and K is the range size
-	//-- @param result A NxK tensor in which to save the cfvs.Positive cfvs are returned, and
-	//--must be negated if the player in question folded.
 	template <typename Derived>
-	void fold_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result);
+	void fold_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
+	{
+		assert(_fold_matrix.size() > 0);
+		result = (ranges.matrix() * _fold_matrix.matrix()).array();
+	}
 
 	//	-- - Computes the counterfactual values that both players achieve at a terminal node
 	//-- where either player has folded.
@@ -122,4 +110,4 @@ public:
 	ArrayXXf _fold_matrix;
 };
 
-//#include "terminal_equity.cpp"
+//#include "terminal_equity.npp"

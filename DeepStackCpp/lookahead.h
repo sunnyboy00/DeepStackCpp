@@ -108,7 +108,7 @@ public:
 	//--
 	//-- @param player_range a range vector for the re - solving player
 	//-- @param opponent_range a range vector for the opponent
-	void resolve_first_node(Tf1& player_range, Tf1& opponent_range);
+	void resolve_first_node(const Tf1& player_range, const  Tf1& opponent_range);
 
 	//-- - Re - solves the lookahead using an input range for the player and
 	//--the @{cfrd_gadget | CFRDGadget

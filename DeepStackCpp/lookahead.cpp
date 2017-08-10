@@ -11,7 +11,7 @@ lookahead::~lookahead()
 {
 }
 
-void lookahead::resolve_first_node(Tf1& player_range, Tf1& opponent_range)
+void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_range)
 {
 	RemoveF4D(ranges_data[1], 0, 0, 0, 0) = player_range;
 	RemoveF4D(ranges_data[1], 0, 0, 0, 1) = opponent_range;

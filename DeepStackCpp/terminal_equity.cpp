@@ -60,19 +60,6 @@ void terminal_equity::_set_fold_matrix(const ArrayXf & board)
 	_handle_blocking_cards(_fold_matrix, board);
 }
 
-template <typename Derived>
-void terminal_equity::call_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
-{
-	result = ranges.matrix() * _equity_matrix.matrix();
-}
-
-template <typename Derived>
-void terminal_equity::fold_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
-{
-	assert(_fold_matrix.size() > 0);
-	result = (ranges.matrix() * _fold_matrix.matrix()).array();
-}
-
 void terminal_equity::tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& result, int folding_player)
 {
 	ArrayXXf tempResult(result.rows(), result.cols());
