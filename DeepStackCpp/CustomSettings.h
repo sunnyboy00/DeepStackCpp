@@ -5,34 +5,38 @@
 
 typedef float mainDataType;
 
-
 //typedef Eigen::TensorFixedSize<float, Sizes<1>> Tf1;
 typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic for a lot of cards to avoid usage of stack!
 
-#define TensorLayoutType RowMajor//RowMajor
-#define TfN Tensor<float, N, TensorLayoutType>
-#define Tf5 Tensor<float, 5, TensorLayoutType>
-#define Tf4 Tensor<float, 4, TensorLayoutType>
-#define Tf3 Tensor<float, 3, TensorLayoutType>
-#define Tf2 Tensor<float, 2, TensorLayoutType>
-#define Tf1 Tensor<float, 1, TensorLayoutType>
+#define TensorLayoutType Eigen::RowMajor//RowMajor
+#define TfN Eigen::Tensor<float, N, TensorLayoutType>
+#define Tf5 Eigen::Tensor<float, 5, TensorLayoutType>
+#define Tf4 Eigen::Tensor<float, 4, TensorLayoutType>
+#define Tf3 Eigen::Tensor<float, 3, TensorLayoutType>
+#define Tf2 Eigen::Tensor<float, 2, TensorLayoutType>
+#define Tf1 Eigen::Tensor<float, 1, TensorLayoutType>
 
-#define TbN TensorBase<float, N>
-#define Tb5 TensorBase<float, 5>
-#define Tb4 TensorBase<float, 4>
-#define Tb3 TensorBase<float, 3>
-#define Tb2 TensorBase<float, 2>
-#define Tb1 TensorBase<float, 1>
+#define TbN Eigen::TensorBase<float, N>
+#define Tb5 Eigen::TensorBase<float, 5>
+#define Tb4 Eigen::TensorBase<float, 4>
+#define Tb3 Eigen::TensorBase<float, 3>
+#define Tb2 Eigen::TensorBase<float, 2>
+#define Tb1 Eigen::TensorBase<float, 1>
 
-#define TmN TensorMap<TfN, N>
-#define Tm5 TensorMap<Tf5, 5>
-#define Tm4 TensorMap<Tf4, 4>
-#define Tm3 TensorMap<Tf3, 3>
-#define Tm2 TensorMap<Tf2, 2>
-#define Tm1 TensorMap<Tf1, 1>
+#define TmN Eigen::TensorMap<TfN, N>
+#define Tm5 Eigen::TensorMap<Tf5, 5>
+#define Tm4 Eigen::TensorMap<Tf4, 4>
+#define Tm3 Eigen::TensorMap<Tf3, 3>
+#define Tm2 Eigen::TensorMap<Tf2, 2>
+#define Tm1 Eigen::TensorMap<Tf1, 1>
 
 #define TmAxx Eigen::Map<ArrayXXf>
 #define TmAxx Eigen::Map<ArrayXXf>
+
+#define CardsT Eigen::TensorFixedSize<float, Eigen::Sizes<card_count>>
+#define CfvsT Eigen::TensorFixedSize<float, Eigen::Sizes<players_count, card_count>>
+
+
 
 #define ToTmxx(tensor, rows, cols) Eigen::Map<ArrayXXf>(tensor.data(), rows, cols)
 #define ToTmx(tensor, len) Eigen::Map<ArrayXf>(tensor.data(), len)

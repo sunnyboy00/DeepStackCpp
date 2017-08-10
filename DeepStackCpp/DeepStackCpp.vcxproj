@@ -175,6 +175,7 @@
     <ClInclude Include="lookahead.h" />
     <ClInclude Include="LookaheadBuilder.h" />
     <ClInclude Include="LookaheadManager.h" />
+    <ClInclude Include="LookaheadResult.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Resolving.h" />
     <ClInclude Include="resource.h" />

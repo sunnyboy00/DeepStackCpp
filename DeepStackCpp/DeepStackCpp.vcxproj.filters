@@ -135,6 +135,9 @@
     <ClInclude Include="LookaheadBuilder.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
+    <ClInclude Include="LookaheadResult.h">
+      <Filter>Header Files\Resolving</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -75,6 +75,62 @@ Tf1 lookahead::get_chance_action_cfv(int action_index, Tf2& board)
 	return out;
 }
 
+LookaheadResult lookahead::get_results()
+{
+	LookaheadResult out;
+
+	const int actions_count = average_strategies_data[1].dimension(0);
+	 
+	//--1.0 average strategy
+	//--[actions x range]
+	//--lookahead already computes the average strategy we just convert the dimensions
+	const std::array<DenseIndex, 2> action_cards_dims = { actions_count, card_count};
+	out.strategy = average_strategies_data[1].reshape(action_cards_dims);
+
+	//--2.0 achieved opponent's CFVs at the starting node 
+	const std::array<DenseIndex, 2> players_cards_dims = { players_count, card_count };
+	Tf2 resized_average_cfvs = average_cfvs_data[0].reshape(players_cards_dims); //ToDo: copy
+
+	out.achieved_cfvs = RemoveF1D(resized_average_cfvs, P1);
+
+	//--3.0 CFVs for the acting player only when resolving first node
+	if (_reconstruction_opponent_cfvs.size() > 0)
+	{
+		out.root_cfvs = RemoveF1D(resized_average_cfvs, P2);
+
+		//--swap cfvs indexing
+		out.root_cfvs_both_players = resized_average_cfvs; // !Copy Do we need this? Looks like we are overwriting below
+		RemoveF1D(out.root_cfvs_both_players, P2) = out.achieved_cfvs;
+		RemoveF1D(out.root_cfvs_both_players, P1) = out.root_cfvs;
+	}
+
+	//--4.0 children CFVs
+	//--[actions x range]
+	out.children_cfvs = Remove4D(average_cfvs_data[1], P1).reshape(action_cards_dims);
+
+	//--IMPORTANT divide average CFVs by average strategy in here
+	Tf2 scaler = average_strategies_data[1].reshape(action_cards_dims);
+
+	const Eigen::array<DenseIndex, 2> s_dims = { 1, card_count };
+
+	Tf2 range_mul = Remove4D(ranges_data[0], P1).reshape(s_dims);
+	range_mul = Util::ExpandAs(range_mul, scaler);
+
+	scaler *= range_mul;
+	Tf2 scalerSum = Util::NoReductionSum(scaler, 1);
+
+	scaler = Util::ExpandAs(scalerSum, range_mul);
+	scaler *= scaler.constant(cfr_iters - cfr_skip_iters);
+
+	out.children_cfvs /= scaler;
+
+	assert(out.strategy.size() > 0);
+	assert(out.achieved_cfvs.size() > 0);
+	assert(out.children_cfvs.size() > 0);
+
+	return out;
+}
+
 void lookahead::_compute_terminal_equities_next_street_box()
 {
 	assert(tree.street == 1);
@@ -205,23 +261,92 @@ void lookahead::_compute_cfvs()
 {
 	for (int d = _depth; d > 1; d--)
 	{
-		/*int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
+		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
+		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
+		Remove4D(cfvs_data[d], P1) *= empty_action_mask[d];
+		Remove4D(cfvs_data[d], P2) *= empty_action_mask[d];
+		Util::Copy(placeholder_data[d], cfvs_data[d]);
+
+		//--player indexing is swapped for cfvs
+		Remove4D(placeholder_data[d], acting_player[d]) *= current_strategy_data[d];
+		std::array<int, 1> dims = { 0 };
+		regrets_sum[d] = placeholder_data[d].sum(dims);
+
+		//--use a swap placeholder to change{ { 1,2,3 },{ 4,5,6 } } into{ { 1,2 },{ 3,4 },{ 5,6 } }
+		auto swap = swap_data[d - 1];
+		CopyDif(swap, regrets_sum[d]);
+
+		std::array<std::array<DenseIndex, 2>, 5> const slices =
+		{ { { gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 },{ 0 , -1 },{ 0, -1 } } };
+
+		Util::CopyToSlice(cfvs_data[d - 1], slices, Util::Transpose(swap, { 1, 2 }));
+	}
+}
+
+void lookahead::_compute_cumulate_average_cfvs(size_t iter)
+{
+	if (iter > cfr_skip_iters)
+	{
+		average_cfvs_data[P1] += cfvs_data[P1];
+		average_cfvs_data[P2] += cfvs_data[P2];
+	}
+}
+
+void lookahead::_compute_normalize_average_strategies()
+{
+	Tensor<float, 2> input(7, 11);
+	std::array<DenseIndex, 3> three_dims{ { 7, 11, 1 } };
+	Tensor<float, 3> result1 = input.reshape(three_dims);
+
+	// Decrease the rank of the input tensor by merging 2 dimensions;
+	std::array<DenseIndex, 1> one_dim{ { 7 * 11 } };
+	Tensor<float, 1> result2 = input.reshape(one_dim);
+
+	//--using regrets_sum as a placeholder container
+	auto player_avg_strategy = average_strategies_data[1];
+	auto player_avg_strategy_sum = regrets_sum[1];
+
+	player_avg_strategy_sum = Util::NoReductionSum(player_avg_strategy, 0);
+	player_avg_strategy /= Util::ExpandAs(player_avg_strategy_sum, player_avg_strategy);
+
+	//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
+	//--it sums to one->now we set to always fold
+	//ToDo: BuG! Fix!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//player_avg_strategy[1][player_avg_strategy[1]:ne(player_avg_strategy[1])] = 1
+	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
+}
+
+void lookahead::_compute_regrets()
+{
+	for (int d = _depth; d > 1; d--)
+	{
+		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
+		int gp_layer_bets_count = bets_count[d - 2];
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
 
-			cfvs_data[d][{ {}, {}, {}, { 1 }, {}}]:cmul(self.empty_action_mask[d])
-			self.cfvs_data[d][{ {}, {}, {}, { 2 }, {}}] : cmul(self.empty_action_mask[d])
+		Tf4 current_regrets = current_regrets_data[d];
+		Tf4 dataToCopy = Remove4D(cfvs_data[d], acting_player[d]);
+		Util::Copy(current_regrets, dataToCopy);
+		Tf5 next_level_cfvs = cfvs_data[d - 1];
 
-			self.placeholder_data[d] : copy(self.cfvs_data[d])
+		auto parent_inner_nodes = inner_nodes_p1[d - 1];
+		std::array<std::array<DenseIndex, 2>, 5> const slices =
+		{ {{ gp_layer_terminal_actions_count, -1 },{ 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 }, {acting_player[d], acting_player[d] }, { 0 , -1 }} };
+		Tf5 sliceData = Util::Slice(next_level_cfvs, slices);
+		Util::Copy(parent_inner_nodes, Util::Transpose(next_level_cfvs, { 1, 2 }));
 
-			--player indexing is swapped for cfvs
-			self.placeholder_data[d][{ {}, {}, {}, self.acting_player[d], {}}] : cmul(self.current_strategy_data[d])
+		std::array<int, 4> sizes = { 1, gp_layer_bets_count, -1, card_count };
+		Util::ProcessSizes((int)parent_inner_nodes.size(), sizes);
+		Tm4 parrentMap(parent_inner_nodes.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
 
-			torch.sum(self.regrets_sum[d], self.placeholder_data[d], 1)
+		Tf4 ex_parent_inner_nodes = Util::ExpandAs(parrentMap, current_regrets);
 
-			--use a swap placeholder to change{ { 1,2,3 },{ 4,5,6 } } into{ { 1,2 },{ 3,4 },{ 5,6 } }
-			local swap = self.swap_data[d - 1]
-			swap : copy(self.regrets_sum[d])
-			self.cfvs_data[d - 1][{ {gp_layer_terminal_actions_count + 1, -1}, { 1, ggp_layer_nonallin_bets_count }, {}, {}, {}}] : copy(swap : transpose(2, 3))*/
+		current_regrets /= ex_parent_inner_nodes;
+
+		regrets_data[d] += current_regrets;
+
+		//--(CFR + )
+		Util::ClipLow(regrets_data[d], 0);
 	}
 }
 

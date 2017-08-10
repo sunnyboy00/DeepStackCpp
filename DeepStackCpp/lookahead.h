@@ -8,6 +8,7 @@
 #include "Util.h"
 #include "terminal_equity.h"
 #include "cfrd_gadget.h"
+#include "LookaheadResult.h"
 
 using namespace std;
 using namespace Eigen;
@@ -132,6 +133,23 @@ public:
 	//	-- @return a vector of cfvs
 	Tf1 get_chance_action_cfv(int action_index, Tf2& board);
 
+	//-- - Gets the results of re - solving the lookahead.
+	//	--
+	//	--The lookahead must first be re - solved with @{resolve} or
+	//	-- @{resolve_first_node}.
+	//	--
+	//	-- @return a table containing the fields :
+	//--
+	//	-- * `strategy`: an AxK tensor containing the re - solve player's strategy at the
+	//	--root of the lookahead, where A is the number of actions and K is the range size
+	//	--
+	//	-- * `achieved_cfvs`: a vector of the opponent's average counterfactual values at the 
+	//	--root of the lookahead
+	//	--
+	//	-- * `children_cfvs`: an AxK tensor of opponent average counterfactual values after
+	//	-- each action that the re - solve player can take at the root of the lookahead
+	LookaheadResult get_results();
+
 
 private:
 
@@ -181,4 +199,19 @@ private:
 	//-- - Using the players' reach probabilities and terminal counterfactual
 	//--values, computes their cfvs at all states of the lookahead.
 	void _compute_cfvs();
+
+	//-- - Updates the players' average counterfactual values with their cfvs from the
+	//--current iteration.
+	//-- @param iter the current iteration number of re - solving
+	void _compute_cumulate_average_cfvs(size_t iter);
+
+	//-- - Normalizes the players' average strategies.
+	//	--
+	//	--Used at the end of re - solving so that we can track un - normalized average
+	//	-- strategies, which are simpler to compute.
+	void _compute_normalize_average_strategies();
+
+	//-- - Using the players' counterfactual values, updates their total regrets
+	// -- for every state in the lookahead.
+	void _compute_regrets();
 };

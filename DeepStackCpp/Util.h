@@ -196,6 +196,16 @@ class Util
 			target.slice(offsets, extentsLen).setConstant(value);
 		}
 
+		template <int N>
+		static inline void CopyToSlice(TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices, TfN source)
+		{
+			Eigen::array<DenseIndex, N> offsets;
+			Eigen::array<DenseIndex, N> extentsLen;
+
+			PreprocessExtents(slices, target, offsets, extentsLen);
+			target.slice(offsets, extentsLen) = source;
+		}
+
 		////Creates a view with different dimensions of the storage associated with tensor.
 		////If one of the dimensions is - 1, the size of that dimension is inferred from the rest of the elements.
 		//template <int N>
@@ -239,6 +249,46 @@ class Util
 		//	};
 		//};
 
+		static Tf5 NoReductionSum(Tf5 target, int dim)
+		{
+			assert(dim < target.NumDimensions);
+			std::array<DenseIndex, 1> dims = { dim };
+			Tf4 res = target.sum(dims);
+			std::array<DenseIndex, 5> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3), target.dimension(4) } };
+			new_dims[dim] = 1;
+			return res.reshape(new_dims);
+		}
+
+		static Tf4 NoReductionSum(Tf4 target, int dim)
+		{
+			assert(dim < target.NumDimensions);
+			std::array<DenseIndex, 1> dims = { dim };
+			Tf3 res = target.sum(dims);
+			std::array<DenseIndex, 4> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3)} };
+			new_dims[dim] = 1;
+			return res.reshape(new_dims);
+		}
+
+		static Tf3 NoReductionSum(Tf3 target, int dim)
+		{
+			assert(dim < target.NumDimensions);
+			std::array<DenseIndex, 1> dims = { dim };
+			Tf2 res = target.sum(dims);
+			std::array<DenseIndex, 3> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2)} };
+			new_dims[dim] = 1;
+			return res.reshape(new_dims);
+		}
+
+		static Tf2 NoReductionSum(Tf2 target, int dim)
+		{
+			assert(dim < target.NumDimensions);
+			std::array<DenseIndex, 1> dims = { dim };
+			Tf1 res = target.sum(dims);
+			std::array<DenseIndex, 2> new_dims{ { target.dimension(0), target.dimension(1) } };
+			new_dims[dim] = 1;
+			return res.reshape(new_dims);
+		}
+
 		// Calculates and replaces one -1 dimension of tensor from sizes basing on the targetSize.
 		template <int N>
 		static inline void ProcessSizes(int targetSize, std::array<int, N>& sizes)
@@ -267,29 +317,29 @@ class Util
 			}
 		};
 
-		static inline Tm2 View(Tf2 &target, std::array<int, 2>& sizes)
+		static inline Tm2 View(Tf2 &source, std::array<int, 2>& sizes)
 		{
-			assert(target.size() == sizes[0] * sizes[1]);
-			Util::ProcessSizes((int)target.size(), sizes);
-			return Tm2(target.data(), sizes[0], sizes[1]);
+			assert(source.size() == sizes[0] * sizes[1]);
+			Util::ProcessSizes((int)source.size(), sizes);
+			return Tm2(source.data(), sizes[0], sizes[1]);
 		}
 
-		static inline Tm3 View(Tf3 &target, std::array<int, 3>& sizes)
+		static inline Tm3 View(Tf3 &source, std::array<int, 3>& sizes)
 		{
-			Util::ProcessSizes((int)target.size(), sizes);
-			return Tm3(target.data(), sizes[0], sizes[1], sizes[2]);
+			Util::ProcessSizes((int)source.size(), sizes);
+			return Tm3(source.data(), sizes[0], sizes[1], sizes[2]);
 		}
 
-		static inline Tm4 View(Tf4 &target, std::array<int, 3>& sizes)
+		static inline Tm4 View(Tf4 &source, std::array<int, 3>& sizes)
 		{
-			Util::ProcessSizes((int)target.size(), sizes);
-			return Tm4(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
+			Util::ProcessSizes((int)source.size(), sizes);
+			return Tm4(source.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
 		}
 
-		static inline Tm5 View(Tf5 &target, std::array<int, 5>& sizes)
+		static inline Tm5 View(Tf5 &source, std::array<int, 5>& sizes)
 		{
-			Util::ProcessSizes((int)target.size(), sizes);
-			return Tm5(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
+			Util::ProcessSizes((int)source.size(), sizes);
+			return Tm5(source.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
 		}
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)
@@ -298,6 +348,8 @@ class Util
 			Tf1 resultTensor = cardMap;
 			return resultTensor;
 		}
+
+		
 
 		// Makes 
 		//template <int N>
