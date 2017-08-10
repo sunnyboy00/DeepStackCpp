@@ -79,7 +79,7 @@ LookaheadResult lookahead::get_results()
 {
 	LookaheadResult out;
 
-	const int actions_count = average_strategies_data[1].dimension(0);
+	const int actions_count = (int)average_strategies_data[1].dimension(0);
 	 
 	//--1.0 average strategy
 	//--[actions x range]
@@ -268,7 +268,7 @@ void lookahead::_compute_cfvs()
 		Util::Copy(placeholder_data[d], cfvs_data[d]);
 
 		//--player indexing is swapped for cfvs
-		Remove4D(placeholder_data[d], acting_player[d]) *= current_strategy_data[d];
+		Remove4D(placeholder_data[d], (int)acting_player[d]) *= current_strategy_data[d];
 		std::array<int, 1> dims = { 0 };
 		regrets_sum[d] = placeholder_data[d].sum(dims);
 
@@ -325,13 +325,14 @@ void lookahead::_compute_regrets()
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
 
 		Tf4 current_regrets = current_regrets_data[d];
-		Tf4 dataToCopy = Remove4D(cfvs_data[d], acting_player[d]);
+		DenseIndex cur_acting_player = (DenseIndex)acting_player[d];
+		Tf4 dataToCopy = Remove4D(cfvs_data[d], cur_acting_player);
 		Util::Copy(current_regrets, dataToCopy);
 		Tf5 next_level_cfvs = cfvs_data[d - 1];
 
 		auto parent_inner_nodes = inner_nodes_p1[d - 1];
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
-		{ {{ gp_layer_terminal_actions_count, -1 },{ 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 }, {acting_player[d], acting_player[d] }, { 0 , -1 }} };
+		{ {{ gp_layer_terminal_actions_count, -1 },{ 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 }, { cur_acting_player, cur_acting_player}, { 0 , -1 }} };
 		Tf5 sliceData = Util::Slice(next_level_cfvs, slices);
 		Util::Copy(parent_inner_nodes, Util::Transpose(next_level_cfvs, { 1, 2 }));
 
@@ -350,25 +351,41 @@ void lookahead::_compute_regrets()
 	}
 }
 
+void lookahead::_set_opponent_starting_range(size_t iteration)
+{
+	if (_reconstruction_opponent_cfvs.size() > 0)
+	{
+		//--note that CFVs indexing is swapped, thus the CFVs for the reconstruction player are for player '1'
+		const std::array<DenseIndex, 1> dims = { 1 };
+		Tf1 opponent_range = _reconstruction_gadget->compute_opponent_range(Remove4D(cfvs_data[0], P1).reshape(dims), iteration);
+		Remove4D(ranges_data[0], P2) = opponent_range;
+	}
+}
+
+void lookahead::_compute_normalize_average_cfvs()
+{
+	average_cfvs_data[0] /= average_cfvs_data[0].constant(cfr_iters - cfr_skip_iters);
+}
+
 void lookahead::_compute()
 {
 	//--1.0 main loop
 	for (size_t iter = 0; iter < cfr_iters; iter++)
 	{
-		//_set_opponent_starting_range(iter);
-		//_compute_current_strategies();
-		//_compute_ranges();
-		//_compute_update_average_strategies(iter);
-		//_compute_terminal_equities();
-		//_compute_cfvs();
-		//_compute_regrets();
-		//_compute_cumulate_average_cfvs(iter);
+		_set_opponent_starting_range(iter);
+		_compute_current_strategies();
+		_compute_ranges();
+		_compute_update_average_strategies(iter);
+		_compute_terminal_equities();
+		_compute_cfvs();
+		_compute_regrets();
+		_compute_cumulate_average_cfvs(iter);
 	}
 
 	//--2.0 at the end normalize average strategy
-	//_compute_normalize_average_strategies();
+	_compute_normalize_average_strategies();
 	//--2.1 normalize root's CFVs
-	//_compute_normalize_average_cfvs()
+	_compute_normalize_average_cfvs();
 }
 
 void lookahead::_compute_current_strategies()

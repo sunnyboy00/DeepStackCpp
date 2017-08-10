@@ -214,4 +214,15 @@ private:
 	//-- - Using the players' counterfactual values, updates their total regrets
 	// -- for every state in the lookahead.
 	void _compute_regrets();
+
+	//-- - Generates the opponent's range for the current re-solve iteration using
+	//	--the @{cfrd_gadget | CFRDGadget}.
+	//	-- @param iteration the current iteration number of re - solving
+	void _set_opponent_starting_range(size_t iteration);
+
+	//-- - Normalizes the players' average counterfactual values.
+	//--
+	//--Used at the end of re - solving so that we can track un - normalized average
+	//-- cfvs, which are simpler to compute.
+	void _compute_normalize_average_cfvs();
 };
