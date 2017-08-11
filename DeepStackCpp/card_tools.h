@@ -53,7 +53,15 @@ public:
 	// @param board a possibly empty vector of board cards
 	// @return `true` if the range puts 0 probability on invalid hands and has
 	// total probability 1
-	bool is_valid_range(const CardArray& range, const ArrayXf& board);
+	template <typename Derived>
+	bool is_valid_range(Eigen::ArrayBase<Derived> & range, ArrayXf & board)
+	{
+		CardArray impossibleCards = get_impossible_hand_indexes(board);
+		CardArray check = range * impossibleCards;
+		bool only_possible_hands = check.sum() == 0;
+		bool sums_to_one = abs(1.0 - range.sum()) < 0.0001;
+		return only_possible_hands && sums_to_one;
+	}
 
 	// Gives the current betting round based on a board vector.
 	// @param board a possibly empty vector of board cards

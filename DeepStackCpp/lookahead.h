@@ -131,7 +131,7 @@ public:
 	//	-- of the lookahead
 	//	-- @param board a tensor of board cards, updated by the chance event
 	//	-- @return a vector of cfvs
-	Tf1 get_chance_action_cfv(int action_index, Tf2& board);
+	Tf1 get_chance_action_cfv(int action_index, Tf1& board);
 
 	//-- - Gets the results of re - solving the lookahead.
 	//	--

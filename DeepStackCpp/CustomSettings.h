@@ -5,9 +5,6 @@
 
 typedef float mainDataType;
 
-//typedef Eigen::TensorFixedSize<float, Sizes<1>> Tf1;
-typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic for a lot of cards to avoid usage of stack!
-
 #define TensorLayoutType Eigen::RowMajor//RowMajor
 #define TfN Eigen::Tensor<float, N, TensorLayoutType>
 #define Tf5 Eigen::Tensor<float, 5, TensorLayoutType>
@@ -15,6 +12,9 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define Tf3 Eigen::Tensor<float, 3, TensorLayoutType>
 #define Tf2 Eigen::Tensor<float, 2, TensorLayoutType>
 #define Tf1 Eigen::Tensor<float, 1, TensorLayoutType>
+
+//typedef Eigen::TensorFixedSize<float, Sizes<1>> Tf1;
+typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic for a lot of cards to avoid usage of stack!
 
 #define TbN Eigen::TensorBase<float, N>
 #define Tb5 Eigen::TensorBase<float, 5>
@@ -37,9 +37,11 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define CfvsT Eigen::TensorFixedSize<float, Eigen::Sizes<players_count, card_count>>
 
 
+#define ToAmxx_ex(tensor, rows, cols) Eigen::Map<ArrayXXf>(tensor.data(), rows, cols)
+#define ToAmx_ex(tensor, len) Eigen::Map<ArrayXf>(tensor.data(), len)
 
-#define ToTmxx(tensor, rows, cols) Eigen::Map<ArrayXXf>(tensor.data(), rows, cols)
-#define ToTmx(tensor, len) Eigen::Map<ArrayXf>(tensor.data(), len)
+#define ToAmxx(tensor) Eigen::Map<ArrayXXf>(tensor.data(), tensor.dimension(0), tensor.dimension(1))
+#define ToAmx(tensor) Eigen::Map<ArrayXf>(tensor.data(), tensor.size())
 
 // Removes tensor second dim
 #define Reshape(tensorBase, sizes) tensorBase.reshape(tensorBase, Util::ProcessSizes(tensorBase.size(), sizes))

@@ -8,7 +8,7 @@ TEST_CASE("ConvertOffset")
 	Tf2 tensor(2, 3);
 	tensor.setRandom();
 
-	int offset = Util::ConvertOffset(tensor, -1, 0);
+	DenseIndex offset = Util::ConvertOffset(tensor, -1, 0);
 	REQUIRE(offset == 1);
 	offset = Util::ConvertOffset(tensor, -2, 0);
 	REQUIRE(offset == 0);
@@ -23,11 +23,11 @@ TEST_CASE("ConvertOffset")
 void FillTensor(Tf2 &tensor)
 {
 	int value = 0;
-	for (size_t x = 0; x < tensor.dimension(0); x++)
+	for (DenseIndex x = 0; x < tensor.dimension(0); x++)
 	{
 		for (size_t y = 0; y < tensor.dimension(1); y++)
 		{
-			tensor(x, y) = value;
+			tensor(x, y) = (float)value;
 			value++;
 		}
 	}

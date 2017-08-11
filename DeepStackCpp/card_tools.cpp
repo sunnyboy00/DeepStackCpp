@@ -89,15 +89,6 @@ CardArray card_tools::get_random_range(const ArrayXf& board, int seed = -1)
 	return out;
 }
 
-bool card_tools::is_valid_range(const CardArray& range, const  ArrayXf& board)
-{
-	CardArray impossibleCards = get_impossible_hand_indexes(board);
-	CardArray check = range * impossibleCards;
-	bool only_possible_hands = check.sum() == 0;
-	bool sums_to_one = abs(1.0 - range.sum()) < 0.0001;
-	return only_possible_hands && sums_to_one;
-}
-
 int card_tools::board_to_street(const ArrayXf& board)
 {
 	if (board.size() == 0)

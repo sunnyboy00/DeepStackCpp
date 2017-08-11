@@ -35,21 +35,13 @@ public:
 	//---- @param player_range a range vector for the re - solving player
 	//---- @param opponent_cfvs a vector of cfvs achieved by the opponent
 	//---- before re - solving
-	void resolve(const Node& node, const Tf1& player_range, const Tf1& opponent_cfvs);
-
-	//---- - Gives the index of the given action at the node being re - solved.
-	//----
-	//----The node must first be re - solved with @{resolve} or @{resolve_first_node}.
-	//---- @param action a legal action at the node
-	//---- @return the index of the action
-	//---- @local
-	void _action_to_action_id(int action);
+	LookaheadResult resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs);
 
 	//---- - Gives a list of possible actions at the node being re - solved.
 	//----
 	//----The node must first be re - solved with @{resolve} or @{resolve_first_node}.
 	//---- @return a list of legal actions
-	void get_possible_actions();
+	ArrayXf get_possible_actions();
 
 	//---- - Gives the average counterfactual values that the re - solve player received
 	//---- at the node during re - solving.
@@ -91,7 +83,7 @@ public:
 	//---- re - solved
 	//---- @param board a vector of board cards which were updated by the chance event
 	//---- @return a vector of cfvs
-	void get_chance_action_cfv(int action, Tf1 board);
+	Tf1 get_chance_action_cfv(int action, Tf1 board);
 
 	//---- - Gives the probability that the re - solved strategy takes a given action.
 	//----
@@ -100,9 +92,22 @@ public:
 	//---- @param action a legal action at the re - solve node
 	//---- @return a vector giving the probability of taking the action with each
 	//---- private hand
-	void get_action_strategy(int action);
+	Tf1 get_action_strategy(int action);
+
+	//---- - Gives the index of the given action at the node being re - solved.
+	//----
+	//----The node must first be re - solved with @{resolve} or @{resolve_first_node}.
+	//---- @param action a legal action at the node
+	//---- @return the index of the action
+	//---- @local
+	int _action_to_action_id(int action);
+
+
 
 private:
+
+	Node _lookahead_tree;
+
 	LookaheadResult _resolve_results;
 
 	tree_builder builder;
@@ -110,6 +115,8 @@ private:
 	lookahead _lookahead;
 
 	LookaheadBuilder* _lookBuilder;
+
+	card_tools _cardTools;
 
 	//-- - Builds a depth - limited public tree rooted at a given game node.
 	//-- @param node the root of the tree

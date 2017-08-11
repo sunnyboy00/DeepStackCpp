@@ -26,7 +26,7 @@ void lookahead::resolve(Tf1& player_range, Tf1& opponent_cfvs)
 	_compute();
 }
 
-Tf1 lookahead::get_chance_action_cfv(int action_index, Tf2& board)
+Tf1 lookahead::get_chance_action_cfv(int action_index, Tf1& board)
 {
 	Tf3 box_outputs;
 	Tf3 next_street_box;
@@ -208,7 +208,7 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 				Tf3 ranges = RemoveF2D(ranges_data[d], 1, -1);//.reshape(rangesDims); // ToDo: Extra copy
 				Tf3 cfvs = RemoveF2D(cfvs_data[d], 1, -1);// .reshape(rangesDims);
 
-				_terminal_equity.call_value(ToTmxx(ranges, players_count, card_count), ToTmxx(cfvs, players_count, card_count));
+				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
 			}
 		}
 		else
@@ -219,15 +219,14 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 			{
 				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
 				Tf4 cfvs = RemoveF1D(cfvs_data[d], 1);
-				_terminal_equity.call_value(ToTmxx(ranges, players_count, card_count), ToTmxx(cfvs, players_count, card_count));
+				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
 			}
 			
 
 			//--folds
 			Tf4 ranges = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
 			Tf4 cfvs = RemoveF1D(cfvs_data[d], 0);
-
-			_terminal_equity.fold_value(ToTmxx(ranges, players_count, card_count), ToTmxx(cfvs, players_count, card_count));
+			_terminal_equity.fold_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
 
 			//--correctly set the folded player by multiplying by - 1
 			float fold_mutliplier = (acting_player[d] * 2 - 3);// ?
