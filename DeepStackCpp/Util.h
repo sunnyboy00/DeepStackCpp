@@ -481,61 +481,32 @@ class Util
 			);
 		}
 
+		template <int N>
+		static inline void ClipLow(TfN& target, float lowLimin)
+		{
+			target = target.cwiseMax(lowLimin);
+		}
+
 		static inline void ClipLow(ArrayXf& target, float lowLimin)
 		{
-			target = (target >= lowLimin).select(
-				target,
-				ArrayXf::Constant(target.rows(), target.cols(), lowLimin)
-			);
+			target = target.cwiseMax(lowLimin);
+
 		}
 
 		static inline void Clip(ArrayXXf& target, float lowLimin, float maxValue)
 		{
-			target = (target >= lowLimin).select(
-				target,
-				ArrayXXf::Constant(target.rows(), target.cols(), lowLimin)
-			);
-
-			target = (target < maxValue).select(
-				target,
-				ArrayXXf::Constant(target.rows(), target.cols(), maxValue)
-			);
+			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
 		static inline void Clip(CardArray& target, float lowLimin, float maxValue)
 		{
-			target = (target >= lowLimin).select(
-				target,
-				CardArray::Constant(target.rows(), target.cols(), lowLimin)
-			);
-
-			target = (target < maxValue).select(
-				target,
-				CardArray::Constant(target.rows(), target.cols(), maxValue)
-			);
+			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
 		template <int N>
 		static inline void Clip(TfN& target, float lowLimin, float maxValue)
 		{
-			target = (target >= lowLimin).select(
-				target,
-				target.setConstant(lowLimin)
-			);
-
-			target = (target < maxValue).select(
-				target,
-				target.setConstant(maxValue)
-			);
-		}
-
-		template <int N>
-		static inline void ClipLow(TfN& target, float lowLimin)
-		{
-			target = (target >= lowLimin).select(
-				target,
-				target.setConstant(lowLimin)
-			);
+			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
 		//static inline void ClipLow(MatrixXf& target, float lowLimin)

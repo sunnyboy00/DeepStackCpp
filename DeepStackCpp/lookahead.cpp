@@ -355,8 +355,11 @@ void lookahead::_set_opponent_starting_range(size_t iteration)
 	if (_reconstruction_opponent_cfvs.size() > 0)
 	{
 		//--note that CFVs indexing is swapped, thus the CFVs for the reconstruction player are for player '1'
-		const std::array<DenseIndex, 1> dims = { 1 };
-		Tf1 opponent_range = _reconstruction_gadget->compute_opponent_range(Remove4D(cfvs_data[0], P1).reshape(dims), iteration);
+		const std::array<DenseIndex, 1> dims = { card_count };
+		auto p1_cfvs = Remove4D(cfvs_data[0], P1).reshape(dims);
+
+		const std::array<DenseIndex, 4> range_dims = { 1, 1, 1, card_count };
+		Tf4 opponent_range = _reconstruction_gadget->compute_opponent_range(p1_cfvs).reshape(range_dims);
 		Remove4D(ranges_data[0], P2) = opponent_range;
 	}
 }

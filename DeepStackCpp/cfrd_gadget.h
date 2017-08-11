@@ -23,7 +23,7 @@ public:
 	//	-- with the current strategy in the re - solve game
 	//	-- @param iteration the current iteration number of re-solving
 	//	-- @return the opponent range vector for this iteration
-	Tf1 compute_opponent_range(const Tf1& current_opponent_cfvs, size_t iteration);
+	Tf1 compute_opponent_range(const Tf1& current_opponent_cfvs);
 
 private:
 	const float regret_epsilon = 1.0f / 100000000;
@@ -60,7 +60,6 @@ private:
 	Tf1 _terminate_possitive_regrets;
 
 	Tf1 _play_regrets;
-	Tf1 _play_possitive_regrets;
 
 	//masking out impossible hands
 	Tf1 _range_mask;

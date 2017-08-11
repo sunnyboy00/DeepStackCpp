@@ -36,12 +36,13 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define CardsT Eigen::TensorFixedSize<float, Eigen::Sizes<card_count>>
 #define CfvsT Eigen::TensorFixedSize<float, Eigen::Sizes<players_count, card_count>>
 
-
 #define ToAmxx_ex(tensor, rows, cols) Eigen::Map<ArrayXXf>(tensor.data(), rows, cols)
 #define ToAmx_ex(tensor, len) Eigen::Map<ArrayXf>(tensor.data(), len)
 
 #define ToAmxx(tensor) Eigen::Map<ArrayXXf>(tensor.data(), tensor.dimension(0), tensor.dimension(1))
 #define ToAmx(tensor) Eigen::Map<ArrayXf>(tensor.data(), tensor.size())
+#define ToTmx(target) Tm1(target.data(), target.size())
+
 
 // Removes tensor second dim
 #define Reshape(tensorBase, sizes) tensorBase.reshape(tensorBase, Util::ProcessSizes(tensorBase.size(), sizes))

@@ -6,6 +6,7 @@
 #include "tree_builder.h"
 #include "card_tools.h"
 #include "LookaheadBuilder.h"
+#include "Resolving.h"
 
 #include <string>
 #include <iostream>
@@ -14,7 +15,7 @@ using namespace std;
 const float myEps = 0.001f;
 
 
-TEST_CASE("build_lookahed_Ks_1200_1200")
+TEST_CASE("test_lookahed_Ks_1200_1200")
 {
 	TreeBuilderParams params;
 	Node node;
@@ -25,11 +26,9 @@ TEST_CASE("build_lookahed_Ks_1200_1200")
 	params.root_node->current_player = P2;
 	params.root_node->bets << 1200, 1200;
 
-	tree_builder treeBuilder;
-	Node& tree = treeBuilder.build_tree(params);
-
-	lookahead look;
-	LookaheadBuilder lookBuilder(look);
-	lookBuilder.build_from_tree(tree);
-
+	card_tools tools;
+	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
+	Tf1 op_range = ToTmx(tools.get_uniform_range(node.board));
+	Resolving resolver;
+	resolver.resolve(node, player_range, op_range);
 }

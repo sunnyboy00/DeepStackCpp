@@ -2,6 +2,7 @@
 #include "Util.h"
 #include <string>
 #include <iostream>
+using namespace std;
 
 TEST_CASE("ConvertOffset")
 {
@@ -32,6 +33,7 @@ void FillTensor(Tf2 &tensor)
 		}
 	}
 }
+
 TEST_CASE("Slice")
 {
 	Tf2 tensor(2, 3);
@@ -105,4 +107,37 @@ TEST_CASE("View")
 	REQUIRE(res2.dimension(0) == 2);
 	REQUIRE(res2.dimension(1) == 1);
 	REQUIRE(res2.dimension(2) == 3);
+}
+
+TEST_CASE("ClipLow")
+{
+	Tf2 ten(2, 2);
+	ten(0, 0) = 0;
+	ten(0, 1) = -3;
+	ten(1, 0) = 33333;
+	ten(1, 1) = 55555;
+
+
+	const int maxVal = 1;
+
+	Util::ClipLow(ten, maxVal);
+	REQUIRE(ten(0, 0) == maxVal);
+	REQUIRE(ten(0, 1) == maxVal);
+	REQUIRE(ten(1, 0) == 33333);
+	REQUIRE(ten(1, 1) == 55555);
+}
+
+TEST_CASE("Clip")
+{
+	Tf2 ten(2, 2);
+	ten(0, 0) = 1;
+	ten(0, 1) = -3;
+	ten(1, 0) = 33333;
+	ten(1, 1) = 999999;
+
+	Util::Clip(ten, 0, 1000);
+	REQUIRE(ten(0, 0) == 1);
+	REQUIRE(ten(0, 1) == 0);
+	REQUIRE(ten(1, 0) == 1000);
+	REQUIRE(ten(1, 1) == 1000);
 }
