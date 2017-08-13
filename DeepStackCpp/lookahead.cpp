@@ -350,7 +350,7 @@ void lookahead::_compute_regrets()
 	}
 }
 
-void lookahead::_set_opponent_starting_range(size_t iteration)
+void lookahead::_set_opponent_starting_range()
 {
 	if (_reconstruction_opponent_cfvs.size() > 0)
 	{
@@ -374,7 +374,7 @@ void lookahead::_compute()
 	//--1.0 main loop
 	for (size_t iter = 0; iter < cfr_iters; iter++)
 	{
-		_set_opponent_starting_range(iter);
+		_set_opponent_starting_range();
 		_compute_current_strategies();
 		_compute_ranges();
 		_compute_update_average_strategies(iter);

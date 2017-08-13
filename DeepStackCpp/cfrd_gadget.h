@@ -37,9 +37,6 @@ private:
 
 	Tf1 _curent_opponent_values;
 
-	// 2 stands for 2 actions: play/terminate
-	Tf2 _opponent_reconstruction_regret;
-
 	Tf1 _play_current_strategy;
 
 	Tf1 _terminate_current_strategy;
@@ -57,8 +54,6 @@ private:
 	Tf1 _total_values_p2;
 
 	Tf1 _terminate_regrets;
-	Tf1 _terminate_possitive_regrets;
-
 	Tf1 _play_regrets;
 
 	//masking out impossible hands

@@ -218,7 +218,7 @@ private:
 	//-- - Generates the opponent's range for the current re-solve iteration using
 	//	--the @{cfrd_gadget | CFRDGadget}.
 	//	-- @param iteration the current iteration number of re - solving
-	void _set_opponent_starting_range(size_t iteration);
+	void _set_opponent_starting_range();
 
 	//-- - Normalizes the players' average counterfactual values.
 	//--
