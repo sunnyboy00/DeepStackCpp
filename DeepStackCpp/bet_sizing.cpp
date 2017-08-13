@@ -1,19 +1,19 @@
 #include "bet_sizing.h"
 
-bet_sizing_manager::bet_sizing_manager(const VectorXf& pot_fractions)
+bet_sizing_manager::bet_sizing_manager(const Tf1& pot_fractions)
 {
 	_pot_fractions = pot_fractions;
 
 	if (pot_fractions.size() == 0)
 	{
 		_pot_fractions.resize(1);
-		_pot_fractions.setOnes();
+		_pot_fractions.setConstant(1.0f);
 	}
 }
 
 bet_sizing_manager::bet_sizing_manager() : bet_sizing_manager(bet_sizing) {}
 
-ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
+TX2f bet_sizing_manager::get_possible_bets(const Node& node)
 {
 	assert(node.current_player == P1 || node.current_player == P2 && "Wrong player for bet size computation");
 
@@ -31,13 +31,13 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 	if (min_raise_size == 0)
 	{
 		//DebugBreak();
-		ArrayX2f ar;
+		TX2f ar;
 		return ar;
 	}
 	else if (min_raise_size == max_raise_size)
 	{
-		ArrayX2f out(1, 2);
-		out.fill((float)opponent_bet);
+		TX2f out(1, 2);
+		out.setConstant((float)opponent_bet);
 		out(0, current_player) = (float)(opponent_bet + min_raise_size);
 		return out;
 	}
@@ -45,8 +45,8 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 	{
 		// iterate through all bets and check if they are possible
 		long long max_possible_bets_count = _pot_fractions.size() + 1; // we can always go allin
-		ArrayX2f out(max_possible_bets_count, player_count);
-		out.fill((float)opponent_bet); // Warning: Perf: don't need to fill all array that will be overwrited
+		TX2f out(max_possible_bets_count, player_count);
+		out.setConstant((float)opponent_bet); // Warning: Perf: don't need to fill all array that will be overwrited
 
 		// take pot size after opponent bet is called
 		float pot = opponent_bet * 2;
@@ -68,12 +68,12 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 		// adding allin
 		used_bets_count++;
 		assert(used_bets_count <= max_possible_bets_count);
-		out.conservativeResize(used_bets_count, player_count);
+		out.resize(used_bets_count, player_count);
 		return out;
 	}
 }
 
-void bet_sizing_manager::SetPotFraction(const VectorXf& potFractions)
+void bet_sizing_manager::SetPotFraction(const Tf1& potFractions)
 {
 	_pot_fractions = potFractions;
 }

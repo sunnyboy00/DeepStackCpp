@@ -13,7 +13,7 @@ void ValueNn::LoadNNfromDick()
 
 }
 
-void ValueNn::get_value(ArrayXXf inputs, ArrayXXf output)
+void ValueNn::get_value(Tf2 inputs, Tf2 output)
 {
 
 }

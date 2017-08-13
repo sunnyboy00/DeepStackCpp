@@ -7,16 +7,16 @@ TEST_CASE("hand_is_possible")
 {
 	card_tools cardTools;
 
-	ArrayXf hand1(card_count);
+	Tf1 hand1(card_count);
 	hand1 << 0, 1, 2, 3, 4, 5;
 
 	REQUIRE(cardTools.hand_is_possible(hand1));
 
-	ArrayXf hand2(card_count);
+	Tf1 hand2(card_count);
 	hand2 << 0, 1, 0, 3, 4, 5;
 	REQUIRE(!cardTools.hand_is_possible(hand2));
 
-	ArrayXf hand3(card_count);
+	Tf1 hand3(card_count);
 	hand3 << 0, 1, 2, 3, 2, 5;
 	REQUIRE(!cardTools.hand_is_possible(hand3));
 }
@@ -25,7 +25,7 @@ TEST_CASE("get_possible_hand_indexes")
 {
 	card_tools cardTools;
 
-	ArrayXf board1(1);
+	Tf1 board1(1);
 	board1 << 0;
 
 	CardArray result = cardTools.get_possible_hand_indexes(board1);
@@ -36,7 +36,7 @@ TEST_CASE("get_possible_hand_indexes")
 	REQUIRE(result(4));
 	REQUIRE(result(5));
 
-	ArrayXf board2(1);
+	Tf1 board2(1);
 	board2 << 1;
 
 	result = cardTools.get_possible_hand_indexes(board2);
@@ -47,7 +47,7 @@ TEST_CASE("get_possible_hand_indexes")
 	REQUIRE(result(4));
 	REQUIRE(result(5));
 
-	ArrayXf board3(1);
+	Tf1 board3(1);
 	board3 << 3;
 
 	result = cardTools.get_possible_hand_indexes(board3);
@@ -63,7 +63,7 @@ TEST_CASE("get_impossible_hand_indexes")
 {
 	card_tools cardTools;
 
-	ArrayXf board(1);
+	Tf1 board(1);
 	board << 3;
 
 	CardArray result = cardTools.get_impossible_hand_indexes(board);
@@ -78,7 +78,7 @@ TEST_CASE("get_impossible_hand_indexes")
 TEST_CASE("get_uniform_range")
 {
 	card_tools cardTools;
-	ArrayXf board(1);
+	Tf1 board(1);
 	board << 3;
 
 	CardArray result = cardTools.get_uniform_range(board);
@@ -94,7 +94,7 @@ TEST_CASE("get_uniform_range")
 TEST_CASE("get_random_range")
 {
 	card_tools cardTools;
-	ArrayXf board(1);
+	Tf1 board(1);
 	board << 4;
 
 	CardArray result = cardTools.get_uniform_range(board);
@@ -109,7 +109,7 @@ TEST_CASE("get_random_range")
 TEST_CASE("is_valid_range")
 {
 	card_tools cardTools;
-	ArrayXf board(1);
+	Tf1 board(1);
 	board << 4;
 
 	CardArray result = cardTools.get_uniform_range(board);
@@ -128,27 +128,27 @@ TEST_CASE("get_boards_count")
 TEST_CASE("get_second_round_boards")
 {
 	card_tools cardTools;
-	ArrayXXf boards = cardTools.get_second_round_boards();
+	Tf2 boards = cardTools.get_second_round_boards();
 	REQUIRE(boards(0, 0) == 0);
 	REQUIRE(boards(1, 0) == 1);
 	REQUIRE(boards(2, 0) == 2);
 	REQUIRE(boards(3, 0) == 3);
 	REQUIRE(boards(4, 0) == 4);
 	REQUIRE(boards(5, 0) == 5);
-	REQUIRE(boards.rows() == card_count);
+	REQUIRE(boards.dimension(0) == card_count);
 }
 
 TEST_CASE("get_board_index")
 {
 	card_tools cardTools;
 
-	ArrayXf board(1);
+	Tf1 board(1);
 	board << 4;
 
 	int index = cardTools.get_board_index(board);
 	REQUIRE(index == 4);
 
-	ArrayXf board2(1);
+	Tf1 board2(1);
 	board2 << 0;
 
 	index = cardTools.get_board_index(board2);
@@ -159,14 +159,14 @@ TEST_CASE("normalize_range")
 {
 	card_tools cardTools;
 
-	ArrayXf board1(0);
+	Tf1 board1(0);
 
 	CardArray uniformRange = cardTools.get_uniform_range(board1);
 
-	ArrayXf board2(1);
+	Tf1 board2(1);
 	board2 << 3;
 
-	ArrayXf resultRange = cardTools.normalize_range(board2, uniformRange);
+	Tf1 resultRange = cardTools.normalize_range(board2, uniformRange);
 	REQUIRE(resultRange.sum() == 1.0);
 	REQUIRE(resultRange(3) == 0.0);
 }

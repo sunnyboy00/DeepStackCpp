@@ -13,9 +13,6 @@
 #include <algorithm> 
 
 using namespace std;
-using Eigen::Array2f;
-using Eigen::ArrayX2f;
-using Eigen::ArrayXf;
 
 
 
@@ -69,7 +66,7 @@ public:
 	bool _limit_to_street;
 
 	// object which gives the allowed bets for each player
-	VectorXf _bet_sizing;
+	Tf1 _bet_sizing;
 
 
 	card_tools _card_tools;

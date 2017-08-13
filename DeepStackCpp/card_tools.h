@@ -5,10 +5,10 @@
 #include <Eigen/Dense>
 #include <memory>
 
-using Eigen::ArrayXf;
+using Eigen::Tf1;
 using Eigen::Array;
 using Eigen::MatrixXf;
-using Eigen::ArrayXXf;
+using Eigen::Tf2;
 using namespace std;
 
 class card_tools
@@ -19,26 +19,26 @@ public:
 	//  - Gives whether a set of cards is valid.
 	//  @param hand a vector of cards
 	//  @return `true` if the tensor contains valid cards and no card is repeated
-	bool hand_is_possible(const ArrayXf& hand);
+	bool hand_is_possible(const Tf1& hand);
 
 	// Gives the private hands which are valid with a given board.
 	// @param board a possibly empty vector of board cards
 	// @return a vector with an entry for every possible hand(private card), which
 	//  is `1` if the hand shares no cards with the board and `0` otherwise
-	CardArray get_possible_hand_indexes(const ArrayXf& board);
+	CardArray get_possible_hand_indexes(const Tf1& board);
 
 	//  Gives the private hands which are invalid with a given board.
 	// @param board a possibly empty vector of board cards
 	// @return a vector with an entry for every possible hand(private card), which
 	// is `1` if the hand shares at least one card with the board and `0` otherwise
-	CardArray get_impossible_hand_indexes(const ArrayXf& board);
+	CardArray get_impossible_hand_indexes(const Tf1& board);
 
 	// Gives a range vector that has uniform probability on each hand which is
 	// valid with a given board.
 	// @param board a possibly empty vector of board cards
 	// @return a range vector where invalid hands have 0 probability and valid
 	// hands have uniform probability
-	CardArray get_uniform_range(const ArrayXf& board);
+	CardArray get_uniform_range(const Tf1& board);
 
 	// Randomly samples a range vector which is valid with a given board.
 	// @param board a possibly empty vector of board cards
@@ -46,19 +46,19 @@ public:
 	// @return a range vector where invalid hands are given 0 probability, each
 	// valid hand is given a probability randomly sampled from the uniform
 	// distribution on[0, 1), and the resulting range is normalized
-	CardArray get_random_range(const ArrayXf& board, int seed);
+	CardArray get_random_range(const Tf1& board, int seed);
 
 	// Checks if a range vector is valid with a given board.
 	// @param range a range vector to check
 	// @param board a possibly empty vector of board cards
 	// @return `true` if the range puts 0 probability on invalid hands and has
 	// total probability 1
-	bool is_valid_range(const CardArray& range, const ArrayXf& board);
+	bool is_valid_range(const CardArray& range, const Tf1& board);
 
 	// Gives the current betting round based on a board vector.
 	// @param board a possibly empty vector of board cards
 	// @return the current betting round
-	int board_to_street(const ArrayXf& board);
+	int board_to_street(const Tf1& board);
 
 	// Gives the number of possible boards.
 	// @return the number of possible boards
@@ -67,7 +67,7 @@ public:
 	// Gives all possible sets of board cards for the game.
 	// @return an NxK tensor, where N is the number of possible boards, and K is
 	// the number of cards on each board
-	ArrayXXf get_second_round_boards();
+	Tf2 get_second_round_boards();
 
 	// Initializes the board index table.
 	// @local
@@ -76,18 +76,18 @@ public:
 	// Gives a numerical index for a set of board cards.
 	// @param board a non - empty vector of board cards
 	// @return the numerical index for the board
-	int card_tools::get_board_index(const ArrayXf& board);
+	int card_tools::get_board_index(const Tf1& board);
 
 	// Normalizes a range vector over hands which are valid with a given board.
 	// @param board a possibly empty vector of board cards
 	// @param range a range vector
 	// @return a modified version of `range` where each invalid hand is given 0
 	//probability and the vector is normalized
-	CardArray normalize_range(const ArrayXf& board, CardArray& range);
+	CardArray normalize_range(const Tf1& board, CardArray& range);
 
 private:
 
 	// Id's of all possible boards
-	MatrixXf _board_index_table;
+	Tf2 _board_index_table;
 };
 

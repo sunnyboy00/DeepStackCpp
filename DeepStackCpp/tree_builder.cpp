@@ -22,15 +22,15 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 		return vector<Node*>();
 	}
 
-	ArrayXXf next_boards = _card_tools.get_second_round_boards();
-	size_t next_boards_count = next_boards.rows();
+	Tf2 next_boards = _card_tools.get_second_round_boards();
+	size_t next_boards_count = next_boards.dimension(0);
 
 	long long subtree_height = -1;
 	auto children = vector<Node*>();
 	//1.0 iterate over the next possible boards to build the corresponding subtrees
 	for (size_t i = 0; i < next_boards_count; i++)
 	{
-		ArrayXf next_board = next_boards.row(i);
+		Tf1 next_board = next_boards.chip(i, 0);
 		string next_board_string = _card_to_string.cards_to_string(next_board);
 		
 		Node* child = new Node();
@@ -50,7 +50,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 
 void tree_builder::_fill_additional_attributes(Node& node)
 {
-	node.pot = node.bets.minCoeff();
+	node.pot = ((Tf1)node.bets.minimum())(0);
 }
 
 vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
@@ -92,7 +92,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		(parent_node.street == 1) &&
 		(
 			(parent_node.current_player == P2 && parent_node.bets(0) == parent_node.bets(1)) || // If now is player 2 turn and bets are equal - call will not be terminal
-			(parent_node.bets(0) != parent_node.bets(1) && parent_node.bets.maxCoeff() < stack)) // Or bets are not equal and less then stack size - call will not be terminal
+			(parent_node.bets(0) != parent_node.bets(1) && parent_node.bets.maximum() < stack)) // Or bets are not equal and less then stack size - call will not be terminal
 		)
 	{
 		Node* chnce_node = new Node();
@@ -102,7 +102,8 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		chnce_node->board_string = parent_node.board_string;
 		chnce_node->current_player = chance;
 		chnce_node->bets = parent_node.bets;
-		chnce_node->bets.fill(parent_node.bets.maxCoeff());
+		float maxVal = ((Tf1)parent_node.bets.maximum())(0);
+		chnce_node->bets.setConstant(maxVal);
 		children.push_back(chnce_node);
 	}
 	else
@@ -116,18 +117,19 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 		terminal_call_node->board = parent_node.board;
 		terminal_call_node->board_string = parent_node.board_string;
 		terminal_call_node->bets = parent_node.bets;
-		terminal_call_node->bets.fill(parent_node.bets.maxCoeff());
+		float maxVal = ((Tf1)parent_node.bets.maximum())(0);
+		terminal_call_node->bets.setConstant(maxVal);
 		children.push_back(terminal_call_node);
 	}
 	
 	//3.0 bet actions  
-	ArrayX2f possible_bets = _bet_sizing_manager.get_possible_bets(parent_node);
+	TX2f possible_bets = _bet_sizing_manager.get_possible_bets(parent_node);
 
-	if (possible_bets.rows() > 0)
+	if (possible_bets.dimension(0) > 0)
 	{
-		assert(possible_bets.cols() == players_count);
+		assert(possible_bets.dimension(1) == players_count);
 
-		for (int i = 0; i < possible_bets.rows(); i++)
+		for (int i = 0; i < possible_bets.dimension(0); i++)
 		{
 			Node* child = new Node();
 			child->parent = &parent_node;
@@ -136,7 +138,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 			child->street = parent_node.street;
 			child->board = parent_node.board;
 			child->board_string = parent_node.board_string;
-			child->bets = possible_bets.row(i);
+			child->bets = possible_bets.chip(i, 0);
 			children.push_back(child);
 		}
 				
@@ -177,7 +179,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 
 	long long depth = -1;
 
-	current_node.actions = ArrayXf(children.size());
+	current_node.actions = Tf1(children.size());
 	for (size_t i = 0; i < children.size(); i++)
 	{
 		Node* cur_children = children[i];
@@ -195,7 +197,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 		}
 		else // All others children are possible bets
 		{
-			current_node.actions(i) = cur_children->bets.maxCoeff(); // Max possible bet is the max bet off child?
+			current_node.actions(i) = ((Tf1)cur_children->bets.maximum())(0); // Max possible bet is the max bet off child?
 		}
 	}
 
@@ -216,7 +218,7 @@ Node& tree_builder::build_tree(TreeBuilderParams& params)
 
 	if (params.bet_sizing.size() == 0)
 	{
-		params.bet_sizing = bet_sizing;
+		params.bet_sizing.setValues(bet_sizing);
 	}
 	else
 	{

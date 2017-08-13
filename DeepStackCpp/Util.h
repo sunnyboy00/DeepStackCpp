@@ -40,7 +40,7 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		static inline void Copy(ArrayXXf & target, ArrayXXf & source)
+		static inline void Copy(Tf2 & target, Tf2 & source)
 		{
 			assert(target.size() >= source.size());
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
@@ -102,25 +102,25 @@ class Util
 		//}
 
 		// Expands one array as other one
-		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as)
+		static inline Tf2 ExpandAs(Tf2 data, Tf2 as)
 		{
 			//ToDo: remove during optimization for performance reasons
-			float difCols = (float)as.cols() / data.cols();
+			float difCols = (float)as.dimension(1) / data.dimension(1);
 			assert(difCols >= 1.0);
 			assert(ceilf(difCols) == difCols && "The coefficients must be integers");
 
-			float difRows = (float)as.rows() / data.rows();
+			float difRows = (float)as.dimension(0) / data.dimension(0);
 			assert(difRows >= 1.0);
 			assert(ceilf(difRows) == difRows && "The coefficients must be integers");
 
-			ArrayXXf res = data.replicate((int)difRows, (int)difCols);
+			Tf2 res = data.replicate((int)difRows, (int)difCols);
 			return res;
 		}
 
 		// Expands one array as other one
-		static inline ArrayXXf ExpandAs(ArrayXf data, ArrayXXf as)
+		static inline Tf2 ExpandAs(Tf1 data, Tf2 as)
 		{
-			return data.replicate(as.rows(), as.cols());
+			return data.replicate(as.dimension(0), as.dimension(1));
 		}
 
 		// Resizes the tensor and fills it with some value
@@ -468,37 +468,37 @@ class Util
 		//	currentRes.setConstant(value);
 		//};
 
-		static inline MatrixXf ExpandAs(VectorXf data, MatrixXf as)
+		static inline MatrixXf ExpandAs(Tf1 data, MatrixXf as)
 		{
-			return data.replicate(as.rows(), as.cols());
+			return data.replicate(as.dimension(0), as.dimension(1));
 		}
 
-		static inline void ClipLow(ArrayXXf& target, float lowLimin)
+		static inline void ClipLow(Tf2& target, float lowLimin)
 		{
 			target = (target >= lowLimin).select(
 				target,
-				ArrayXXf::Constant(target.rows(), target.cols(), lowLimin)
+				Tf2::Constant(target.dimension(0), target.dimension(1), lowLimin)
 			);
 		}
 
-		static inline void ClipLow(ArrayXf& target, float lowLimin)
+		static inline void ClipLow(Tf1& target, float lowLimin)
 		{
 			target = (target >= lowLimin).select(
 				target,
-				ArrayXf::Constant(target.rows(), target.cols(), lowLimin)
+				Tf1::Constant(target.dimension(0), target.dimension(1), lowLimin)
 			);
 		}
 
-		static inline void Clip(ArrayXXf& target, float lowLimin, float maxValue)
+		static inline void Clip(Tf2& target, float lowLimin, float maxValue)
 		{
 			target = (target >= lowLimin).select(
 				target,
-				ArrayXXf::Constant(target.rows(), target.cols(), lowLimin)
+				Tf2::Constant(target.dimension(0), target.dimension(1), lowLimin)
 			);
 
 			target = (target < maxValue).select(
 				target,
-				ArrayXXf::Constant(target.rows(), target.cols(), maxValue)
+				Tf2::Constant(target.dimension(0), target.dimension(1), maxValue)
 			);
 		}
 
@@ -506,12 +506,12 @@ class Util
 		{
 			target = (target >= lowLimin).select(
 				target,
-				CardArray::Constant(target.rows(), target.cols(), lowLimin)
+				CardArray::Constant(target.dimension(0), target.dimension(1), lowLimin)
 			);
 
 			target = (target < maxValue).select(
 				target,
-				CardArray::Constant(target.rows(), target.cols(), maxValue)
+				CardArray::Constant(target.dimension(0), target.dimension(1), maxValue)
 			);
 		}
 
@@ -542,29 +542,29 @@ class Util
 		//{
 		//	target = (target.array() >= lowLimin).select(
 		//		target,
-		//		MatrixXf::Constant(target.rows(), target.cols(), lowLimin)
+		//		MatrixXf::Constant(target.dimension(0), target.dimension(1), lowLimin)
 		//	);
 		//}
 
-		static void ToString(const ArrayXXf& dataArg);
+		static void ToString(const Tf2& dataArg);
 
 		static void ToString(const MatrixXf& dataArg);
 
-		//static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
+		//static inline TensorMap<Tensor<float, 2>> ToTensor(Tf2 & source)
 		//{
-		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
+		//	return TensorMap<Tensor<float, 2>>(source.data(), source.dimension(0), source.dimension(1));
 		//}
 
 		//static inline TensorMap<Tensor<float, 2>> ToTensor(MatrixXf & source)
 		//{
-		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
+		//	return TensorMap<Tensor<float, 2>>(source.data(), source.dimension(0), source.dimension(1));
 		//}
 
 		//// Returns 2d tensor from 3d 
-		//static Map<ArrayXXf> TensorToArray2d(Tensor<float, 3>& tensor, int offset, int dim, Tensor<float, 2>& tempVar)
+		//static Map<Tf2> TensorToArray2d(Tensor<float, 3>& tensor, int offset, int dim, Tensor<float, 2>& tempVar)
 		//{
 		//	tempVar = tensor.chip(offset, dim);
-		//	Map<ArrayXXf> plCfAr(tempVar.data(), tempVar.dimension(0), tempVar.dimension(1));
+		//	Map<Tf2> plCfAr(tempVar.data(), tempVar.dimension(0), tempVar.dimension(1));
 		//	return plCfAr;
 		//}
 

@@ -6,7 +6,7 @@
 #include "tree_builder.h"
 #include "lookahead.h"
 #include "LookaheadBuilder.h"
-#include "LookaheadResult.h"
+#include "card_tools.h"
 
 //-- - Implements depth - limited re - solving at a node of the game tree.
 //--Internally uses @{cfrd_gadget | CFRDGadget} TODO SOLVER
@@ -110,6 +110,8 @@ private:
 	lookahead _lookahead;
 
 	LookaheadBuilder* _lookBuilder;
+
+	card_tools _card_tools;
 
 	//-- - Builds a depth - limited public tree rooted at a given game node.
 	//-- @param node the root of the tree

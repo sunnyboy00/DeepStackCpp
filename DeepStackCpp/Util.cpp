@@ -5,7 +5,7 @@ std::wstring string_to_wstring(const std::string& str) {
 	return std::wstring(str.begin(), str.end());
 }
 
-void Util::ToString(const ArrayXXf& dataArg)
+void Util::ToString(const Tf2& dataArg)
 {
 	IOFormat CleanFmt(3, 0, ", ", "\n", "[", "]");
 

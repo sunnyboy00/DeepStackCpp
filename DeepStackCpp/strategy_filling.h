@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-using Eigen::ArrayXXf;
+using Eigen::Tf2;
 
 //
 // Fills a game's public tree with a uniform strategy. In particular, fills

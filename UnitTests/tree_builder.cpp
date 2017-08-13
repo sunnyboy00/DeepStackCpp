@@ -11,7 +11,7 @@ TEST_CASE("_get_children_nodes_transition_call")
 	root_node.board = converter.string_to_board("");
 	root_node.street = 1;
 	root_node.current_player = P1;
-	root_node.bets = Eigen::Array2f();
+	root_node.bets = T2f();
 	root_node.bets << 100, 200;
 
 	tree_builder builder;
@@ -28,7 +28,7 @@ TEST_CASE("_get_children_nodes_chance_node")
 	root_node.board = converter.string_to_board("");
 	root_node.street = 1;
 	root_node.current_player = chance;
-	root_node.bets = Eigen::Array2f();
+	root_node.bets = T2f();
 	root_node.bets << 100, 100;
 
 	tree_builder builder;
@@ -43,7 +43,7 @@ TEST_CASE("_get_children_player_node")
 	root_node.board = converter.string_to_board("");
 	root_node.street = 1;
 	root_node.current_player = P2;
-	root_node.bets = Eigen::Array2f();
+	root_node.bets = T2f();
 	root_node.bets << 100, 100;
 
 	tree_builder builder;
@@ -53,7 +53,7 @@ TEST_CASE("_get_children_player_node")
 	root_node.board = converter.string_to_board("Qs");
 	root_node.street = 2;
 	root_node.current_player = P1;
-	root_node.bets = Eigen::Array2f();
+	root_node.bets = T2f();
 	root_node.bets << 100, 200;
 
 	result = builder._get_children_player_node(root_node);

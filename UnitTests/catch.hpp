@@ -1247,7 +1247,7 @@ namespace Catch {
 		void handleResult(AssertionResult const& result);
 		void react();
 		bool shouldDebugBreak() const;
-		bool allowThrows() const;
+		bool allowThdimension(0) const;
 
 		template<typename ArgT, typename MatcherT>
 		void captureMatch(ArgT const& arg, MatcherT const& matcher, char const* matcherString);
@@ -2242,7 +2242,7 @@ namespace Catch {
 #define INTERNAL_CATCH_THROWS( macroName, resultDisposition, matcher, expr ) \
     do { \
         Catch::ResultBuilder __catchResult( macroName, CATCH_INTERNAL_LINEINFO, #expr, resultDisposition, #matcher ); \
-        if( __catchResult.allowThrows() ) \
+        if( __catchResult.allowThdimension(0) ) \
             try { \
                 static_cast<void>(expr); \
                 __catchResult.captureResult( Catch::ResultWas::DidntThrowException ); \
@@ -2259,7 +2259,7 @@ namespace Catch {
 #define INTERNAL_CATCH_THROWS_AS( macroName, exceptionType, resultDisposition, expr ) \
     do { \
         Catch::ResultBuilder __catchResult( macroName, CATCH_INTERNAL_LINEINFO, #expr ", " #exceptionType, resultDisposition ); \
-        if( __catchResult.allowThrows() ) \
+        if( __catchResult.allowThdimension(0) ) \
             try { \
                 static_cast<void>(expr); \
                 __catchResult.captureResult( Catch::ResultWas::DidntThrowException ); \
@@ -3252,7 +3252,7 @@ namespace Catch {
 		friend void setTags(TestCaseInfo& testCaseInfo, std::set<std::string> const& tags);
 
 		bool isHidden() const;
-		bool throws() const;
+		bool thdimension(0) const;
 		bool okToFail() const;
 		bool expectedToFail() const;
 
@@ -3863,7 +3863,7 @@ namespace Catch {
 
 		virtual ~IConfig();
 
-		virtual bool allowThrows() const = 0;
+		virtual bool allowThdimension(0) const = 0;
 		virtual std::ostream& stream() const = 0;
 		virtual std::string name() const = 0;
 		virtual bool includeSuccessfulResults() const = 0;
@@ -4052,7 +4052,7 @@ namespace Catch {
 		bool showHelp() const { return m_data.showHelp; }
 
 		// IConfig interface
-		virtual bool allowThrows() const CATCH_OVERRIDE { return !m_data.noThrow; }
+		virtual bool allowThdimension(0) const CATCH_OVERRIDE { return !m_data.noThrow; }
 		virtual std::ostream& stream() const CATCH_OVERRIDE { return m_stream->stream(); }
 		virtual std::string name() const CATCH_OVERRIDE { return m_data.name.empty() ? m_data.processName : m_data.name; }
 		virtual bool includeSuccessfulResults() const CATCH_OVERRIDE { return m_data.showSuccessfulTests; }
@@ -4158,7 +4158,7 @@ namespace STITCH_TBC_TEXT_FORMAT_OUTER_NAMESPACE {
 
 			std::size_t initialIndent;  // indent of first line, or npos
 			std::size_t indent;         // indent of subsequent lines, or all if initialIndent is npos
-			std::size_t width;          // maximum width of text, including indent. Longer text will wrap
+			std::size_t width;          // max width of text, including indent. Longer text will wrap
 			char tabChar;               // If this char is seen the indent is changed to current pos
 		};
 
@@ -5382,7 +5382,7 @@ namespace CLICHE_TBC_TEXT_FORMAT_OUTER_NAMESPACE {
 
 			std::size_t initialIndent;  // indent of first line, or npos
 			std::size_t indent;         // indent of subsequent lines, or all if initialIndent is npos
-			std::size_t width;          // maximum width of text, including indent. Longer text will wrap
+			std::size_t width;          // max width of text, including indent. Longer text will wrap
 		};
 
 		class Text {
@@ -7223,7 +7223,7 @@ namespace Catch {
 		return sorted;
 	}
 	bool matchTest(TestCase const& testCase, TestSpec const& testSpec, IConfig const& config) {
-		return testSpec.matches(testCase) && (config.allowThrows() || !testCase.throws());
+		return testSpec.matches(testCase) && (config.allowThdimension(0) || !testCase.thdimension(0));
 	}
 
 	void enforceNoDuplicateTestCases(std::vector<TestCase> const& functions) {
@@ -8264,7 +8264,7 @@ namespace Catch {
 	bool TestCaseInfo::isHidden() const {
 		return (properties & IsHidden) != 0;
 	}
-	bool TestCaseInfo::throws() const {
+	bool TestCaseInfo::thdimension(0) const {
 		return (properties & Throws) != 0;
 	}
 	bool TestCaseInfo::okToFail() const {
@@ -9159,7 +9159,7 @@ namespace Catch {
 	}
 
 	bool ResultBuilder::shouldDebugBreak() const { return m_shouldDebugBreak; }
-	bool ResultBuilder::allowThrows() const { return getCurrentContext().getConfig()->allowThrows(); }
+	bool ResultBuilder::allowThdimension(0) const { return getCurrentContext().getConfig()->allowThdimension(0); }
 
 	AssertionResult ResultBuilder::build() const
 	{

@@ -30,9 +30,9 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
-//	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
-//	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+//	Tf2 starting_ranges(players_count, card_count);
+//	starting_ranges.chip(0, 0) = cradTools.get_uniform_range(params.root_node->board);
+//	starting_ranges.chip(1, 0) = cradTools.get_uniform_range(params.root_node->board);
 //
 //	TreeCFR tree_cfr;
 //	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
@@ -68,9 +68,9 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
-//	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
-//	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+//	Tf2 starting_ranges(players_count, card_count);
+//	starting_ranges.chip(0, 0) = cradTools.get_uniform_range(params.root_node->board);
+//	starting_ranges.chip(1, 0) = cradTools.get_uniform_range(params.root_node->board);
 //
 //	TreeCFR tree_cfr;
 //	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
@@ -106,9 +106,9 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
-//	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
-//	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+//	Tf2 starting_ranges(players_count, card_count);
+//	starting_ranges.chip(0, 0) = cradTools.get_uniform_range(params.root_node->board);
+//	starting_ranges.chip(1, 0) = cradTools.get_uniform_range(params.root_node->board);
 //
 //	TreeCFR tree_cfr;
 //	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
@@ -144,9 +144,9 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
-//	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
-//	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+//	Tf2 starting_ranges(players_count, card_count);
+//	starting_ranges.chip(0, 0) = cradTools.get_uniform_range(params.root_node->board);
+//	starting_ranges.chip(1, 0) = cradTools.get_uniform_range(params.root_node->board);
 //
 //	TreeCFR tree_cfr;
 //	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
@@ -171,9 +171,9 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
-//	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
-//	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+//	Tf2 starting_ranges(players_count, card_count);
+//	starting_ranges.chip(0, 0) = cradTools.get_uniform_range(params.root_node->board);
+//	starting_ranges.chip(1, 0) = cradTools.get_uniform_range(params.root_node->board);
 //
 //	TreeCFR tree_cfr;
 //	tree_cfr.run_cfr(tree, starting_ranges, 1, 0);
@@ -198,9 +198,9 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
-//	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
-//	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+//	Tf2 starting_ranges(players_count, card_count);
+//	starting_ranges.chip(0, 0) = cradTools.get_uniform_range(params.root_node->board);
+//	starting_ranges.chip(1, 0) = cradTools.get_uniform_range(params.root_node->board);
 //
 //	TreeCFR tree_cfr;
 //	tree_cfr.run_cfr(tree, starting_ranges, 2, 0);

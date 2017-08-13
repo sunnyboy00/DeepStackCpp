@@ -5,7 +5,7 @@
 
 const float myEps = 0.001f;
 
-float GetMatrixVal(string me, string other, ArrayXXf matrix)
+float GetMatrixVal(string me, string other, Tf2 matrix)
 {
 	card_to_string_conversion converter;
 	int c1 = converter.string_to_card(other);
@@ -19,12 +19,12 @@ TEST_CASE("get_last_round_call_matrix")
 	card_to_string_conversion converter;
 	int card = converter.string_to_card("Ah");
 
-	ArrayXf board(1);
+	Tf1 board(1);
 	board << (float)card;
 
 	terminal_equity term;
 
-	ArrayXXf callMatrix;
+	Tf2 callMatrix;
 	term.get_last_round_call_matrix(board, callMatrix);
 
 	REQUIRE(GetMatrixVal("As", "Ah", callMatrix) == 0);
@@ -56,7 +56,7 @@ TEST_CASE("get_last_round_call_matrix")
 TEST_CASE("_fold_matrix")
 {
 	card_to_string_conversion converter;
-	ArrayXf board = converter.string_to_board("Qs");
+	Tf1 board = converter.string_to_board("Qs");
 	terminal_equity term;
 
 	term._set_fold_matrix(board);
@@ -88,7 +88,7 @@ TEST_CASE("_fold_matrix")
 TEST_CASE("_call_matrix")
 {
 	card_to_string_conversion converter;
-	ArrayXf board = converter.string_to_board("");
+	Tf1 board = converter.string_to_board("");
 	terminal_equity term;
 
 	term._set_call_matrix(board);
@@ -123,7 +123,7 @@ TEST_CASE("_call_matrix")
 TEST_CASE("call_matrix_with_board")
 {
 	card_to_string_conversion converter;
-	ArrayXf board = converter.string_to_board("Qs");
+	Tf1 board = converter.string_to_board("Qs");
 	terminal_equity term;
 
 	term._set_call_matrix(board);
@@ -138,7 +138,7 @@ TEST_CASE("call_matrix_with_board")
 
 TEST_CASE("tree_node_call_value")
 {
-	ArrayXXf range(2, 6);
+	Tf2 range(2, 6);
 	int i = 0;
 	for (size_t r = 0; r < 2; r++)
 	{
@@ -149,7 +149,7 @@ TEST_CASE("tree_node_call_value")
 		}
 	}
 
-	ArrayXXf result(2, 6);
+	Tf2 result(2, 6);
 	terminal_equity term;
 	term.tree_node_call_value(range.array(), result);
 	REQUIRE(result(0,0) == Approx(0.0963).epsilon(myEps));
@@ -173,7 +173,7 @@ TEST_CASE("tree_node_fold_value")
 	//Matrix2Xf f(2, 6);
 
 
-	//// ...using the "maximum" operator.
+	//// ...using the "max" operator.
 	//// The result is a tensor with one dimension.  The size of
 	//// that dimension is the same as the first (non-reduced) dimension of a.
 	//Eigen::Tensor<int, 1> b = a.sum(edim(0));
@@ -186,7 +186,7 @@ TEST_CASE("tree_node_fold_value")
 	//Eigen::Tensor<int, 1> col_2 = a.chip(1, 1);
 	//cout << "a" << endl << a << endl;
 	//cout << "row_3" << endl << row_3 << endl;
-	ArrayXXf range(2, 6);
+	Tf2 range(2, 6);
 	int i = 0;
 	for (size_t r = 0; r < 2; r++)
 	{
@@ -198,7 +198,7 @@ TEST_CASE("tree_node_fold_value")
 	}
 
 
-	ArrayXXf result(2, 6);
+	Tf2 result(2, 6);
 	terminal_equity term;
 	term.tree_node_fold_value(range, result, P2);
 	REQUIRE(result(0, 0) == Approx(0.2552).epsilon(myEps));
@@ -211,16 +211,16 @@ TEST_CASE("tree_node_fold_value")
 
 TEST_CASE("tree_node_fold_value_integration")
 {
-	ArrayXXf range(2, 6);
+	Tf2 range(2, 6);
 
 	range << 0.0000f,0.2000f,0.2000f,0.2000f,0.2000f,0.2000f,
 		0.0000f,0.1000f,0.1000f,0.1000f,0.1000f,0.1000f;
 
-	ArrayXXf result(2, 6);
+	Tf2 result(2, 6);
 	terminal_equity term;
 
 	card_to_string_conversion converter;
-	ArrayXf board = converter.string_to_board("As");
+	Tf1 board = converter.string_to_board("As");
 
 	term.set_board(board);
 	term.tree_node_fold_value(range, result, P2);

@@ -25,10 +25,10 @@ public:
 	//-- @param tree the public tree used to construct the lookahead
 	void build_from_tree(Node& tree);
 
-	//-- - Computes the maximum number of actions at each depth of the tree.
+	//-- - Computes the max number of actions at each depth of the tree.
 	//--
 	//--Used to find the size for the tensors which store lookahead data.The
-	//-- maximum number of actions is used so that every node at that depth can
+	//-- max number of actions is used so that every node at that depth can
 	//-- fit in the same tensor.
 	//-- @param current_layer a list of tree nodes at the current depth
 	//-- @param current_depth the depth of the current tree nodes

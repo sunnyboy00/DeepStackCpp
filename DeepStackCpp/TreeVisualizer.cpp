@@ -16,7 +16,7 @@ string TreeVisualizer::string_format(const std::string& format, Args ... args)
 	return string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-string TreeVisualizer::add_tensor(ArrayXXf tensor, const char* name, const char* format, const std::unordered_map<int, string>* labels)
+string TreeVisualizer::add_tensor(Tf2 tensor, const char* name, const char* format, const std::unordered_map<int, string>* labels)
 {
 	// std::stringstream fmt;
 	string out = "";
@@ -38,7 +38,7 @@ string TreeVisualizer::add_tensor(ArrayXXf tensor, const char* name, const char*
 		format_l = string(format);
 	}
 
-	for (int i = 0; i < tensor.cols(); i++)
+	for (int i = 0; i < tensor.dimension(1); i++)
 	{
 		if (labels != nullptr)
 		{
@@ -58,22 +58,22 @@ string TreeVisualizer::add_range_info(const Node& node)
 
 	if (node.ranges_absolute.size() > 0)
 	{
-		out += add_tensor(node.ranges_absolute.row(0), "abs_range1");
-		out += add_tensor(node.ranges_absolute.row(1), "abs_range2");
+		out += add_tensor(node.ranges_absolute.chip(0, 0), "abs_range1");
+		out += add_tensor(node.ranges_absolute.chip(1, 0), "abs_range2");
 	}
 
 	if (node.cf_values.size() > 0)
 	{
 		//--cf values computed by real tree dfs
-		out += add_tensor(node.cf_values.row(0), "cf_values1");
-		out += add_tensor(node.cf_values.row(1), "cf_values2");
+		out += add_tensor(node.cf_values.chip(0, 0), "cf_values1");
+		out += add_tensor(node.cf_values.chip(1, 0), "cf_values2");
 	}
 
 	if (node.cf_values_br.size() > 0)
 	{
 		//--cf values that br has in real tree
-		out += add_tensor(node.cf_values_br.row(0), "cf_values_br1");
-		out += add_tensor(node.cf_values_br.row(1), "cf_values_br2");
+		out += add_tensor(node.cf_values_br.chip(0, 0), "cf_values_br1");
+		out += add_tensor(node.cf_values_br.chip(1, 0), "cf_values_br2");
 	}
 
 	return out;

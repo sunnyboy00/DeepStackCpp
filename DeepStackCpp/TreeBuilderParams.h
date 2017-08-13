@@ -1,5 +1,6 @@
 #pragma once
 #include "Node.h"
+#include "CustomSettings.h"
 
 struct TreeBuilderParams
 {
@@ -13,13 +14,13 @@ struct TreeBuilderParams
 	int current_player;
 
 	// a possibly empty vector of board cards at the root node
-	Eigen::ArrayXf board;
+	Tf1 board;
 
 	// if `true`, only build the current betting round
 	bool limit_to_street;
 
 	// object which gives the allowed bets for each player
-	Eigen::VectorXf bet_sizing;
+	Tf1 bet_sizing;
 
 	Node* root_node;
 

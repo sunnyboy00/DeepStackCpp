@@ -90,7 +90,7 @@ public:
 	map<int, Tf5> swap_data;
 
 	// Which player acts at particular depth. 0 - first player to act. 1 - second player to act.
-	ArrayXf acting_player;
+	Tf1 acting_player;
 
 	bool first_call_terminal;
 	bool first_call_transition;

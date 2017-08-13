@@ -24,7 +24,7 @@ public:
 	//	-- @param[opt] iter_count the number of iterations to run CFR for
 	//	--(default @{arguments.cfr_iters
 	//})
-	void run_cfr(Node& root, const ArrayXXf&  starting_ranges, size_t iter_count = 0, size_t skip_iters = cfr_skip_iters);
+	void run_cfr(Node& root, const Tf2&  starting_ranges, size_t iter_count = 0, size_t skip_iters = cfr_skip_iters);
 
 private:
 
@@ -35,7 +35,7 @@ private:
 	// --for ease of implementation, we use small epsilon rather than zero when working with regrets
 	const float regret_epsilon = 1.0f / 1000000000;
 
-	map<ArrayXf*, terminal_equity*> _cached_terminal_equities;
+	map<Tf1*, terminal_equity*> _cached_terminal_equities;
 
 	size_t _cfr_skip_iters;
 
@@ -56,22 +56,22 @@ private:
 
 	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
 
-	ArrayXXf ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<float, Dynamic, card_count>* cf_values_allactions);
+	Tf2 ComputeRegrets(Node &node, Tf2 &current_strategy, Array<float, Dynamic, card_count>* cf_values_allactions);
 
-	void _fillChanceRangesAndStrategy(Node &node, map<int, ArrayXXf> &children_ranges_absolute, ArrayXXf& current_strategy);
+	void _fillChanceRangesAndStrategy(Node &node, map<int, Tf2> &children_ranges_absolute, Tf2& current_strategy);
 
-	void _fillPlayersRangesAndStrategy(Node & node, map<int, ArrayXXf>& children_ranges_absolute, ArrayXXf & current_strategy);
+	void _fillPlayersRangesAndStrategy(Node & node, map<int, Tf2>& children_ranges_absolute, Tf2 & current_strategy);
 
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update
 	//-- @param current_regrets the regrets from the current iteration of CFR
-	void update_regrets(Node& node, const ArrayXXf& current_regrets);
+	void update_regrets(Node& node, const Tf2& current_regrets);
 
 	//-- - Update a node's average strategy with the current iteration strategy.
 	//-- @param node the node to update
 	//-- @param current_strategy the CFR strategy for the current iteration
 	//-- @param iter the iteration number of the current CFR iteration
-	void update_average_strategy(Node& node, ArrayXXf& current_strategy, size_t iter);
+	void update_average_strategy(Node& node, Tf2& current_strategy, size_t iter);
 
 	// Fill cf_values for terminal nodes
 	void _fillCFvaluesForTerminalNode(Node &node);

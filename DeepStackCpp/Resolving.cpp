@@ -35,6 +35,16 @@ LookaheadResult Resolving::resolve_first_node(Node& node, const Tf1& player_rang
 
 void Resolving::resolve(const Node& node, const Tf1& player_range, const Tf1& opponent_cfvs)
 {
+	//assert(_card_tools.is_valid_range(player_range, node.board));
 
+	//	self:_create_lookahead_tree(node)
+
+	//	self.lookahead = Lookahead()
+	//	self.lookahead : build_lookahead(self.lookahead_tree)
+
+	//	self.lookahead : resolve(player_range, opponent_cfvs)
+
+	//	self.resolve_results = self.lookahead : get_results()
+	//	return self.resolve_results
 }
 

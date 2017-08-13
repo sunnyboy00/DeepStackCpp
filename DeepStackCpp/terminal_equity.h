@@ -4,8 +4,8 @@
 #include "LeducEvaluator.h"
 #include "game_settings.h"
 #include "assert.h"
+#include "CustomSettings.h"
 
-using Eigen::ArrayXf;
 using namespace std;
 
 //-- - Evaluates player equities at terminal nodes of the game's public tree.
@@ -21,7 +21,7 @@ public:
 	//--
 	//-- @param equity_matrix the matrix to modify
 	//-- @param board a possibly empty vector of board cards
-	void _handle_blocking_cards(ArrayXXf& equity_matrix, const ArrayXf& board);
+	void _handle_blocking_cards(Tf2& equity_matrix, const Tf1& board);
 
 	//-- - Constructs the matrix that turns player ranges into showdown equity.
 	//	--
@@ -30,11 +30,11 @@ public:
 	//	--
 	//	-- @param board_cards a non - empty vector of board cards
 	//	-- @param call_matrix a tensor where the computed matrix is stored
-	void get_last_round_call_matrix(const ArrayXf& board_cards, ArrayXXf& call_matrix);
+	void get_last_round_call_matrix(const Tf1& board_cards, Tf2& call_matrix);
 
 	//-- - Sets the board cards for the evaluator and creates its internal data structures.
 	//-- @param board a possibly empty vector of board cards
-	void set_board(const ArrayXf& board);
+	void set_board(const Tf1& board);
 
 	//-- - Sets the evaluator's call matrix, which gives the equity for terminal
 	//--nodes where no player has folded.
@@ -44,7 +44,7 @@ public:
 	//-- in the first betting round, gives the weighted average of all such possible matrices.
 	//--
 	//-- @param board a possibly empty vector of board cards
-	void _set_call_matrix(const ArrayXf& board);
+	void _set_call_matrix(const Tf1& board);
 
 	//-- - Sets the evaluator's fold matrix, which gives the equity for terminal
 	//	--nodes where one player has folded.
@@ -52,7 +52,7 @@ public:
 	//	--Creates the matrix `B` such that for player ranges `x` and `y`, `x'By` is the equity
 	//	-- for the player who doesn't fold
 	//	-- @param board a possibly empty vector of board cards
-	void _set_fold_matrix(const ArrayXf& board);
+	void _set_fold_matrix(const Tf1& board);
 
 	template <typename Derived>
 	void call_value(const ArrayBase<Derived> & ranges, ArrayBase<Derived> & result)
@@ -76,7 +76,7 @@ public:
 	//-- @param ranges a 2xK tensor containing ranges for each player(where K is the range size)
 	//-- @param result a 2xK tensor in which to store the cfvs for each player
 	//-- @param folding_player which player folded
-	void tree_node_fold_value(const ArrayXXf& ranges, ArrayXXf& result, int folding_player);
+	void tree_node_fold_value(const Tf2& ranges, Tf2& result, int folding_player);
 
 	//-- - Returns the matrix which gives showdown equity for any ranges.
 	//--
@@ -86,7 +86,7 @@ public:
 	//-- @return For nodes in the last betting round, the matrix `A` such that for player ranges
 	//-- `x` and `y`, `x'Ay` is the equity for the first player when no player folds.For nodes
 	//-- in the first betting round, the weighted average of all such possible matrices.
-	ArrayXXf get_call_matrix();
+	Tf2 get_call_matrix();
 
 	//-- - Computes the counterfactual values that both players achieve at a terminal node
 	//-- where no player has folded.
@@ -96,7 +96,7 @@ public:
 	//--
 	//-- @param ranges a 2xK tensor containing ranges for each player(where K is the range size)
 	//-- @param result a 2xK tensor in which to store the cfvs for each player
-	void tree_node_call_value(const ArrayXXf& ranges, ArrayXXf& result);
+	void tree_node_call_value(const Tf2& ranges, Tf2& result);
 
 
 //private: ToDo:Remove after testing
@@ -105,9 +105,9 @@ public:
 
 	card_tools _cardTools;
 
-	ArrayXXf _equity_matrix;
+	Tf2 _equity_matrix;
 
-	ArrayXXf _fold_matrix;
+	Tf2 _fold_matrix;
 };
 
 //#include "terminal_equity.npp"

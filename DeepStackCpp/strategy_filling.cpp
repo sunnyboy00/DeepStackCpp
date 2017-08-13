@@ -21,8 +21,8 @@ void strategy_filling::_fill_chance(Node& node)
 	//we will fill strategy with an uniform probability, but it has to be zero for hands that are not possible on
 	//corresponding board
 	float cardsProbability = 1.0 / (card_count - 2); //remove 2 because each player holds one card
-	node.strategy = ArrayXXf(node.children.size(), card_count);
-	node.strategy.fill(cardsProbability);
+	node.strategy = Tf2(node.children.size(), card_count);
+	node.strategy.setConstant(cardsProbability);
 
 	//setting probability of impossible hands to 0
 
@@ -33,7 +33,7 @@ void strategy_filling::_fill_chance(Node& node)
 	//{
 	//	CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
 	//	//node.strategy[i] : fill(0)
-	//	node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
+	//	node.strategy.chip(i, 0) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
 	//	i++;
 	//}
 
@@ -42,7 +42,7 @@ void strategy_filling::_fill_chance(Node& node)
 		Node* child_node = node.children[i];
 		CardArray mask = _card_tools.get_possible_hand_indexes(child_node->board);
 		//node.strategy[i] : fill(0)
-		node.strategy.row(i) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
+		node.strategy.chip(i, 0) *= mask; // [i][mask] = 1.0 / (game_settings.card_count - 2)
 	}
 }
 
@@ -56,7 +56,7 @@ void strategy_filling::_fill_uniformly(Node & node)
 	}
 
 	node.strategy = MatrixXf(node.children.size(), card_count);
-	node.strategy.fill(1.0f / node.children.size());
+	node.strategy.setConstant(1.0f / node.children.size());
 }
 
 void strategy_filling::_fill_uniform_dfs(Node& node)
