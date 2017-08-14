@@ -84,7 +84,14 @@ class Util
 
 		static void Print(Tf5& tensor);
 
+		static void Print(Tf4& tensor);
+
+		static void Print(Tf3& tensor);
+
+		static void Print(Tf2& tensor);
+
 		static void Print(Tf1& tensor);
+
 		//// Expands one tensor as other one
 		//template<typename Derived, typename OtherDerived>
 		//static inline TensorBase<Derived> ExpandAs(TensorBase<Derived>& data, const TensorBase<OtherDerived>& as)
@@ -208,6 +215,16 @@ class Util
 			PreprocessExtents(slices, target, offsets, extentsLen);
 			target.slice(offsets, extentsLen) = source;
 		}
+
+		template <int N>
+		static inline TfN NotReduceSum(const TfN& tensor, int dim)
+		{
+			const std::array<int, 1> sumDims = { dim };
+			std::array<DenseIndex, N> dims = tensor.dimensions();
+			dims[dim] = 1;
+			return tensor.sum(sumDims).reshape(dims);
+		}
+
 
 		////Creates a view with different dimensions of the storage associated with tensor.
 		////If one of the dimensions is - 1, the size of that dimension is inferred from the rest of the elements.

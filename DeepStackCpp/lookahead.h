@@ -25,7 +25,7 @@ public:
 	// Game tree
 	Node tree;
 
-	// Depth
+	// Lookahead depth to solve
 	long long depth;
 
 	const float regret_epsilon = 1.0f / 1000000000;
@@ -162,9 +162,6 @@ private:
 	cfrd_gadget* _reconstruction_gadget;
 
 	Tf1 _reconstruction_opponent_cfvs;
-
-	// Lookahead depth to solve
-	int _depth;
 
 	//-- - Re - solves the lookahead.
 	void _compute();

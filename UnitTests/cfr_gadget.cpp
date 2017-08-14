@@ -51,7 +51,7 @@ TEST_CASE("cfr_gadget_Ks_2_iter")
 	REQUIRE(op_range(5) == Approx(0.0).epsilon(myEps));
 }
 
-TEST_CASE("cfr_gadget_root_2_iter")
+TEST_CASE("cfr_gadget_root_3_iter")
 {
 	card_to_string_conversion converter;
 	card_tools tools;

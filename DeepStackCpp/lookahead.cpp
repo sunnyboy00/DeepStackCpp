@@ -254,7 +254,7 @@ void lookahead::_compute_terminal_equities()
 	_compute_terminal_equities_terminal_equity();
 
 	//--multiply by pot scale factor
-	for (int d = 1; d <= _depth; d++)
+	for (int d = 1; d <= depth; d++)
 	{
 		cfvs_data[d] *= pot_size[d];
 	}
@@ -262,7 +262,7 @@ void lookahead::_compute_terminal_equities()
 
 void lookahead::_compute_cfvs()
 {
-	for (int d = _depth; d >= 1; d--)
+	for (int d = depth; d >= 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
@@ -321,7 +321,7 @@ void lookahead::_compute_normalize_average_strategies()
 
 void lookahead::_compute_regrets()
 {
-	for (int d = _depth; d > 1; d--)
+	for (int d = depth; d > 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int gp_layer_bets_count = bets_count[d - 2];
@@ -396,7 +396,7 @@ void lookahead::_compute()
 
 void lookahead::_compute_current_strategies()
 {
-	for (int d = 0; d <= _depth; d++)
+	for (int d = 1; d <= depth; d++)
 	{
 		positive_regrets_data[d] = regrets_data[d];
 		Util::ClipLow(positive_regrets_data[d], regret_epsilon);
@@ -406,9 +406,7 @@ void lookahead::_compute_current_strategies()
 
 		//--1.1  regret matching
 		//--note that the regrets as well as the CFVs have switched player indexing
-		std::array<int, 1> dims = { 0 };
-		regrets_sum[d].chip(0, 0) = positive_regrets_data[d].sum(dims);
-
+		regrets_sum[d] = Util::NotReduceSum(positive_regrets_data[d], 0);
 		Tf4& player_current_strategy = current_strategy_data[d];
 		Tf4& player_regrets = positive_regrets_data[d];
 		Tf4& player_regrets_sum = regrets_sum[d];
@@ -419,7 +417,7 @@ void lookahead::_compute_current_strategies()
 
 void lookahead::_compute_ranges()
 {
-	for (int d = 0; d <= _depth; d++)
+	for (int d = 0; d <= depth; d++)
 	{
 		Tf5& current_level_ranges = ranges_data[d];
 		Tf5& next_level_ranges = ranges_data[d + 1]; // ToDo: check Is this a copy or a ref to original tensor?
