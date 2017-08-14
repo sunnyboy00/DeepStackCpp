@@ -70,7 +70,7 @@ Tf1 cfrd_gadget::compute_opponent_range(const Tf1& current_opponent_cfvs)
 	Util::Clip(_play_regrets, regret_epsilon, max_number);
 
 	//--3.0 regret matching
-	_regret_sum += _terminate_regrets;
+	_regret_sum = _play_regrets + _terminate_regrets;
 
 	_play_current_strategy = _play_regrets /  _regret_sum;
 	_terminate_current_strategy = _terminate_regrets / _regret_sum;
@@ -83,6 +83,6 @@ Tf1 cfrd_gadget::compute_opponent_range(const Tf1& current_opponent_cfvs)
 
 	_input_opponent_range = Tf1(_play_current_strategy);
 
-	return _input_opponent_range;
+	return _input_opponent_range; // Only in this range opponent have reason to play(F) and not to fall-back to trunk strategy(T) 
 }
 

@@ -82,6 +82,9 @@ class Util
 			return res;
 		}
 
+		static void Print(Tf5& tensor);
+
+		static void Print(Tf1& tensor);
 		//// Expands one tensor as other one
 		//template<typename Derived, typename OtherDerived>
 		//static inline TensorBase<Derived> ExpandAs(TensorBase<Derived>& data, const TensorBase<OtherDerived>& as)
@@ -546,5 +549,6 @@ class Util
 		//}
 
 };
+
 
 

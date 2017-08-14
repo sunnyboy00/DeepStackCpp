@@ -13,15 +13,15 @@ lookahead::~lookahead()
 
 void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_range)
 {
-	RemoveF4D(ranges_data[1], 0, 0, 0, 0) = player_range;
-	RemoveF4D(ranges_data[1], 0, 0, 0, 1) = opponent_range;
+	RemoveF4D(ranges_data[1], 0, 0, 0, P1) = player_range;
+	RemoveF4D(ranges_data[1], 0, 0, 0, P2) = opponent_range;
 	_compute();
 }
 
 void lookahead::resolve(Tf1& player_range, Tf1& opponent_cfvs)
 {
 	_reconstruction_gadget = new cfrd_gadget(tree.board, player_range, opponent_cfvs);
-	RemoveF4D(ranges_data[1], 0, 0, 0, 0) = player_range;
+	RemoveF4D(ranges_data[1], 0, 0, 0, P1) = player_range;
 	_reconstruction_opponent_cfvs = opponent_cfvs;
 	_compute();
 }
@@ -102,6 +102,10 @@ LookaheadResult lookahead::get_results()
 		out.root_cfvs_both_players = resized_average_cfvs; // !Copy Do we need this? Looks like we are overwriting below
 		RemoveF1D(out.root_cfvs_both_players, P2) = out.achieved_cfvs;
 		RemoveF1D(out.root_cfvs_both_players, P1) = out.root_cfvs;
+	}
+	else
+	{
+		assert(false);
 	}
 
 	//--4.0 children CFVs
@@ -214,7 +218,7 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 		else
 		{
 			assert(tree.street == 2);
-					//--on river, any call is terminal
+			//--on river, any call is terminal
 			if (d > 1 || first_call_terminal)
 			{
 				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
@@ -249,7 +253,7 @@ void lookahead::_compute_terminal_equities()
 
 	_compute_terminal_equities_terminal_equity();
 
-		//--multiply by pot scale factor
+	//--multiply by pot scale factor
 	for (int d = 1; d <= _depth; d++)
 	{
 		cfvs_data[d] *= pot_size[d];
@@ -258,7 +262,7 @@ void lookahead::_compute_terminal_equities()
 
 void lookahead::_compute_cfvs()
 {
-	for (int d = _depth; d > 1; d--)
+	for (int d = _depth; d >= 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
@@ -323,11 +327,11 @@ void lookahead::_compute_regrets()
 		int gp_layer_bets_count = bets_count[d - 2];
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
 
-		Tf4 current_regrets = current_regrets_data[d];
+		Tf4& current_regrets = current_regrets_data[d];
 		DenseIndex cur_acting_player = (DenseIndex)acting_player[d];
 		Tf4 dataToCopy = Remove4D(cfvs_data[d], cur_acting_player);
 		Util::Copy(current_regrets, dataToCopy);
-		Tf5 next_level_cfvs = cfvs_data[d - 1];
+		Tf5& next_level_cfvs = cfvs_data[d - 1];
 
 		auto parent_inner_nodes = inner_nodes_p1[d - 1];
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
@@ -392,7 +396,7 @@ void lookahead::_compute()
 
 void lookahead::_compute_current_strategies()
 {
-	for (int d = 0; d < _depth; d++)
+	for (int d = 0; d <= _depth; d++)
 	{
 		positive_regrets_data[d] = regrets_data[d];
 		Util::ClipLow(positive_regrets_data[d], regret_epsilon);
@@ -405,9 +409,9 @@ void lookahead::_compute_current_strategies()
 		std::array<int, 1> dims = { 0 };
 		regrets_sum[d].chip(0, 0) = positive_regrets_data[d].sum(dims);
 
-		Tf4 player_current_strategy = current_strategy_data[d];
-		Tf4 player_regrets = positive_regrets_data[d];
-		Tf4 player_regrets_sum = regrets_sum[d];
+		Tf4& player_current_strategy = current_strategy_data[d];
+		Tf4& player_regrets = positive_regrets_data[d];
+		Tf4& player_regrets_sum = regrets_sum[d];
 
 		player_current_strategy = player_regrets / Util::ExpandAs(player_regrets_sum, player_regrets);
 	}
@@ -415,23 +419,19 @@ void lookahead::_compute_current_strategies()
 
 void lookahead::_compute_ranges()
 {
-	for (int d = 0; d < _depth; d++)
+	for (int d = 0; d <= _depth; d++)
 	{
 		Tf5& current_level_ranges = ranges_data[d];
 		Tf5& next_level_ranges = ranges_data[d + 1]; // ToDo: check Is this a copy or a ref to original tensor?
 
 		int prev_layer_terminal_actions_count = terminal_actions_count[d - 1];
-		int prev_layer_actions_count = actions_count[d - 1];
 		int prev_layer_bets_count = bets_count[d - 1];
 		int gp_layer_nonallin_bets_count = nonallinbets_count[d - 2];
-		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
-
 
 		//for (size_t action = prev_layer_terminal_actions_count; action < current_level_ranges.dimension(0); action++)
 		//{
 		//	for (size_t parentAction = 0; parentAction < gp_layer_nonallin_bets_count; parentAction++)
 		//	{
-
 		//	}
 		//}
 

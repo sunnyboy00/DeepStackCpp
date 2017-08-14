@@ -187,7 +187,7 @@ private:
 	void _compute_update_average_strategies(size_t iter);
 
 	//-- - Using the players' reach probabilities, computes their counterfactual
-	//--values at each lookahead state which is a terminal state of the game.
+	//--values at each lookahead state which is a terminal state of the game. Saves it in the cfvs_data.
 	void _compute_terminal_equities_terminal_equity();
 
 	//-- - Using the players' reach probabilities, computes their counterfactual
