@@ -34,8 +34,10 @@ void AreEq(Tf1& source, float scalar)
 	}
 }
 
-lookahead& BuildLook(Resolving& resolver, Node& node)
+lookahead BuildLook()
 {
+	Resolving resolver;
+	Node node;
 	TreeBuilderParams params;
 	params.root_node = &node;
 	card_to_string_conversion converter;
@@ -61,22 +63,19 @@ lookahead& BuildLook(Resolving& resolver, Node& node)
 }
 
 
-//TEST_CASE("lookahed_set_opponent_starting_range")
-//{
-//	Resolving resolver;
-//	lookahead&  look = BuildLook(resolver);
-//	look._set_opponent_starting_range();
-//
-//	std::array<float, card_count> target = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };
-//	Tf1 opRrange = RemoveF4D(look.ranges_data[0], 0, 0, 0, P2);
-//	AreEq(opRrange, target);
-//}
+TEST_CASE("lookahed_set_opponent_starting_range")
+{
+	lookahead&  look = BuildLook();
+	look._set_opponent_starting_range();
+
+	std::array<float, card_count> target = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };
+	Tf1 opRrange = RemoveF4D(look.ranges_data[0], 0, 0, 0, P2);
+	AreEq(opRrange, target);
+}
 
 TEST_CASE("lookahed_compute_current_strategies")
 {
-	Resolving resolver;
-	Node node;
-	lookahead&  look = BuildLook(resolver, node);
+	lookahead look = BuildLook();
 	look._set_opponent_starting_range();
 	look._compute_current_strategies();
 
@@ -86,9 +85,6 @@ TEST_CASE("lookahed_compute_current_strategies")
 	Tf4 res = look.current_strategy_data[1];
 	Tf1 ac2_str = Util::Slice(look.current_strategy_data[1], { { { 1, 1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
 	AreEq(ac2_str, 1.0);
-/*	delete(resolver);
-	delete(node)*/;
-
 
 	//std::array<float, card_count> target = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };
 	//Tf1 opRrange = RemoveF4D(look.ranges_data[0], 0, 0, 0, P2);
