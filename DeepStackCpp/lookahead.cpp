@@ -121,7 +121,7 @@ LookaheadResult lookahead::get_results()
 	range_mul = Util::ExpandAs(range_mul, scaler);
 
 	scaler *= range_mul;
-	Tf2 scalerSum = Util::NoReductionSum(scaler, 1);
+	Tf2 scalerSum = Util::NotReduceSum(scaler, 1);
 
 	scaler = Util::ExpandAs(scalerSum, range_mul);
 	scaler *= scaler.constant(cfr_iters - cfr_skip_iters);
@@ -272,8 +272,9 @@ void lookahead::_compute_cfvs()
 
 		//--player indexing is swapped for cfvs
 		Remove4D(placeholder_data[d], (int)acting_player[d]) *= current_strategy_data[d];
-		std::array<int, 1> dims = { 0 };
-		regrets_sum[d] = placeholder_data[d].sum(dims);
+		//std::array<int, 1> dims = { 0 };
+		//regrets_sum[d] = placeholder_data[d].sum(dims);
+		//regrets_sum[d] = Util::NotReduceSum(placeholder_data[d], 0);
 
 		//--use a swap placeholder to change{ { 1,2,3 },{ 4,5,6 } } into{ { 1,2 },{ 3,4 },{ 5,6 } }
 		auto swap = swap_data[d - 1];
@@ -282,7 +283,8 @@ void lookahead::_compute_cfvs()
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
 		{ { { gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 },{ 0 , -1 },{ 0, -1 } } };
 
-		Util::CopyToSlice(cfvs_data[d - 1], slices, Util::Transpose(swap, { 1, 2 }));
+		auto transposedRegretSum = Util::Transpose(swap, { 0, 2, 1, 3, 4 });
+		Util::CopyToSlice(cfvs_data[d - 1], slices, transposedRegretSum);
 	}
 }
 
@@ -309,7 +311,7 @@ void lookahead::_compute_normalize_average_strategies()
 	auto player_avg_strategy = average_strategies_data[1];
 	auto player_avg_strategy_sum = regrets_sum[1];
 
-	player_avg_strategy_sum = Util::NoReductionSum(player_avg_strategy, 0);
+	player_avg_strategy_sum = Util::NotReduceSum(player_avg_strategy, 0);
 	player_avg_strategy /= Util::ExpandAs(player_avg_strategy_sum, player_avg_strategy);
 
 	//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
@@ -417,7 +419,7 @@ void lookahead::_compute_current_strategies()
 
 void lookahead::_compute_ranges()
 {
-	for (int d = 0; d <= depth; d++)
+	for (int d = 0; d < depth; d++)
 	{
 		Tf5& current_level_ranges = ranges_data[d];
 		Tf5& next_level_ranges = ranges_data[d + 1]; // ToDo: check Is this a copy or a ref to original tensor?
@@ -435,8 +437,8 @@ void lookahead::_compute_ranges()
 
 		//--copy the ranges of inner nodes and transpose
 		Tf5& betActionsRanges = Util::Slice(current_level_ranges,
-		{ { { prev_layer_terminal_actions_count, -1 }, { 1, gp_layer_nonallin_bets_count }, {0, -1}, {0 , -1}, {0, -1} } });
-		inner_nodes[d] = Util::Transpose(betActionsRanges, { 1 , 2 }); // Shuffle parent and gp axis;
+		{ { { prev_layer_terminal_actions_count, -1 }, { 0, gp_layer_nonallin_bets_count - 1}, {0, -1}, {0 , -1}, {0, -1} } });
+		inner_nodes[d] = Util::Transpose(betActionsRanges, { 0, 2, 1, 3, 4}); // Shuffle parent and gp axis;
 		std::array<int, 5> sizes = { { 1, prev_layer_bets_count, -1, players_count, card_count } };
 		Tm5& super_view = Util::View(inner_nodes[d], sizes);
 		Tf5& super_view_t = Util::ExpandAs(super_view, betActionsRanges); // ToDo: Extra copy perf hit
@@ -446,7 +448,8 @@ void lookahead::_compute_ranges()
 		//--multiply the ranges of the acting player by his strategy
 		DenseIndex curPlayer = (DenseIndex)acting_player[d];
 
-		Util::Slice(next_level_ranges,
-		{ { { 0, -1 },{ 0, -1 },{ 0, -1 },{ curPlayer, curPlayer },{ 0, -1 } } }) *= next_level_strategies;
+		Remove4D(next_level_ranges, curPlayer) *= next_level_strategies;
+			/*Util::Slice(next_level_ranges,
+			{ { { 0, -1 },{ 0, -1 },{ 0, -1 },{ curPlayer, curPlayer },{ 0, -1 } } }) *= next_level_strategies;*/
 	}
 }

@@ -314,7 +314,7 @@ void LookaheadBuilder::construct_data_structures()
 	//--data structures for inner nodes(not terminal nor allin)[bets_count x parent_nonallinbetscount x gp_id x batch x players x range]
 	Util::ResizeAndFill(_lookahead->inner_nodes[0], { 1, 1, 1, players_count, card_count });
 	
-	_lookahead->swap_data[0] = Util::Transpose(_lookahead->inner_nodes[0], { 0, 1, 3, 2, 4 });
+	_lookahead->swap_data[0] = Util::Transpose(_lookahead->inner_nodes[0], { 0, 2, 1, 3, 4 });
 	Util::ResizeAndFill(_lookahead->inner_nodes_p1[0], { 1, 1, 1, 1, card_count });
 
 	if (_lookahead->depth > 1)
@@ -322,7 +322,7 @@ void LookaheadBuilder::construct_data_structures()
 		Eigen::array<DenseIndex, 5> inner_dims{ { _lookahead->bets_count[0], 1, 1, players_count, card_count } };
 		Util::ResizeAndFill(_lookahead->inner_nodes[1], inner_dims);
 		Util::ResizeAndFill(_lookahead->swap_data[1], inner_dims);
-		_lookahead->swap_data[1] = Util::Transpose(_lookahead->inner_nodes[1], { 0, 1, 3, 2, 4 });
+		_lookahead->swap_data[1] = Util::Transpose(_lookahead->inner_nodes[1], { 0, 2, 1, 3, 4 });
 		Util::ResizeAndFill(_lookahead->inner_nodes_p1[1], { _lookahead->bets_count[0], 1, 1, 1, card_count });
 	}
 
@@ -375,7 +375,7 @@ void LookaheadBuilder::construct_data_structures()
 				1,
 				card_count });
 
-			_lookahead->swap_data[d] = Util::Transpose(_lookahead->inner_nodes[d], { 0, 1, 3, 2, 4 });
+			_lookahead->swap_data[d] = Util::Transpose(_lookahead->inner_nodes[d], { 0, 2, 1, 3, 4 });
 		}
 	}
 

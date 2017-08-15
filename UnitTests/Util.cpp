@@ -82,7 +82,6 @@ TEST_CASE("Slice")
 
 TEST_CASE("View")
 {
-	
 	Tf2 tensor(2, 3);
 
 	FillTensor(tensor);
@@ -140,4 +139,15 @@ TEST_CASE("Clip")
 	REQUIRE(ten(0, 1) == 0);
 	REQUIRE(ten(1, 0) == 1000);
 	REQUIRE(ten(1, 1) == 1000);
+}
+
+TEST_CASE("Transponse")
+{
+	Tf3 ten(1, 2, 3);
+	ten.setZero();
+	ten(0, 0, 0) = 1;
+	ten(0, 1, 0) = 2;
+	Tf3 res = Util::Transpose(ten, { 1, 0, 2});
+	REQUIRE(ten(0, 0, 0) == 2);
+	REQUIRE(ten(0, 1, 0) == 1);
 }

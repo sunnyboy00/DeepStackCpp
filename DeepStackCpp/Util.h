@@ -149,6 +149,17 @@ class Util
 			return output;
 		}
 
+		//template <int N>
+		//static inline TfN Transpose(const TfN &target, std::array<DenseIndex, 2> const &dims)
+		//{
+		//	Eigen::array<DenseIndex, N> targetDims = target.dimensions();
+		//	int firstSwapDimLen = targetDims[dims[0]];
+		//	targetDims[dims[0]] = targetDims[dims[1]];
+		//	targetDims[dims[1]] = firstSwapDimLen;
+		//	TfN output = target.shuffle(targetDims);
+		//	return output;
+		//}
+
 		// Converters negative indexes offsets to positive zero indexes.
 		template <int N>
 		static inline DenseIndex ConvertOffset(const TfN& target, DenseIndex offset, DenseIndex dim)
@@ -268,53 +279,49 @@ class Util
 		//		throw std::invalid_argument("Invalid tensor size");
 		//	};
 		//};
-
-		static Tf5 NoReductionSum(Tf5 target, int dim)
-		{
-			assert(dim < target.NumDimensions);
-			std::array<DenseIndex, 1> dims = { dim };
-			Tf4 res = target.sum(dims);
-			std::array<DenseIndex, 5> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3), target.dimension(4) } };
-			new_dims[dim] = 1;
-			return res.reshape(new_dims);
-		}
-
-		static Tf4 NoReductionSum(Tf4 target, int dim)
-		{
-			assert(dim < target.NumDimensions);
-			std::array<DenseIndex, 1> dims = { dim };
-			Tf3 res = target.sum(dims);
-			std::array<DenseIndex, 4> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3)} };
-			new_dims[dim] = 1;
-			return res.reshape(new_dims);
-		}
-
-		static Tf3 NoReductionSum(Tf3 target, int dim)
-		{
-			assert(dim < target.NumDimensions);
-			std::array<DenseIndex, 1> dims = { dim };
-			Tf2 res = target.sum(dims);
-			std::array<DenseIndex, 3> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2)} };
-			new_dims[dim] = 1;
-			return res.reshape(new_dims);
-		}
-
-		static Tf2 NoReductionSum(Tf2 target, int dim)
-		{
-			assert(dim < target.NumDimensions);
-			std::array<DenseIndex, 1> dims = { dim };
-			Tf1 res = target.sum(dims);
-			std::array<DenseIndex, 2> new_dims{ { target.dimension(0), target.dimension(1) } };
-			new_dims[dim] = 1;
-			return res.reshape(new_dims);
-		}
+		//static Tf5 NoReductionSum(Tf5 target, int dim)
+		//{
+		//	assert(dim < target.NumDimensions);
+		//	std::array<DenseIndex, 1> dims = { dim };
+		//	Tf4 res = target.sum(dims);
+		//	std::array<DenseIndex, 5> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3), target.dimension(4) } };
+		//	new_dims[dim] = 1;
+		//	return res.reshape(new_dims);
+		//}
+		//static Tf4 NoReductionSum(Tf4 target, int dim)
+		//{
+		//	assert(dim < target.NumDimensions);
+		//	std::array<DenseIndex, 1> dims = { dim };
+		//	Tf3 res = target.sum(dims);
+		//	std::array<DenseIndex, 4> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3)} };
+		//	new_dims[dim] = 1;
+		//	return res.reshape(new_dims);
+		//}
+		//static Tf3 NoReductionSum(Tf3 target, int dim)
+		//{
+		//	assert(dim < target.NumDimensions);
+		//	std::array<DenseIndex, 1> dims = { dim };
+		//	Tf2 res = target.sum(dims);
+		//	std::array<DenseIndex, 3> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2)} };
+		//	new_dims[dim] = 1;
+		//	return res.reshape(new_dims);
+		//}
+		//static Tf2 NoReductionSum(Tf2 target, int dim)
+		//{
+		//	assert(dim < target.NumDimensions);
+		//	std::array<DenseIndex, 1> dims = { dim };
+		//	Tf1 res = target.sum(dims);
+		//	std::array<DenseIndex, 2> new_dims{ { target.dimension(0), target.dimension(1) } };
+		//	new_dims[dim] = 1;
+		//	return res.reshape(new_dims);
+		//}
 
 		// Calculates and replaces one -1 dimension of tensor from sizes basing on the targetSize.
 		template <int N>
 		static inline void ProcessSizes(int targetSize, std::array<int, N>& sizes)
 		{
 			int negativeIndex = -1;
-			int sizeLeft = targetSize;
+			int sizeUsed = 1;
 			for (int dim = 0; dim < N; dim++)
 			{
 				int curDimSize = sizes[dim];
@@ -326,14 +333,16 @@ class Util
 				else
 				{
 					assert(curDimSize > 0);
-					sizeLeft -= curDimSize;
-					assert(sizeLeft >= 0);
+					sizeUsed  *= curDimSize; 
+					assert(sizeUsed <= targetSize);
 				}
 			}
 
 			if (negativeIndex > 0)
-			{
-				sizes[negativeIndex] = sizeLeft;
+			{ 
+				float difKoef = targetSize / sizeUsed;
+				assert(ceilf(difKoef) == difKoef && "The coefficients must be integers");
+				sizes[negativeIndex] = (int)difKoef;
 			}
 		};
 
