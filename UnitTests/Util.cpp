@@ -147,7 +147,7 @@ TEST_CASE("Transponse")
 	ten.setZero();
 	ten(0, 0, 0) = 1;
 	ten(0, 1, 0) = 2;
-	Tf3 res = Util::Transpose(ten, { 1, 0, 2});
-	REQUIRE(ten(0, 0, 0) == 2);
-	REQUIRE(ten(0, 1, 0) == 1);
+	Tf3 res = Util::Transpose(ten, { 0, 2, 1});
+	REQUIRE(ten(0, 0, 0) == 1);
+	REQUIRE(ten(0, 1, 0) == 2);
 }

@@ -9,7 +9,6 @@ lookahead::lookahead()
 
 lookahead::~lookahead()
 {
-	int g = 7;
 }
 
 void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_range)
@@ -21,7 +20,7 @@ void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_
 
 void lookahead::resolve(Tf1& player_range, Tf1& opponent_cfvs)
 {
-	_reconstruction_gadget = new cfrd_gadget(tree.board, player_range, opponent_cfvs);
+	_reconstruction_gadget = new cfrd_gadget(tree->board, player_range, opponent_cfvs);
 	RemoveF4D(ranges_data[1], 0, 0, 0, P1) = player_range;
 	_reconstruction_opponent_cfvs = opponent_cfvs;
 	_compute();
@@ -72,7 +71,7 @@ Tf1 lookahead::get_chance_action_cfv(int action_index, Tf1& board)
 
 	box_outputs *= pot_mult;
 
-	Tf1 out = RemoveF2D(box_outputs, batch_index, 2 - tree.current_player);
+	Tf1 out = RemoveF2D(box_outputs, batch_index, 2 - tree->current_player);
 	return out;
 }
 
@@ -138,7 +137,7 @@ LookaheadResult lookahead::get_results()
 
 void lookahead::_compute_terminal_equities_next_street_box()
 {
-	assert(tree.street == 1);
+	assert(tree->street == 1);
 
 	for (int d = 1; d <= depth; d++)
 	{
@@ -161,7 +160,7 @@ void lookahead::_compute_terminal_equities_next_street_box()
 
 			CopyDif(_next_street_boxes_outputs[d], dataCopy);
 
-			if (tree.current_player == P1)
+			if (tree->current_player == P1)
 			{
 				Util::Copy(_next_street_boxes_inputs[d], _next_street_boxes_outputs[d]);
 			}
@@ -176,7 +175,7 @@ void lookahead::_compute_terminal_equities_next_street_box()
 			//_next_street_boxes[d] : get_value(_next_street_boxes_inputs[d], self.next_street_boxes_outputs[d])
 
 			//--now the neural net outputs for P1 and P2 respectively, so we need to swap the output values if necessary
-			if (tree.current_player == 1)
+			if (tree->current_player == 1)
 			{
 				Util::Copy(_next_street_boxes_inputs[d], _next_street_boxes_outputs[d]);
 
@@ -205,7 +204,7 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 	for (int d = 1; d <= depth; d++)
 	{
 		//--call term eq evaluation
-		if (tree.street == 1)
+		if (tree->street == 1)
 		{
 			if (d > 1 || first_call_terminal)
 			{
@@ -218,7 +217,7 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 		}
 		else
 		{
-			assert(tree.street == 2);
+			assert(tree->street == 2);
 			//--on river, any call is terminal
 			if (d > 1 || first_call_terminal)
 			{
@@ -247,7 +246,7 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 
 void lookahead::_compute_terminal_equities()
 {
-	if (tree.street == 1)
+	if (tree->street == 1)
 	{
 		_compute_terminal_equities_next_street_box();
 	}

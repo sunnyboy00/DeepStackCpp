@@ -23,7 +23,7 @@ LookaheadBuilder::~LookaheadBuilder()
 
 void LookaheadBuilder::build_from_tree(Node& tree)
 {
-	_lookahead->tree = tree;
+	_lookahead->tree = &tree;
 	_lookahead->depth = tree.depth;
 
 	vector<Node*> treeVec;
@@ -40,15 +40,15 @@ void LookaheadBuilder::build_from_tree(Node& tree)
 		//--set additional info
 	assert(_lookahead->terminal_actions_count[0] == 1 || _lookahead->terminal_actions_count[0] == 2);
 
-	_lookahead->first_call_terminal = _lookahead->tree.children[1]->terminal;
-	_lookahead->first_call_transition = _lookahead->tree.children[1]->current_player == chance;
+	_lookahead->first_call_terminal = _lookahead->tree->children[1]->terminal;
+	_lookahead->first_call_transition = _lookahead->tree->children[1]->current_player == chance;
 	_lookahead->first_call_check = (!_lookahead->first_call_terminal) && (!_lookahead->first_call_transition);
 
 
 	//--we mask out fold as a possible action when check is for free, due to
 	//--1) fewer actions means faster convergence
 	//--2) we need to make sure prob of free fold is zero because ACPC dealer changes such action to check
-	if (_lookahead->tree.bets[0] == _lookahead->tree.bets[1])
+	if (_lookahead->tree->bets[0] == _lookahead->tree->bets[1])
 	{
 		RemoveF1D(_lookahead->empty_action_mask[1], 0).setZero();
 	}
@@ -226,7 +226,7 @@ void LookaheadBuilder::ProcessNodeWithEmptyActions(Node &node, int layer, int ac
 
 void LookaheadBuilder::_compute_structure()
 {
-	assert(_lookahead->tree.street >= 1 && _lookahead->tree.street <= 2);
+	assert(_lookahead->tree->street >= 1 && _lookahead->tree->street <= 2);
 
 	//--which player acts at particular depth
 	_lookahead->acting_player.resize(_lookahead->depth + 2);
@@ -383,7 +383,7 @@ void LookaheadBuilder::construct_data_structures()
 
 void LookaheadBuilder::_construct_transition_boxes()
 {
-	if (_lookahead->tree.street == 2)
+	if (_lookahead->tree->street == 2)
 	{
 		return;
 	}

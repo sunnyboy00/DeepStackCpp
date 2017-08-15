@@ -26,11 +26,11 @@ TEST_CASE("build_lookahed_Ks_1200_1200")
 	params.root_node->bets << 1200, 1200;
 
 	tree_builder treeBuilder;
-	Node& tree = treeBuilder.build_tree(params);
+	Node* tree = treeBuilder.build_tree(params);
 
 	lookahead look;
 	LookaheadBuilder lookBuilder(look);
-	lookBuilder.build_from_tree(tree);
+	lookBuilder.build_from_tree(*tree);
 
 	REQUIRE(look.first_call_terminal);
 	REQUIRE(!look.first_call_transition);
@@ -92,11 +92,11 @@ TEST_CASE("build_lookahed_300_300_Ks")
 	params.root_node->bets << 300, 300;
 
 	tree_builder treeBuilder;
-	Node& tree = treeBuilder.build_tree(params);
+	Node* tree = treeBuilder.build_tree(params);
 
 	lookahead look;
 	LookaheadBuilder lookBuilder(look);
-	lookBuilder.build_from_tree(tree);
+	lookBuilder.build_from_tree(*tree);
 
 	REQUIRE(look.first_call_terminal);
 	REQUIRE(!look.first_call_transition);
@@ -201,11 +201,11 @@ TEST_CASE("build_lookahed_300_900_Ks")
 	params.root_node->bets << 300, 900;
 
 	tree_builder treeBuilder;
-	Node& tree = treeBuilder.build_tree(params);
+	Node* tree = treeBuilder.build_tree(params);
 
 	lookahead look;
 	LookaheadBuilder lookBuilder(look);
-	lookBuilder.build_from_tree(tree);
+	lookBuilder.build_from_tree(*tree);
 
 	REQUIRE(look.first_call_terminal);
 	REQUIRE(!look.first_call_transition);
@@ -283,11 +283,11 @@ TEST_CASE("build_lookahed_100_100")
 	params.root_node->bets << 100, 100;
 
 	tree_builder treeBuilder;
-	Node& tree = treeBuilder.build_tree(params);
+	Node* tree = treeBuilder.build_tree(params);
 
 	lookahead look;
 	LookaheadBuilder lookBuilder(look);
-	lookBuilder.build_from_tree(tree);
+	lookBuilder.build_from_tree(*tree);
 
 	REQUIRE(!look.first_call_terminal);
 	REQUIRE(!look.first_call_transition);

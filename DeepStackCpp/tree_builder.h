@@ -60,7 +60,7 @@ public:
 	//		-- * `bet_sizing` (optional) : a @{bet_sizing} object which gives the allowed
 	//	    -- bets for each player
 	//      -- @return the root node of the built tree
-	Node& build_tree(TreeBuilderParams& params);
+	Node* build_tree(TreeBuilderParams& params);
 
 //private: Remove after testing
 	bet_sizing_manager _bet_sizing_manager;

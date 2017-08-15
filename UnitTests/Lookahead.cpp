@@ -50,11 +50,11 @@ lookahead& BuildLook(Resolving& resolver, Node& node)
 	op_cfvs.setZero();
 
 	resolver._create_lookahead_tree(node);
-	resolver._lookBuilder->build_from_tree(resolver._lookahead_tree);
+	resolver._lookBuilder->build_from_tree(*resolver._lookahead_tree);
 
 	lookahead& look = resolver._lookahead;
 
-	look._reconstruction_gadget = new cfrd_gadget(look.tree.board, player_range, op_cfvs);
+	look._reconstruction_gadget = new cfrd_gadget(look.tree->board, player_range, op_cfvs);
 	RemoveF4D(look.ranges_data[1], 0, 0, 0, P1) = player_range;
 	look._reconstruction_opponent_cfvs = op_cfvs;
 	return look;
@@ -74,9 +74,9 @@ lookahead& BuildLook(Resolving& resolver, Node& node)
 
 TEST_CASE("lookahed_compute_current_strategies")
 {
-	Resolving* resolver = new Resolving();
-	Node* node = new Node();
-	lookahead&  look = BuildLook(*resolver, *node);
+	Resolving resolver;
+	Node node;
+	lookahead&  look = BuildLook(resolver, node);
 	look._set_opponent_starting_range();
 	look._compute_current_strategies();
 
@@ -86,8 +86,8 @@ TEST_CASE("lookahed_compute_current_strategies")
 	Tf4 res = look.current_strategy_data[1];
 	Tf1 ac2_str = Util::Slice(look.current_strategy_data[1], { { { 1, 1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
 	AreEq(ac2_str, 1.0);
-	delete(resolver);
-	delete(node);
+/*	delete(resolver);
+	delete(node)*/;
 
 
 	//std::array<float, card_count> target = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };

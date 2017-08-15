@@ -13,11 +13,13 @@ Resolving::~Resolving()
 	if (_lookahead_tree != nullptr)
 	{
 		delete(_lookahead_tree);
+		_lookahead_tree = nullptr;
 	}
 
 	if (_lookBuilder != nullptr)
 	{
 		delete(_lookBuilder);
+		_lookBuilder = nullptr;
 	}
 }
 
@@ -57,7 +59,7 @@ LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_
 	assert(_cardTools.is_valid_range(ToAmx(player_range), node.board));
 	_create_lookahead_tree(node);
 
-	_lookBuilder->build_from_tree(_lookahead_tree);
+	_lookBuilder->build_from_tree(*_lookahead_tree);
 	_lookahead.resolve(player_range, opponent_cfvs);
 	_resolve_results = _lookahead.get_results();
 	return _resolve_results;
@@ -65,7 +67,7 @@ LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_
 
 ArrayXf Resolving::get_possible_actions()
 {
-	return _lookahead_tree.actions;
+	return _lookahead_tree->actions;
 }
 
 Tf1 Resolving::get_root_cfv()

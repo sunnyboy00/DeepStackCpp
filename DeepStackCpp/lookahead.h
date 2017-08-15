@@ -23,7 +23,7 @@ public:
 
 
 	// Game tree
-	Node tree;
+	Node* tree = nullptr;
 
 	// Lookahead depth to solve
 	long long depth;

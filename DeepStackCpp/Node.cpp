@@ -29,6 +29,8 @@ Node::~Node()
 		{
 			delete(cur_node);
 		}
+
+		children.clear();
 	}
 }
 

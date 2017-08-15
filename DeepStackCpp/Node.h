@@ -38,7 +38,7 @@ struct Node
 	float pot;
 
 	// Parent of the node
-	Node* parent;
+	Node* parent = nullptr;
 
 	// Is node a terminal node
 	bool terminal;

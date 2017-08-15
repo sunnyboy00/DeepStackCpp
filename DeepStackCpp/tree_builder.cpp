@@ -204,7 +204,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 	return current_node;
 }
 
-Node& tree_builder::build_tree(TreeBuilderParams& params)
+Node* tree_builder::build_tree(TreeBuilderParams& params)
 {
 	Node* root = new Node();
 
@@ -232,7 +232,7 @@ Node& tree_builder::build_tree(TreeBuilderParams& params)
 
 	strategy_filling filler;
 	filler.fill_uniform(*root);
-	return *root;
+	return root;
 }
 
 
