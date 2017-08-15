@@ -9,6 +9,7 @@ lookahead::lookahead()
 
 lookahead::~lookahead()
 {
+	int g = 7;
 }
 
 void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_range)

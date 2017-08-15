@@ -104,9 +104,9 @@ public:
 
 
 
-private:
+//private:
 
-	Node _lookahead_tree;
+	Node* _lookahead_tree;
 
 	LookaheadResult _resolve_results;
 

@@ -24,7 +24,11 @@ Node::~Node()
 {
 	for (size_t i = 0; i < children.size(); i++)
 	{
-		delete(children[i]);
+		Node* cur_node = children[i];
+		if (cur_node != nullptr)
+		{
+			delete(cur_node);
+		}
 	}
 }
 

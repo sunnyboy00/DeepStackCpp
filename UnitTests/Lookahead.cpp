@@ -10,15 +10,33 @@
 
 #include <string>
 #include <iostream>
+
 using namespace std;
 
 const float myEps = 0.001f;
 
+template <int N>
+void AreEq(Tf1& source, const std::array<float, N> target)
+{
+	assert(source.size() == N);
+	for (size_t n = 0; n < N; n++)
+	{
+		REQUIRE(source(n) == Approx(target[n]).epsilon(myEps));
+	}
+}
 
-TEST_CASE("test_lookahed_Ks_1200_1200")
+void AreEq(Tf1& source, float scalar)
+{
+	for (size_t n = 0; n < source.size(); n++)
+	{
+		float data = source(n);
+		REQUIRE(data == Approx(scalar).epsilon(myEps));
+	}
+}
+
+lookahead& BuildLook(Resolving& resolver, Node& node)
 {
 	TreeBuilderParams params;
-	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
 	params.root_node->board = converter.string_to_board("Ks");
@@ -28,7 +46,69 @@ TEST_CASE("test_lookahed_Ks_1200_1200")
 
 	card_tools tools;
 	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
-	Tf1 op_range = ToTmx(tools.get_uniform_range(node.board));
-	Resolving resolver;
-	resolver.resolve(node, player_range, op_range);
+	Tf1 op_cfvs(card_count);
+	op_cfvs.setZero();
+
+	resolver._create_lookahead_tree(node);
+	resolver._lookBuilder->build_from_tree(resolver._lookahead_tree);
+
+	lookahead& look = resolver._lookahead;
+
+	look._reconstruction_gadget = new cfrd_gadget(look.tree.board, player_range, op_cfvs);
+	RemoveF4D(look.ranges_data[1], 0, 0, 0, P1) = player_range;
+	look._reconstruction_opponent_cfvs = op_cfvs;
+	return look;
 }
+
+
+//TEST_CASE("lookahed_set_opponent_starting_range")
+//{
+//	Resolving resolver;
+//	lookahead&  look = BuildLook(resolver);
+//	look._set_opponent_starting_range();
+//
+//	std::array<float, card_count> target = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };
+//	Tf1 opRrange = RemoveF4D(look.ranges_data[0], 0, 0, 0, P2);
+//	AreEq(opRrange, target);
+//}
+
+TEST_CASE("lookahed_compute_current_strategies")
+{
+	Resolving* resolver = new Resolving();
+	Node* node = new Node();
+	lookahead&  look = BuildLook(*resolver, *node);
+	look._set_opponent_starting_range();
+	look._compute_current_strategies();
+
+	const std::array<DenseIndex, 1> dims = { card_count };
+	Tf1 ac1_str = Util::Slice(look.current_strategy_data[1], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
+	AreEq(ac1_str, 0.0);
+	Tf4 res = look.current_strategy_data[1];
+	Tf1 ac2_str = Util::Slice(look.current_strategy_data[1], { { { 1, 1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
+	AreEq(ac2_str, 1.0);
+	delete(resolver);
+	delete(node);
+
+
+	//std::array<float, card_count> target = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };
+	//Tf1 opRrange = RemoveF4D(look.ranges_data[0], 0, 0, 0, P2);
+	//AreEq(opRrange, target);
+}
+
+//TEST_CASE("test_lookahed_Ks_1200_1200")
+//{
+//	TreeBuilderParams params;
+//	Node node;
+//	params.root_node = &node;
+//	card_to_string_conversion converter;
+//	params.root_node->board = converter.string_to_board("Ks");
+//	params.root_node->street = 2;
+//	params.root_node->current_player = P2;
+//	params.root_node->bets << 1200, 1200;
+//
+//	card_tools tools;
+//	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
+//	Tf1 op_range = ToTmx(tools.get_uniform_range(node.board));
+//	Resolving resolver;
+//	resolver.resolve(node, player_range, op_range);
+//}

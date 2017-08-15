@@ -151,7 +151,7 @@ public:
 	LookaheadResult get_results();
 
 
-private:
+//private:
 
 	vector<Tf3> _next_street_boxes_inputs;
 

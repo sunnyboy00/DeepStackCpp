@@ -10,7 +10,15 @@ Resolving::Resolving()
 
 Resolving::~Resolving()
 {
-	delete(_lookBuilder);
+	if (_lookahead_tree != nullptr)
+	{
+		delete(_lookahead_tree);
+	}
+
+	if (_lookBuilder != nullptr)
+	{
+		delete(_lookBuilder);
+	}
 }
 
 void Resolving::_create_lookahead_tree(Node & node)
