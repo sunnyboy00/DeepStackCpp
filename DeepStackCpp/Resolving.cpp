@@ -65,7 +65,7 @@ LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_
 	return _resolve_results;
 }
 
-ArrayXf Resolving::get_possible_actions()
+ArrayX Resolving::get_possible_actions()
 {
 	return _lookahead_tree->actions;
 }
@@ -100,7 +100,7 @@ Tf1 Resolving::get_action_strategy(int action)
 
 int Resolving::_action_to_action_id(int action)
 {
-	ArrayXf actions = get_possible_actions();
+	ArrayX actions = get_possible_actions();
 	int action_id = -1;
 
 	for (int i = 0; i < actions.size(); i++)

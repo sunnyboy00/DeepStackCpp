@@ -7,8 +7,6 @@
 #include <Eigen/Dense>
 #include <memory>
 
-using Eigen::ArrayXXf;
-
 //
 // Fills a game's public tree with a uniform strategy. In particular, fills
 //the chance nodes with the probability of each outcome.

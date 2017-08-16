@@ -31,7 +31,7 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		static inline void Copy(ArrayXXf & target, ArrayXXf & source)
+		static inline void Copy(ArrayXX & target, ArrayXX & source)
 		{
 			assert(target.size() >= source.size());
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
@@ -102,7 +102,7 @@ class Util
 		//}
 
 		// Expands one array as other one
-		static inline ArrayXXf ExpandAs(ArrayXXf data, ArrayXXf as)
+		static inline ArrayXX ExpandAs(ArrayXX data, ArrayXX as)
 		{
 			//ToDo: remove during optimization for performance reasons
 			float difCols = (float)as.cols() / data.cols();
@@ -113,12 +113,12 @@ class Util
 			assert(difRows >= 1.0);
 			assert(ceilf(difRows) == difRows && "The coefficients must be integers");
 
-			ArrayXXf res = data.replicate((int)difRows, (int)difCols);
+			ArrayXX res = data.replicate((int)difRows, (int)difCols);
 			return res;
 		}
 
 		// Expands one array as other one
-		static inline ArrayXXf ExpandAs(ArrayXf data, ArrayXXf as)
+		static inline ArrayXX ExpandAs(ArrayX data, ArrayXX as)
 		{
 			return data.replicate(as.rows(), as.cols());
 		}
@@ -277,16 +277,16 @@ class Util
 			return resultTensor;
 		}
 
-		static inline MatrixXf ExpandAs(VectorXf data, MatrixXf as)
+		static inline MatrixX ExpandAs(VectorX data, MatrixX as)
 		{
 			return data.replicate(as.rows(), as.cols());
 		}
 
-		static inline void ClipLow(ArrayXXf& target, float lowLimin)
+		static inline void ClipLow(ArrayXX& target, float lowLimin)
 		{
 			target = (target >= lowLimin).select(
 				target,
-				ArrayXXf::Constant(target.rows(), target.cols(), lowLimin)
+				ArrayXX::Constant(target.rows(), target.cols(), lowLimin)
 			);
 		}
 
@@ -296,13 +296,13 @@ class Util
 			target = target.cwiseMax(lowLimin);
 		}
 
-		static inline void ClipLow(ArrayXf& target, float lowLimin)
+		static inline void ClipLow(ArrayX& target, float lowLimin)
 		{
 			target = target.cwiseMax(lowLimin);
 
 		}
 
-		static inline void Clip(ArrayXXf& target, float lowLimin, float maxValue)
+		static inline void Clip(ArrayXX& target, float lowLimin, float maxValue)
 		{
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
@@ -318,9 +318,9 @@ class Util
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
-		static void ToString(const ArrayXXf& dataArg);
+		static void ToString(const ArrayXX& dataArg);
 
-		static void ToString(const MatrixXf& dataArg);
+		static void ToString(const MatrixX& dataArg);
 };
 
 

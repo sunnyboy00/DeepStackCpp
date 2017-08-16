@@ -28,7 +28,7 @@ public:
 	//-- @param node the current node of the tree
 	//-- @param ranges_absolute a 2xK tensor containing the probabilities of each
 	//-- player reaching the current node with each private hand
-	void _fill_ranges_dfs(Node& node, ArrayXXf& ranges_absolute);
+	void _fill_ranges_dfs(Node& node, ArrayXX& ranges_absolute);
 
 	//-- - Recursively calculate the counterfactual values for each player at each
 	//	-- node of the tree using the saved strategy profile.
@@ -52,6 +52,6 @@ public:
 	//	-- have a strategy saved in the `strategy` field.
 	//	-- @param[opt] starting_ranges probability vectors over player private hands
 	//	-- at the root node(default uniform)
-	void compute_values(Node& root, ArrayXXf* starting_ranges = nullptr);
+	void compute_values(Node& root, ArrayXX* starting_ranges = nullptr);
 };
 

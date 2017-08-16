@@ -16,7 +16,7 @@ string TreeVisualizer::string_format(const std::string& format, Args ... args)
 	return string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-string TreeVisualizer::add_tensor(ArrayXXf tensor, const char* name, const char* format, const std::unordered_map<int, string>* labels)
+string TreeVisualizer::add_tensor(ArrayXX tensor, const char* name, const char* format, const std::unordered_map<int, string>* labels)
 {
 	// std::stringstream fmt;
 	string out = "";

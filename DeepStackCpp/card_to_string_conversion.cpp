@@ -37,7 +37,7 @@ inline int card_to_string_conversion::card_to_suit(int card)
 	return card % suit_count;
 }
 
-string card_to_string_conversion::cards_to_string(ArrayXf cards)
+string card_to_string_conversion::cards_to_string(ArrayX cards)
 {
 	std::string  out = "";
 	for (int card = 0; card < cards.size(); card++)
@@ -57,15 +57,15 @@ inline int card_to_string_conversion::string_to_card(string card_string)
 }
 
 //Warning: return by value? Perf degradation? ToDo:Review
-ArrayXf card_to_string_conversion::string_to_board(string card_string)
+ArrayX card_to_string_conversion::string_to_board(string card_string)
 {
 	if (card_string == "")
 	{
-		ArrayXf out;
+		ArrayX out;
 		return out;
 	}
 	
-	ArrayXf out(1);
+	ArrayX out(1);
 	out << (float)string_to_card(card_string);
 	return out;
 }

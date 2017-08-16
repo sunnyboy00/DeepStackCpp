@@ -44,7 +44,7 @@ TEST_CASE("card_to_string")
 
 TEST_CASE("cards_to_string") {
 	card_to_string_conversion converter;
-	ArrayXf cards(2);
+	ArrayX cards(2);
 	cards << 0, 3;
 	REQUIRE(converter.cards_to_string(cards) == "AsKh");
 }
@@ -63,6 +63,6 @@ TEST_CASE("string_to_card")
 TEST_CASE("string_to_board")
 {
 	card_to_string_conversion converter;
-	ArrayXf result = converter.string_to_board("Qs");
+	ArrayX result = converter.string_to_board("Qs");
 	REQUIRE(result(0) == 4);
 }

@@ -15,7 +15,7 @@ using namespace Eigen;
 class cfrd_gadget
 {
 public:
-	cfrd_gadget(ArrayXf& board, Tf1& player_range, Tf1& opponent_cfvs);
+	cfrd_gadget(ArrayX& board, Tf1& player_range, Tf1& opponent_cfvs);
 
 	//-- - Uses one iteration of the gadget game to generate an opponent range for
 	//	-- the current re-solving iteration.

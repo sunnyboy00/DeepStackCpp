@@ -7,7 +7,6 @@
 #include <Eigen/Dense>
 #include <string>
 
-using Eigen::ArrayXf;
 using namespace std;
 
 class card_to_string_conversion
@@ -51,7 +50,7 @@ public:
 	//representations.
 	// @param cards a vector of numeric representations of cards
 	// @return a string containing each card's string representation, concatenated
-	string cards_to_string(ArrayXf cards);
+	string cards_to_string(ArrayX cards);
 
 	// Converts a card's string representation to its numeric representation.
 	// @param card_string the string representation of a card
@@ -64,7 +63,7 @@ public:
 	//	-- card
 	//	-- @return either an empty tensor or a tensor containing the numeric
 	//	-- representation of the card
-	ArrayXf string_to_board(string card_string);
+	ArrayX string_to_board(string card_string);
 };
 
 //inline std::string card_to_string_conversion::card_to_suit(int card)

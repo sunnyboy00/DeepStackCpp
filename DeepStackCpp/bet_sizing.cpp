@@ -1,6 +1,6 @@
 #include "bet_sizing.h"
 
-bet_sizing_manager::bet_sizing_manager(const VectorXf& pot_fractions)
+bet_sizing_manager::bet_sizing_manager(const VectorX& pot_fractions)
 {
 	_pot_fractions = pot_fractions;
 
@@ -73,7 +73,7 @@ ArrayX2f bet_sizing_manager::get_possible_bets(const Node& node)
 	}
 }
 
-void bet_sizing_manager::SetPotFraction(const VectorXf& potFractions)
+void bet_sizing_manager::SetPotFraction(const VectorX& potFractions)
 {
 	_pot_fractions = potFractions;
 }

@@ -9,7 +9,7 @@ card_tools::card_tools()
 	_init_board_index_table();
 }
 
-bool card_tools::hand_is_possible(const ArrayXf& hand) // Perfomance warning: Cant we change all ArrayXf to vectors?
+bool card_tools::hand_is_possible(const ArrayX& hand) // Perfomance warning: Cant we change all ArrayX to vectors?
 {
 	assert(hand.minCoeff() >= 0 && hand.maxCoeff() < card_count   && "Illegal cards in hand");
 	vector<bool> cards_table(card_count);
@@ -29,7 +29,7 @@ bool card_tools::hand_is_possible(const ArrayXf& hand) // Perfomance warning: Ca
 	return true;
 }
 
-CardArray card_tools::get_possible_hand_indexes(const ArrayXf& board)
+CardArray card_tools::get_possible_hand_indexes(const ArrayX& board)
 {
 	CardArray out = CardArray();
 
@@ -42,7 +42,7 @@ CardArray card_tools::get_possible_hand_indexes(const ArrayXf& board)
 	}
 
 	int newSize = (int)board.size() + 1; //some extra space for one more element
-	ArrayXf whole_hand(newSize);
+	ArrayX whole_hand(newSize);
 	
 	memcpy(whole_hand.data(), board.data(), board.size() * sizeof(float));  //copy data to the beginning
 	for (int card = 0; card < card_count; card++)
@@ -57,7 +57,7 @@ CardArray card_tools::get_possible_hand_indexes(const ArrayXf& board)
 	return out;
 }
 
-CardArray card_tools::get_impossible_hand_indexes(const ArrayXf& board)
+CardArray card_tools::get_impossible_hand_indexes(const ArrayX& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out -= 1;
@@ -65,14 +65,14 @@ CardArray card_tools::get_impossible_hand_indexes(const ArrayXf& board)
 	return out;
 }
 
-CardArray card_tools::get_uniform_range(const ArrayXf& board)
+CardArray card_tools::get_uniform_range(const ArrayX& board)
 {
 	CardArray out = get_possible_hand_indexes(board);
 	out /= out.sum();
 	return out;
 }
 
-CardArray card_tools::get_random_range(const ArrayXf& board, int seed = -1)
+CardArray card_tools::get_random_range(const ArrayX& board, int seed = -1)
 {
 	if (seed == -1)
 		srand((unsigned int)time(NULL));
@@ -89,7 +89,7 @@ CardArray card_tools::get_random_range(const ArrayXf& board, int seed = -1)
 	return out;
 }
 
-int card_tools::board_to_street(const ArrayXf& board)
+int card_tools::board_to_street(const ArrayX& board)
 {
 	if (board.size() == 0)
 		return 1;
@@ -113,12 +113,12 @@ long long card_tools::get_boards_count()
 	}
 }
 
-ArrayXXf card_tools::get_second_round_boards()
+ArrayXX card_tools::get_second_round_boards()
 {
 	long long boards_count = get_boards_count();
 	if (board_card_count == 1)
 	{
-		MatrixXf out(boards_count, 1);
+		MatrixX out(boards_count, 1);
 		for (int card = 0; card < card_count; card++)
 		{
 			out(card, 0) = (float)card;
@@ -128,7 +128,7 @@ ArrayXXf card_tools::get_second_round_boards()
 	}
 	else if (board_card_count == 2)
 	{
-		MatrixXf out(boards_count, 2);
+		MatrixX out(boards_count, 2);
 		long long board_idx = 0;
 		for (int card_1 = 0; card_1 < card_count; card_1++)
 		{
@@ -149,18 +149,18 @@ ArrayXXf card_tools::get_second_round_boards()
 	}
 }
 
-auto ar = ArrayXf::LinSpaced(5, 1, 5);
+auto ar = ArrayX::LinSpaced(5, 1, 5);
 
 void card_tools::_init_board_index_table()
 {
 	if (board_card_count == 1)
 	{
-		_board_index_table = MatrixXf(1, card_count);
-		_board_index_table.row(0) = ArrayXf::LinSpaced(card_count, 0.0, (float)card_count - 1);
+		_board_index_table = MatrixX(1, card_count);
+		_board_index_table.row(0) = ArrayX::LinSpaced(card_count, 0.0, (float)card_count - 1);
 	}
 	else if (board_card_count == 2)
 	{
-		_board_index_table = ArrayXXf::Constant(1, card_count, -1);
+		_board_index_table = ArrayXX::Constant(1, card_count, -1);
 		float board_idx = 0;
 		for (int card_1 = 0; card_1 < card_count; card_1++)
 		{
@@ -178,7 +178,7 @@ void card_tools::_init_board_index_table()
 	}
 }
 
-int card_tools::get_board_index(const ArrayXf& board)
+int card_tools::get_board_index(const ArrayX& board)
 {
 	int bordsSize = (int)board.size();
 
@@ -197,10 +197,10 @@ int card_tools::get_board_index(const ArrayXf& board)
 	}
 }
 
-CardArray card_tools::normalize_range(const ArrayXf& board, CardArray& range)
+CardArray card_tools::normalize_range(const ArrayX& board, CardArray& range)
 {
-	ArrayXf rangeM = ArrayXf(range);
-	ArrayXf mask = get_possible_hand_indexes(board);
+	ArrayX rangeM = ArrayX(range);
+	ArrayX mask = get_possible_hand_indexes(board);
 	CardArray out = rangeM * mask;
 
 	auto sum = out.sum();

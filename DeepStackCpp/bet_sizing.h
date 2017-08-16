@@ -7,8 +7,6 @@
 #include <algorithm> 
 #include <memory>
 
-using Eigen::VectorXf;
-using Eigen::ArrayX2f;
 using namespace std;
 
 class bet_sizing_manager
@@ -19,7 +17,7 @@ public:
 	// Constructor
 	// @param pot_fractions a list of fractions of the pot which are allowed
 	// as bets, sorted in ascending order
-	bet_sizing_manager(const VectorXf& pot_fractions);
+	bet_sizing_manager(const VectorX& pot_fractions);
 
 	// Gives the bets which are legal at a game state.
 	// @param node a representation of the current game state, with fields :
@@ -32,10 +30,10 @@ public:
 	ArrayX2f get_possible_bets(const Node& node);
 
 	// Sets new _pot_fractions value
-	void SetPotFraction(const VectorXf& potFractions);
+	void SetPotFraction(const VectorX& potFractions);
 
 
 private:
-	VectorXf _pot_fractions;
+	VectorX _pot_fractions;
 };
 

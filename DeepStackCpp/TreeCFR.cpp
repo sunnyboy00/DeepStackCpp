@@ -16,7 +16,7 @@ TreeCFR::~TreeCFR()
 	_cached_terminal_equities.clear();
 }
 
-void TreeCFR::run_cfr(Node& root, const ArrayXXf& starting_ranges, size_t iter_count, size_t skip_iters)
+void TreeCFR::run_cfr(Node& root, const ArrayXX& starting_ranges, size_t iter_count, size_t skip_iters)
 {
 	_cfr_skip_iters = skip_iters;
 	Util::ToString(starting_ranges);
@@ -55,7 +55,7 @@ void TreeCFR::_fillCFvaluesForTerminalNode(Node &node)
 	terminal_equity* termEquity = _get_terminal_equity(node);
 
 	// CF values  2p X each private hand.
-	node.cf_values = ArrayXXf::Zero(players_count, card_count);
+	node.cf_values = ArrayXX::Zero(players_count, card_count);
 
 	if (node.type == terminal_fold)
 	{
@@ -78,7 +78,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 {
 	const int actions_count = (int)node.children.size();
 
-	ArrayXXf current_strategy;
+	ArrayXX current_strategy;
 
 
 	//--current cfv[[actions, players, ranges]]
@@ -89,7 +89,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 	cf_values_allactions[P2] = Array<float, Dynamic, card_count>(actions_count, card_count);
 
 	//map <player/[actions, ranges]>
-	map <int, ArrayXXf> children_ranges_absolute;
+	map <int, ArrayXX> children_ranges_absolute;
 
 	static const int PLAYERS_DIM = 1;
 
@@ -108,7 +108,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 	{
 		Node* child_node = node.children[i];
 		//--set new absolute ranges(after the action) for the child
-		child_node->ranges_absolute = ArrayXXf(node.ranges_absolute);
+		child_node->ranges_absolute = ArrayXX(node.ranges_absolute);
 
 		child_node->ranges_absolute.row(P1) = children_ranges_absolute[P1].row(i);
 		child_node->ranges_absolute.row(P2) = children_ranges_absolute[P2].row(i);
@@ -121,7 +121,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 		//cf_values_allactions.chip(i, 0) = Util::ToTensor(child_node->cf_values);
 	}
 
-	node.cf_values = MatrixXf(players_count, card_count);
+	node.cf_values = MatrixX(players_count, card_count);
 	node.cf_values.fill(0);
 
 	Tensor<float, 2> tempVar;
@@ -136,7 +136,7 @@ void TreeCFR::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 	}
 	else
 	{
-		ArrayXXf current_regrets = ComputeRegrets(node, current_strategy, cf_values_allactions);
+		ArrayXX current_regrets = ComputeRegrets(node, current_strategy, cf_values_allactions);
 		update_regrets(node, current_regrets);
 		//--accumulating average strategy
 		update_average_strategy(node, current_strategy, iter);
@@ -162,7 +162,7 @@ terminal_equity* TreeCFR::_get_terminal_equity(Node& node)
 	return cached;
 }
 
-void TreeCFR::update_regrets(Node& node, const ArrayXXf& current_regrets)
+void TreeCFR::update_regrets(Node& node, const ArrayXX& current_regrets)
 {
 	//--node.regrets:add(current_regrets)
 	//	--local negative_regrets = node.regrets[node.regrets:lt(0)]
@@ -174,47 +174,47 @@ void TreeCFR::update_regrets(Node& node, const ArrayXXf& current_regrets)
 		MatrixXd::Constant(node.regrets.rows(), node.regrets.cols(), regret_epsilon));
 }
 
-void TreeCFR::update_average_strategy(Node& node, ArrayXXf& current_strategy, size_t iter)
+void TreeCFR::update_average_strategy(Node& node, ArrayXX& current_strategy, size_t iter)
 {
 	if (iter >= _cfr_skip_iters)
 	{
 		if (node.strategy.size() == 0)
 		{
 			const int actions_count = (int)node.children.size();
-			node.strategy = ArrayXXf::Zero(actions_count, card_count);
+			node.strategy = ArrayXX::Zero(actions_count, card_count);
 		}
 
 		if (node.iter_weight_sum.size() == 0)
 		{
-			node.iter_weight_sum = ArrayXf::Zero(card_count);
+			node.iter_weight_sum = ArrayX::Zero(card_count);
 		}
 
-		ArrayXf iter_weight_contribution = node.ranges_absolute.row(node.current_player); 
+		ArrayX iter_weight_contribution = node.ranges_absolute.row(node.current_player); 
 		Util::ClipLow(iter_weight_contribution, regret_epsilon);
 		node.iter_weight_sum += iter_weight_contribution;
 
-		ArrayXXf iter_weight = iter_weight_contribution / node.iter_weight_sum;
+		ArrayXX iter_weight = iter_weight_contribution / node.iter_weight_sum;
 		iter_weight.resize(1, card_count);
-		ArrayXXf expanded_weight = Util::ExpandAs(iter_weight, node.strategy);
-		ArrayXXf old_strategy_scale = (expanded_weight * (-1)) + 1; //--same as 1 - expanded weight
+		ArrayXX expanded_weight = Util::ExpandAs(iter_weight, node.strategy);
+		ArrayXX old_strategy_scale = (expanded_weight * (-1)) + 1; //--same as 1 - expanded weight
 		node.strategy *= old_strategy_scale;
 		node.strategy += (current_strategy  * expanded_weight);
 	}
 }
 
-void TreeCFR::_fillChanceRangesAndStrategy(Node &node, map<int, ArrayXXf> &children_ranges_absolute, ArrayXXf& current_strategy)
+void TreeCFR::_fillChanceRangesAndStrategy(Node &node, map<int, ArrayXX> &children_ranges_absolute, ArrayXX& current_strategy)
 {
 	int actions_count = (int)node.children.size();
 	current_strategy = node.strategy;
 
-	ArrayXXf ranges_mul_matrix = node.ranges_absolute.row(0).replicate(actions_count, 1);
+	ArrayXX ranges_mul_matrix = node.ranges_absolute.row(0).replicate(actions_count, 1);
 	children_ranges_absolute[0] = current_strategy * ranges_mul_matrix;
 
 	ranges_mul_matrix = node.ranges_absolute.row(1).replicate(actions_count, 1);
 	children_ranges_absolute[1] = current_strategy * ranges_mul_matrix;	
 }
 
-void TreeCFR::_fillPlayersRangesAndStrategy(Node &node, map<int, ArrayXXf> &children_ranges_absolute, ArrayXXf& current_strategy)
+void TreeCFR::_fillPlayersRangesAndStrategy(Node &node, map<int, ArrayXX> &children_ranges_absolute, ArrayXX& current_strategy)
 {
 	int currentPlayer = node.current_player; // Because we have zero based indexes, unlike the original source.
 	int opponentIndex = 1 - currentPlayer;
@@ -226,7 +226,7 @@ void TreeCFR::_fillPlayersRangesAndStrategy(Node &node, map<int, ArrayXXf> &chil
 	//--initialize regrets in the first iteration
 	if (node.regrets.size() == 0)
 	{
-		node.regrets = MatrixXf(actions_count, card_count);
+		node.regrets = MatrixX(actions_count, card_count);
 		node.regrets.fill(regret_epsilon);
 	}
 
@@ -239,16 +239,16 @@ void TreeCFR::_fillPlayersRangesAndStrategy(Node &node, map<int, ArrayXXf> &chil
 	//}
 
 	//--compute the current strategy
-	ArrayXXf regrets_sum = node.regrets.colwise().sum().row(action_dimension);
-	current_strategy = ArrayXXf(node.regrets);
+	ArrayXX regrets_sum = node.regrets.colwise().sum().row(action_dimension);
+	current_strategy = ArrayXX(node.regrets);
 	current_strategy /= Util::ExpandAs(regrets_sum, current_strategy); // We are dividing regrets for each actions by the sum of regrets for all actions and doing this element wise for every card
 
-	ArrayXXf ranges_mul_matrix = node.ranges_absolute.row(currentPlayer).replicate(actions_count, 1);
+	ArrayXX ranges_mul_matrix = node.ranges_absolute.row(currentPlayer).replicate(actions_count, 1);
 	children_ranges_absolute[currentPlayer] = current_strategy.array() * ranges_mul_matrix.array(); // Just multiplying ranges(cards probabilities) by the probability that action will be taken(from the strategy) inside the matrix  
 	children_ranges_absolute[opponentIndex] = node.ranges_absolute.row(opponentIndex).replicate(actions_count, 1); //For opponent we are just cloning ranges
 }
 
-ArrayXXf TreeCFR::ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<float, Dynamic, card_count>* cf_values_allactions)
+ArrayXX TreeCFR::ComputeRegrets(Node &node, ArrayXX &current_strategy, Array<float, Dynamic, card_count>* cf_values_allactions)
 {
 	Tensor<float, 2> tempVar;
 	static const int PLAYERS_DIM = 1;
@@ -259,29 +259,29 @@ ArrayXXf TreeCFR::ComputeRegrets(Node &node, ArrayXXf &current_strategy, Array<f
 	assert(current_strategy.rows() == actions_count && current_strategy.cols() == card_count);
 	//current_strategy.conservativeResize(actions_count, card_count); // Do we need this?
 
-	//Map<ArrayXXf> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
+	//Map<ArrayXX> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
 
-	ArrayXXf opCfAr = cf_values_allactions[opponent]; // [actions X cards] - cf values for the opponent
+	ArrayXX opCfAr = cf_values_allactions[opponent]; // [actions X cards] - cf values for the opponent
 	node.cf_values.row(opponent) = opCfAr.colwise().sum(); // for opponent assume that strategy is uniform
 
-	//ArrayXXf strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
-	//Map<ArrayXXf> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
+	//ArrayXX strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
+	//Map<ArrayXX> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
 
-	ArrayXXf currentPlayerCfValues = cf_values_allactions[currentPlayer];
+	ArrayXX currentPlayerCfValues = cf_values_allactions[currentPlayer];
 	assert(currentPlayerCfValues.rows() == actions_count && currentPlayerCfValues.cols() == card_count);
 
-	ArrayXXf weigtedCfValues = current_strategy * currentPlayerCfValues; // weight the regrets by the used strategy
+	ArrayXX weigtedCfValues = current_strategy * currentPlayerCfValues; // weight the regrets by the used strategy
 	node.cf_values.row(currentPlayer) = weigtedCfValues.colwise().sum(); // summing CF values for different actions
 
 	//--computing regrets
-	//Map<ArrayXXf> current_regrets = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
+	//Map<ArrayXX> current_regrets = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
 
 	//current_regrets.resize(actions_count, card_count); Do we need this resize?
 
 
-	ArrayXXf cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayer);
+	ArrayXX cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayer);
 	cfValuesOdCurrentPlayer.resize(1, card_count); // [1(action) X card_count]
-	ArrayXXf matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
+	ArrayXX matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
 	currentPlayerCfValues -= matrixToSubstract; // Substructing sum of CF values over all actions with every action CF value
 	return currentPlayerCfValues;
 }

@@ -11,7 +11,7 @@ Node CreateNode()
 	Node root_node;
 	root_node.board = converter.string_to_board("");
 	root_node.street = 1;
-	root_node.bets = Eigen::Array2f();
+	root_node.bets = Array2();
 	return root_node;
 }
 
@@ -105,7 +105,7 @@ TEST_CASE("bet_sizing_300_600_P1")
 TEST_CASE("bet_sizing_100_200_pot_size_0.5_1")
 {
 
-	VectorXf potSize(2);
+	VectorX potSize(2);
 	potSize << 0.5, 1.0;
 	bet_sizing_manager manager(potSize);
 	Node root_node = CreateNode();

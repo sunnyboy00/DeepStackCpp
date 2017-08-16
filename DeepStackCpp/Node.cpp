@@ -11,7 +11,7 @@
 //	board = node.board;
 //	board_string = node.board_string;
 //	current_player = node.current_player;
-//	bets = Eigen::Array2f(node.bets);
+//	bets = Eigen::Array2(node.bets);
 //	pot = node.pot;
 //	terminal = terminal;
 //}

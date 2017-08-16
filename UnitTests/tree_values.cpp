@@ -30,7 +30,7 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
+//	ArrayXX starting_ranges(players_count, card_count);
 //	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 //	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 //
@@ -68,7 +68,7 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
+//	ArrayXX starting_ranges(players_count, card_count);
 //	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 //	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 //
@@ -106,7 +106,7 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
+//	ArrayXX starting_ranges(players_count, card_count);
 //	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 //	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 //
@@ -144,7 +144,7 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
+//	ArrayXX starting_ranges(players_count, card_count);
 //	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 //	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 //
@@ -171,7 +171,7 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
+//	ArrayXX starting_ranges(players_count, card_count);
 //	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 //	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 //
@@ -198,7 +198,7 @@
 //	Node& tree = builder.build_tree(params);
 //	card_tools cradTools;
 //
-//	ArrayXXf starting_ranges(players_count, card_count);
+//	ArrayXX starting_ranges(players_count, card_count);
 //	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 //	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 //

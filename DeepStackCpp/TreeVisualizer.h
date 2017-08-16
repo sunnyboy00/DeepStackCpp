@@ -14,7 +14,6 @@
 #include <fstream>
 
 using namespace std;
-using Eigen::ArrayXXf;
 
 class TreeVisualizer
 {
@@ -27,7 +26,7 @@ public:
 	//-- element of the tensor
 	//-- @param[opt] labels a list of labels for the elements of the tensor
 	//-- @return a string representation of the tensor
-	string add_tensor(ArrayXXf tensor, const char* name = nullptr, const char* format = nullptr, const std::unordered_map<int, string>* labels = nullptr);
+	string add_tensor(ArrayXX tensor, const char* name = nullptr, const char* format = nullptr, const std::unordered_map<int, string>* labels = nullptr);
 
 	//-- - Generates a string representation of any range or value fields that are set
 	//	-- for the given tree node.

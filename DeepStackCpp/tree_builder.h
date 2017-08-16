@@ -13,11 +13,6 @@
 #include <algorithm> 
 
 using namespace std;
-using Eigen::Array2f;
-using Eigen::ArrayX2f;
-using Eigen::ArrayXf;
-
-
 
 // Builds a public tree for Leduc Hold'em or variants.
 //
@@ -69,7 +64,7 @@ public:
 	bool _limit_to_street;
 
 	// object which gives the allowed bets for each player
-	VectorXf _bet_sizing;
+	VectorX _bet_sizing;
 
 
 	card_tools _card_tools;

@@ -1,6 +1,6 @@
 #include "cfrd_gadget.h"
 
-cfrd_gadget::cfrd_gadget(ArrayXf& board, Tf1& player_range, Tf1& opponent_cfvs) 
+cfrd_gadget::cfrd_gadget(ArrayX& board, Tf1& player_range, Tf1& opponent_cfvs) 
 {
 	_input_opponent_value = opponent_cfvs;
 

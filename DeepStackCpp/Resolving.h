@@ -41,7 +41,7 @@ public:
 	//----
 	//----The node must first be re - solved with @{resolve} or @{resolve_first_node}.
 	//---- @return a list of legal actions
-	ArrayXf get_possible_actions();
+	ArrayX get_possible_actions();
 
 	//---- - Gives the average counterfactual values that the re - solve player received
 	//---- at the node during re - solving.

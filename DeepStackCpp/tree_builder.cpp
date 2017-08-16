@@ -22,7 +22,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 		return vector<Node*>();
 	}
 
-	ArrayXXf next_boards = _card_tools.get_second_round_boards();
+	ArrayXX next_boards = _card_tools.get_second_round_boards();
 	size_t next_boards_count = next_boards.rows();
 
 	long long subtree_height = -1;
@@ -30,7 +30,7 @@ vector<Node*> tree_builder::_get_children_nodes_chance_node(Node& parent_node)
 	//1.0 iterate over the next possible boards to build the corresponding subtrees
 	for (size_t i = 0; i < next_boards_count; i++)
 	{
-		ArrayXf next_board = next_boards.row(i);
+		ArrayX next_board = next_boards.row(i);
 		string next_board_string = _card_to_string.cards_to_string(next_board);
 		
 		Node* child = new Node();
@@ -177,7 +177,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 
 	long long depth = -1;
 
-	current_node.actions = ArrayXf(children.size());
+	current_node.actions = ArrayX(children.size());
 	for (size_t i = 0; i < children.size(); i++)
 	{
 		Node* cur_children = children[i];

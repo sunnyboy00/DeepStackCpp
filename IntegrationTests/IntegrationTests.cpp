@@ -26,7 +26,7 @@ void test_tree_builder()
 	params.root_node->board = converter.string_to_board("");
 	params.root_node->street = 1;
 	params.root_node->current_player = P1;
-	params.root_node->bets = Eigen::Array2f();
+	params.root_node->bets = Array2();
 	params.root_node->bets << 100, 100;
 
 	tree_builder builder;
@@ -66,7 +66,7 @@ void test_tree_cfr()
 	Node* tree = builder.build_tree(params);
 	card_tools cradTools;
 
-	ArrayXXf starting_ranges(players_count, card_count);
+	ArrayXX starting_ranges(players_count, card_count);
 	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 

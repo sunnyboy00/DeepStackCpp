@@ -5,7 +5,7 @@ std::wstring string_to_wstring(const std::string& str) {
 	return std::wstring(str.begin(), str.end());
 }
 
-void Util::ToString(const ArrayXXf& dataArg)
+void Util::ToString(const ArrayXX& dataArg)
 {
 	IOFormat CleanFmt(3, 0, ", ", "\n", "[", "]");
 
@@ -17,7 +17,7 @@ void Util::ToString(const ArrayXXf& dataArg)
 	OutputDebugString(result.str().c_str());
 }
 
-void Util::ToString(const MatrixXf& dataArg)
+void Util::ToString(const MatrixX& dataArg)
 {
 	IOFormat CleanFmt(3, 0, ", ", "\n", "[", "]");
 	ostringstream ss;

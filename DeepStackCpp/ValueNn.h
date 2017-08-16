@@ -1,5 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
+#include "CustomSettings.h"
 
 using namespace Eigen;
 
@@ -19,6 +20,6 @@ public:
 	//} for details of each input.
 	//-- @param output An NxO tensor in which to store N sets of neural net outputs.
 	//--See @{net_builder} for details of each output.
-	void get_value(ArrayXXf inputs, ArrayXXf output);
+	void get_value(ArrayXX inputs, ArrayXX output);
 };
 

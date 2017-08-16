@@ -24,7 +24,7 @@ TEST_CASE("cfr_gadget_Ks_2_iter")
 	opponent_cfvs.setConstant(0.2f);
 	opponent_cfvs(2) = 0;
 
-	ArrayXf board = converter.string_to_board("Ks");
+	ArrayX board = converter.string_to_board("Ks");
 	Tf1 player_range = ToTmx(tools.get_uniform_range(board));
 
 	cfrd_gadget gadget(board, player_range, opponent_cfvs);
@@ -60,7 +60,7 @@ TEST_CASE("cfr_gadget_root_3_iter")
 	Util::Print(opponent_cfvs);
 	opponent_cfvs.setConstant(1.0f/6);
 
-	ArrayXf board = converter.string_to_board("");
+	ArrayX board = converter.string_to_board("");
 	Tf1 player_range = ToTmx(tools.get_uniform_range(board));
 
 	cfrd_gadget gadget(board, player_range, opponent_cfvs);

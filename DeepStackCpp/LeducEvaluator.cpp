@@ -6,7 +6,7 @@ LeducEvaluator::LeducEvaluator()
 {
 }
 
-long long LeducEvaluator::evaluate_two_card_hand(Array2f hand_ranks)
+long long LeducEvaluator::evaluate_two_card_hand(Array2 hand_ranks)
 {
 	hand_ranks += 1; //ToDo: performance warning to review. added this line.
 
@@ -27,7 +27,7 @@ long long LeducEvaluator::evaluate_two_card_hand(Array2f hand_ranks)
 	return hand_value;
 }
 
-long long LeducEvaluator::evaluate_three_card_hand(Array2f hand_ranks)
+long long LeducEvaluator::evaluate_three_card_hand(Array2 hand_ranks)
 {
 	hand_ranks += 1;
 
@@ -52,7 +52,7 @@ long long LeducEvaluator::evaluate_three_card_hand(Array2f hand_ranks)
 	return hand_value;
 }
 
-ArrayXf LeducEvaluator::evaluate(ArrayXf hand, ArrayXf impossible_hand_value)
+ArrayX LeducEvaluator::evaluate(ArrayX hand, ArrayX impossible_hand_value)
 {
 	assert(hand.maxCoeff() <= card_count && hand.minCoeff() >= 0 && "hand does not correspond to any cards");
 
@@ -61,7 +61,7 @@ ArrayXf LeducEvaluator::evaluate(ArrayXf hand, ArrayXf impossible_hand_value)
 		return impossible_hand_value;
 	}
 	//--we are not interested in the hand suit - we will use ranks instead of cards
-	ArrayXf hand_ranks = ArrayXf(hand.size());
+	ArrayX hand_ranks = ArrayX(hand.size());
 	for (int i = 0; i < hand_ranks.size(); i++)
 	{
 		hand_ranks(i) = (float)_card_to_string.card_to_rank((int)hand(i));
@@ -70,7 +70,7 @@ ArrayXf LeducEvaluator::evaluate(ArrayXf hand, ArrayXf impossible_hand_value)
 	sort(hand_ranks.data(), hand_ranks.data() + hand_ranks.size());
 		//hand_ranks = hand_ranks.so : sort()
 
-	ArrayXf res(1);
+	ArrayX res(1);
 
 	if (hand.size() == 2)
 	{
@@ -89,7 +89,7 @@ ArrayXf LeducEvaluator::evaluate(ArrayXf hand, ArrayXf impossible_hand_value)
 	}
 }
 
-ArrayXf LeducEvaluator::batch_eval(ArrayXf board, ArrayXf impossible_hand_value)
+ArrayX LeducEvaluator::batch_eval(ArrayX board, ArrayX impossible_hand_value)
 {
 	CardArray hand_values = CardArray::Constant(-1);
 	size_t board_size = board.size();
@@ -103,7 +103,7 @@ ArrayXf LeducEvaluator::batch_eval(ArrayXf board, ArrayXf impossible_hand_value)
 	else
 	{
 		assert(board_size == 1 || board_size == 2 && "Incorrect board size for Leduc");
-		ArrayXf whole_hand = ArrayXf(board_size + 1);
+		ArrayX whole_hand = ArrayX(board_size + 1);
 		memcpy(whole_hand.data(), board.data(), board.size() * sizeof(float));  //copy data to the beginning
 
 		for (int card = 0; card < card_count; card++)
@@ -117,9 +117,9 @@ ArrayXf LeducEvaluator::batch_eval(ArrayXf board, ArrayXf impossible_hand_value)
 }
 
 // Warning is it ok to use -1 as DEFAULT_IMPOSSIBLE_HAND_VALUE?
-ArrayXf LeducEvaluator::batch_eval(ArrayXf board)
+ArrayX LeducEvaluator::batch_eval(ArrayX board)
 {
-	ArrayXf impossible_hand_value(1);
+	ArrayX impossible_hand_value(1);
 	impossible_hand_value << (float)DEFAULT_IMPOSSIBLE_HAND_VALUE;
 	return batch_eval(board, impossible_hand_value);
 }

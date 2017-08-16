@@ -226,8 +226,8 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 			{
 				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
 				//auto cfvs = RemoveF1D(cfvs_data[d], 1);
-				ArrayXXf rng2 = ToAmxx_ex(ranges, players_count, card_count);
-				ArrayXXf targ = ArrayXXf(players_count, card_count);
+				ArrayXX rng2 = ToAmxx_ex(ranges, players_count, card_count);
+				ArrayXX targ = ArrayXX(players_count, card_count);
 				_terminal_equity.call_value(rng2, targ);
 				cout << rng2 << endl << "--------------" << endl;
 				cout << targ << endl << endl;

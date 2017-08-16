@@ -15,12 +15,12 @@ long long GetStrenPositionByEval(string cardOne, string cardTwo)
 	int card1 = converter.string_to_card(cardOne);
 	int card2 = converter.string_to_card(cardTwo);
 
-	ArrayXf param(2);
+	ArrayX param(2);
 	param << (float)card1, (float)card2;
 
-	ArrayXf invalid(1);
+	ArrayX invalid(1);
 	invalid << INVALID_HAND_VALUE;
-	ArrayXf res = evaluator.evaluate(param, invalid);
+	ArrayX res = evaluator.evaluate(param, invalid);
 
 	return (long long)res(0);
 }
@@ -47,19 +47,19 @@ TEST_CASE("evaluate_with_two_card_hand")
 
 }
 
-ArrayXf GetBatchEvalVector(string boardCard)
+ArrayX GetBatchEvalVector(string boardCard)
 {
 	card_to_string_conversion converter;
 	LeducEvaluator evaluator;
 
 	int card = converter.string_to_card(boardCard);
 
-	ArrayXf board(1);
+	ArrayX board(1);
 	board << (float)card;
 
-	ArrayXf invalid(1);
+	ArrayX invalid(1);
 	invalid << INVALID_HAND_VALUE;
-	ArrayXf res = evaluator.batch_eval(board, invalid);
+	ArrayX res = evaluator.batch_eval(board, invalid);
 
 	return res;
 }
@@ -67,7 +67,7 @@ ArrayXf GetBatchEvalVector(string boardCard)
 TEST_CASE("batch_eval")
 {
 	card_to_string_conversion converter;
-	ArrayXf batch = GetBatchEvalVector("As");
+	ArrayX batch = GetBatchEvalVector("As");
 
 	REQUIRE(batch(converter.string_to_card("Ah")) < batch(converter.string_to_card("Kh")));
 	REQUIRE(batch(converter.string_to_card("Ks")) < batch(converter.string_to_card("Qh")));

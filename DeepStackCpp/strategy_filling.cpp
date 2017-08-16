@@ -21,7 +21,7 @@ void strategy_filling::_fill_chance(Node& node)
 	//we will fill strategy with an uniform probability, but it has to be zero for hands that are not possible on
 	//corresponding board
 	float cardsProbability = 1.0 / (card_count - 2); //remove 2 because each player holds one card
-	node.strategy = ArrayXXf(node.children.size(), card_count);
+	node.strategy = ArrayXX(node.children.size(), card_count);
 	node.strategy.fill(cardsProbability);
 
 	//setting probability of impossible hands to 0
@@ -55,7 +55,7 @@ void strategy_filling::_fill_uniformly(Node & node)
 		return;
 	}
 
-	node.strategy = MatrixXf(node.children.size(), card_count);
+	node.strategy = MatrixX(node.children.size(), card_count);
 	node.strategy.fill(1.0f / node.children.size());
 }
 

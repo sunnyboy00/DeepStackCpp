@@ -5,7 +5,7 @@
 
 tree_values::tree_values(){}
 
-void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
+void tree_values::_fill_ranges_dfs(Node & node, ArrayXX & ranges_absolute)
 {
 	node.ranges_absolute = ranges_absolute;
 
@@ -21,11 +21,11 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 	const int opponentIndex = 1 - node.current_player;
 
 	//--check that it's a legal strategy
-	ArrayXXf strategy_to_check = node.strategy;
+	ArrayXX strategy_to_check = node.strategy;
 
 	if (node.current_player != chance)
 	{
-		ArrayXf checksum = strategy_to_check.colwise().sum();
+		ArrayX checksum = strategy_to_check.colwise().sum();
 		assert((strategy_to_check > 0.f).all());
 		assert((strategy_to_check < 1.001f).all());
 		assert((checksum > 0.999f).all());
@@ -38,7 +38,7 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 	//--check if the range consists only of cards that don't overlap with the board
 
 #ifdef _DEBUG
-	ArrayXXf hands_mask = _cardTools.get_possible_hand_indexes(node.board);
+	ArrayXX hands_mask = _cardTools.get_possible_hand_indexes(node.board);
 	hands_mask.resize(1, card_count);
 	hands_mask = Util::ExpandAs(hands_mask, node.ranges_absolute);
 
@@ -51,8 +51,8 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXXf & ranges_absolute)
 #endif
 
 	//actions_count X [players_count, card_count]
-	//vector<ArrayXXf&> children_ranges_absolute(actions_count);
-	ArrayXXf child_range(players_count, card_count);
+	//vector<ArrayXX&> children_ranges_absolute(actions_count);
+	ArrayXX child_range(players_count, card_count);
 
 	//--chance player
 	if (node.current_player == chance)
@@ -96,7 +96,7 @@ void tree_values::_compute_values_dfs(Node& node)
 
 		_terminal_equity.set_board(node.board);
 
-		ArrayXXf values = ArrayXXf::Zero(players_count, card_count);
+		ArrayXX values = ArrayXX::Zero(players_count, card_count);
 
 		if (node.type == terminal_fold)
 		{
@@ -109,16 +109,16 @@ void tree_values::_compute_values_dfs(Node& node)
 
 		//--multiply by the pot
 		values *= node.pot;
-		node.cf_values = ArrayXXf(values);
-		node.cf_values_br = ArrayXXf(values);
+		node.cf_values = ArrayXX(values);
+		node.cf_values_br = ArrayXX(values);
 	}
 	else
 	{
 
 		const int actions_count = (int)node.children.size();
 		//[players_count x card_count][actions_count]
-		node.cf_values = ArrayXXf::Zero(players_count, card_count);
-		node.cf_values_br = ArrayXXf::Zero(players_count, card_count); 
+		node.cf_values = ArrayXX::Zero(players_count, card_count);
+		node.cf_values_br = ArrayXX::Zero(players_count, card_count); 
 
 		for (size_t i = 0; i < actions_count; i++)
 		{
@@ -150,12 +150,12 @@ void tree_values::_compute_values_dfs(Node& node)
 	}
 
 	//--counterfactual values weighted by the reach prob
-	node.cfv_infset = ArrayXf(players_count);
+	node.cfv_infset = ArrayX(players_count);
 	node.cfv_infset.row(P1) = node.cf_values.row(P1).matrix().dot(node.ranges_absolute.row(P1).matrix());
 	node.cfv_infset.row(P2) = node.cf_values.row(P2).matrix().dot(node.ranges_absolute.row(P2).matrix());
 
 	//--compute CFV - BR values weighted by the reach prob
-	node.cfv_br_infset = ArrayXf(players_count);
+	node.cfv_br_infset = ArrayX(players_count);
 	node.cfv_br_infset.row(P1) = node.cf_values_br.row(P1).matrix().dot(node.ranges_absolute.row(P1).matrix());
 	node.cfv_br_infset.row(P2) = node.cf_values_br.row(P2).matrix().dot(node.ranges_absolute.row(P2).matrix());
 	
@@ -163,14 +163,14 @@ void tree_values::_compute_values_dfs(Node& node)
 	node.exploitability = node.epsilon.mean();
 }
 
-void tree_values::compute_values(Node& root, ArrayXXf* starting_ranges)
+void tree_values::compute_values(Node& root, ArrayXX* starting_ranges)
 {
-	ArrayXXf range;
+	ArrayXX range;
 
 	//--1.0 set the starting range
 	if (starting_ranges == nullptr)
 	{
-		range = ArrayXXf::Constant(players_count, card_count, 1.0f / card_count);
+		range = ArrayXX::Constant(players_count, card_count, 1.0f / card_count);
 	}
 	else
 	{
@@ -180,7 +180,7 @@ void tree_values::compute_values(Node& root, ArrayXXf* starting_ranges)
 	//--2.0 check the starting ranges
 #ifdef _DEBUG
 
-	ArrayXf checksum = range.rowwise().sum();
+	ArrayX checksum = range.rowwise().sum();
 	assert(abs(checksum(P1) - 1) < 0.0001 && "starting range does not sum to 1");
 	assert(abs(checksum(P2) - 1) < 0.0001 && "starting range does not sum to 1");
 	assert((range >= 0).all());

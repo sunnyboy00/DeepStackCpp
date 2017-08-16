@@ -2,6 +2,7 @@
 #pragma warning(disable:4554) 
 
 #include "Constants.h"
+#include "CustomSettings.h"
 #include <Eigen/Dense>
 #include <vector>
 #include <memory>
@@ -23,7 +24,7 @@ struct Node
 	int street;
 
 	// A possibly empty vector of board cards
-	ArrayXf board;
+	ArrayX board;
 
 	// A string representation of the board cards
 	string board_string;
@@ -32,7 +33,7 @@ struct Node
 	int current_player;
 
 	// The number of chips that each player has committed to the pot
-	Array2f bets;
+	Array2 bets;
 
 	// Half the pot size, equaled to the smaller number in `bets`
 	float pot;
@@ -56,46 +57,46 @@ struct Node
 	//
 	//For a chance node, `strategy[i][j]` gives the probability of reaching the
 	// `i`th child for either player when that player holds the `j`th card.
-	ArrayXXf strategy;
+	ArrayXX strategy;
 
 	// A list of children nodes
 	vector<Node*> children;
 
 	// Actions
-	ArrayXf actions;
+	ArrayX actions;
 
 	// Depth of the node inside the tree
 	long long depth;
 
 	// Player regrets. A tensor of [actions_count x card_count] size.
-	ArrayXXf regrets;
+	ArrayXX regrets;
 
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
-	ArrayXXf ranges_absolute;
+	ArrayXX ranges_absolute;
 
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against
 	//--each other. [players_count X card_count]
-	ArrayXXf cf_values;
+	ArrayXX cf_values;
 
 	//-- The cfvs for a best response against each player in the profile
-	ArrayXXf cf_values_br;
+	ArrayXX cf_values_br;
 
 	// Counterfactual values weighted by the reach prob
-	ArrayXXf cfv_infset;
+	ArrayXX cfv_infset;
 
 	// CFV-BR values weighted by the reach prob
-	ArrayXXf cfv_br_infset;
+	ArrayXX cfv_br_infset;
 
 	//Weighted sum of card ranges
-	ArrayXf iter_weight_sum;
+	ArrayX iter_weight_sum;
 
 	//Weighted current card ranges contribution;
-	ArrayXf iter_weight_contribution;
+	ArrayX iter_weight_contribution;
 
 	// Difference between CFV-BR and Counterfactual values = node.cfv_br_infset - node.cfv_infset
-	ArrayXXf epsilon;
+	ArrayXX epsilon;
 
 	// <action_id, parent_id, gp_id>
 	// action_id - the index of the action that led to this node
