@@ -275,12 +275,13 @@ void lookahead::_compute_cfvs()
 
 		//--player indexing is swapped for cfvs
 		Remove4D(placeholder_data[d], (int)acting_player[d]) *= current_strategy_data[d];
-		//std::array<int, 1> dims = { 0 };
-		//regrets_sum[d] = placeholder_data[d].sum(dims);
+
+		std::array<int, 1> dims = { 0 };
+		regrets_sum[d] = placeholder_data[d].sum(dims);
 		//regrets_sum[d] = Util::NotReduceSum(placeholder_data[d], 0);
 
 		//--use a swap placeholder to change{ { 1,2,3 },{ 4,5,6 } } into{ { 1,2 },{ 3,4 },{ 5,6 } }
-		auto swap = swap_data[d - 1];
+		Tf5& swap = swap_data[d - 1];
 		CopyDif(swap, regrets_sum[d]);
 
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
@@ -326,7 +327,7 @@ void lookahead::_compute_normalize_average_strategies()
 
 void lookahead::_compute_regrets()
 {
-	for (int d = depth; d > 1; d--)
+	for (long long d = depth; d >= 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int gp_layer_bets_count = bets_count[d - 2];

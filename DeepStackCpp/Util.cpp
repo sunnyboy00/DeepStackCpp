@@ -27,6 +27,67 @@ void Util::ToString(const MatrixX& dataArg)
 	OutputDebugString(result.str().c_str());
 }
 
+void Util::Print(const vector<Tf5>& target, int index)
+{
+	Tf5 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const std::map<int, Tf5>& target, int index)
+{
+	Tf5 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const vector<Tf4>& target, int index)
+{
+	Tf4 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const std::map<int, Tf4>& target, int index)
+{
+	Tf4 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const vector<Tf3>& target, int index)
+{
+	Tf3 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const std::map<int, Tf3>& target, int index)
+{
+	Tf3 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const vector<Tf2>& target, int index)
+{
+	Tf2 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const std::map<int, Tf2>& target, int index)
+{
+	Tf2 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const vector<Tf1>& target, int index)
+{
+	Tf1 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+void Util::Print(const std::map<int, Tf1>& target, int index)
+{
+	Tf1 tensor = target.at(index);
+	Util::Print(tensor);
+}
+
+
 void Util::Print(Tf5& tensor)
 {
 	std::wostringstream result;

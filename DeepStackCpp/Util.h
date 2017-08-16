@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <map>
 #include "CustomSettings.h"
 
 using namespace Eigen;
@@ -83,6 +84,20 @@ class Util
 
 		static void Print(Tf1& tensor);
 
+		static void Print(const vector<Tf5>& target, int index);
+		static void Print(const std::map<int, Tf5>& target, int index);
+
+		static void Print(const vector<Tf4>& target, int index);
+		static void Print(const std::map<int, Tf4>& target, int index);
+
+		static void Print(const vector<Tf3>& target, int index);
+		static void Print(const std::map<int, Tf3>& target, int index);
+
+		static void Print(const vector<Tf2>& target, int index);
+		static void Print(const std::map<int, Tf2>& target, int index);
+
+		static void Print(const vector<Tf1>& target, int index);
+		static void Print(const std::map<int, Tf1>& target, int index);
 		//// Expands one tensor as other one
 		//template<typename Derived, typename OtherDerived>
 		//static inline TensorBase<Derived> ExpandAs(TensorBase<Derived>& data, const TensorBase<OtherDerived>& as)
