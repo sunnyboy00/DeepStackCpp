@@ -218,20 +218,28 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 		else
 		{
 			assert(tree->street == 2);
+
+			Tf4 csvfs_res(1, 1, players_count, card_count);  // ToDo: Extra copy
+
 			//--on river, any call is terminal
 			if (d > 1 || first_call_terminal)
 			{
 				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
-				Tf4 cfvs = RemoveF1D(cfvs_data[d], 1);
-				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
+				//auto cfvs = RemoveF1D(cfvs_data[d], 1);
+				ArrayXXf rng2 = ToAmxx_ex(ranges, players_count, card_count);
+				ArrayXXf targ = ArrayXXf(players_count, card_count);
+				_terminal_equity.call_value(rng2, targ);
+				cout << rng2 << endl << "--------------" << endl;
+				cout << targ << endl << endl;
+				RemoveF1D(cfvs_data[d], 1) = csvfs_res;
 			}
 			
 
 			//--folds
 			Tf4 ranges = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
-			Tf4 cfvs = RemoveF1D(cfvs_data[d], 0);
-			_terminal_equity.fold_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
-
+			_terminal_equity.fold_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(csvfs_res, players_count, card_count));
+			RemoveF1D(cfvs_data[d], 0) = csvfs_res;
+			Tf5 temp = cfvs_data[d];
 			//--correctly set the folded player by multiplying by - 1
 			float fold_mutliplier = (acting_player[d] * 2 - 3);// ?
 

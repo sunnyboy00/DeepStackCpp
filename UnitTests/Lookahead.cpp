@@ -34,17 +34,14 @@ void AreEq(Tf1& source, float scalar)
 	}
 }
 
-lookahead BuildLook()
+void BuildLook(Resolving& resolver)
 {
-	Resolving resolver;
 	Node node;
-	TreeBuilderParams params;
-	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("Ks");
-	params.root_node->street = 2;
-	params.root_node->current_player = P2;
-	params.root_node->bets << 1200, 1200;
+	node.board = converter.string_to_board("Ks");
+	node.street = 2;
+	node.current_player = P2;
+	node.bets << 1200, 1200;
 
 	card_tools tools;
 	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
@@ -59,13 +56,14 @@ lookahead BuildLook()
 	look._reconstruction_gadget = new cfrd_gadget(look.tree->board, player_range, op_cfvs);
 	RemoveF4D(look.ranges_data[0], 0, 0, 0, P1) = player_range;
 	look._reconstruction_opponent_cfvs = op_cfvs;
-	return look;
 }
 
 
 TEST_CASE("lookahed_set_opponent_starting_range")
 {
-	lookahead&  look = BuildLook();
+	Resolving resolver;
+	BuildLook(resolver);
+	lookahead&  look = resolver._lookahead;
 	look._set_opponent_starting_range();
 
 	std::array<float, card_count> opTarget = { 0.5, 0.5, 0.0, 0.5, 0.5, 0.5 };
@@ -77,23 +75,27 @@ TEST_CASE("lookahed_set_opponent_starting_range")
 	AreEq(plRrange, plTarget);
 }
 
-//TEST_CASE("lookahed_compute_current_strategies")
-//{
-//	lookahead look = BuildLook();
-//	look._set_opponent_starting_range();
-//	look._compute_current_strategies();
-//
-//	const std::array<DenseIndex, 1> dims = { card_count };
-//	Tf1 ac1_str = Util::Slice(look.current_strategy_data[1], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
-//	AreEq(ac1_str, 0.0);
-//	Tf4 res = look.current_strategy_data[1];
-//	Tf1 ac2_str = Util::Slice(look.current_strategy_data[1], { { { 1, 1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
-//	AreEq(ac2_str, 1.0);
-//}
+TEST_CASE("lookahed_compute_current_strategies")
+{
+	Resolving resolver;
+	BuildLook(resolver);
+	lookahead&  look = resolver._lookahead;
+	look._set_opponent_starting_range();
+	look._compute_current_strategies();
+
+	const std::array<DenseIndex, 1> dims = { card_count };
+	Tf1 ac1_str = Util::Slice(look.current_strategy_data[1], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
+	AreEq(ac1_str, 0.0);
+	Tf4 res = look.current_strategy_data[1];
+	Tf1 ac2_str = Util::Slice(look.current_strategy_data[1], { { { 1, 1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
+	AreEq(ac2_str, 1.0);
+}
 
 TEST_CASE("lookahed_compute_ranges")
 {
-	lookahead look = BuildLook();
+	Resolving resolver;
+	BuildLook(resolver);
+	lookahead&  look = resolver._lookahead;
 	look._set_opponent_starting_range();
 	look._compute_current_strategies();
 	look._compute_ranges();
@@ -125,20 +127,38 @@ TEST_CASE("lookahed_compute_ranges")
 	AreEq(p2_range_2, p2_target_2);
 }
 
-//
-//TEST_CASE("lookahed_compute_terminal_equities")
-//{
-//	lookahead look = BuildLook();
-//	look._set_opponent_starting_range();
-//	look._compute_current_strategies();
-//
-//	const std::array<DenseIndex, 1> dims = { card_count };
-//	Tf1 ac1_str = Util::Slice(look.current_strategy_data[1], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
-//	AreEq(ac1_str, 0.0);
-//	Tf4 res = look.current_strategy_data[1];
-//	Tf1 ac2_str = Util::Slice(look.current_strategy_data[1], { { { 1, 1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }).reshape(dims);
-//	AreEq(ac2_str, 1.0);
-//}
+
+TEST_CASE("lookahed_compute_terminal_equities")
+{
+	Resolving resolver;
+	BuildLook(resolver);
+	lookahead&  look = resolver._lookahead;
+	look._set_opponent_starting_range();
+	look._compute_current_strategies();
+	look._compute_ranges();
+	look._compute_update_average_strategies(0);
+	look._compute_terminal_equities();
+
+	Tf1 p1_csvs_1 = RemoveF4D(look.cfvs_data[0], 0, 0, 0, P1);
+	AreEq(p1_csvs_1, 0);
+	Tf1 p2_csvs_1 = RemoveF4D(look.cfvs_data[0], 0, 0, 0, P2);
+	AreEq(p2_csvs_1, 0);
+
+	Tf5 csvs_1 = look.cfvs_data[1];
+	Tf1 p1_csvs_2 = RemoveF4D(look.cfvs_data[1], 0, 0, 0, P1);
+	AreEq(p1_csvs_2, 0);
+	Tf1 p2_csvs_2 = RemoveF4D(look.cfvs_data[1], 0, 0, 0, P2);
+	std::array<float, card_count> p2_target_csvs_2 = { -2.0, -2.0, 0.0, -2.0, -2.0, -2.0 };
+	AreEq(p2_csvs_2, p2_target_csvs_2);
+
+	Tf1 p1_csvs_3 = RemoveF4D(look.ranges_data[1], 1, 0, 0, P1);
+	std::array<float, card_count> p1_target_csvs_3 = { 0.2, 0.2, 0.0, 0.8, -0.6, -0.6 };
+	AreEq(p1_csvs_3, p1_target_csvs_3);
+
+	Tf1 p2_csvs_3 = RemoveF4D(look.ranges_data[1], 1, 0, 0, P2);
+	std::array<float, card_count> p2_target_csvs_3 = { 0.5, 0.5, 0.0, 2.0, -1.5, -1.5 };
+	AreEq(p2_csvs_3, p2_target_csvs_3);
+}
 
 
 //TEST_CASE("test_lookahed_Ks_1200_1200")
