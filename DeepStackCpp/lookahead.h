@@ -17,13 +17,19 @@ class lookahead
 {
 	// 	-- - A depth - limited lookahead of the game tree used for re - solving.
 public:
-	lookahead();
+	lookahead(long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
+
 	~lookahead();
+
 	terminal_equity _terminal_equity;
 
 
 	// Game tree
 	Node* tree = nullptr;
+
+	long long _cfr_skip_iters;
+
+	long long _cfr_iters;
 
 	// Lookahead depth to solve
 	long long depth;

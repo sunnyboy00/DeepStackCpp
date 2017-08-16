@@ -195,8 +195,6 @@ TEST_CASE("lookahed_compute_regrets")
 	look._compute_terminal_equities();
 	look._compute_cfvs();
 	look._compute_regrets();
-	//Util::Print(look.cfvs_data, 0);
-
 
 	Tf1 p1_csvs_1 = RemoveF3D(look.regrets_data[1], 0, 0, 0);
 	std::array<float, card_count> p1_target_regret_1 = { 0,   0,     0,   0,  1800,  1800 };
@@ -204,6 +202,38 @@ TEST_CASE("lookahed_compute_regrets")
 
 	Tf1 p2_csvs_1 = RemoveF3D(look.regrets_data[1], 1, 0, 0);
 	AreEq(p2_csvs_1, 0);
+}
+
+TEST_CASE("lookahed_full_cycle")
+{
+	Resolving resolver;
+
+	Node node;
+	card_to_string_conversion converter;
+	node.board = converter.string_to_board("Ks");
+	node.street = 2;
+	node.current_player = P2;
+	node.bets << 1200, 1200;
+
+	card_tools tools;
+	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
+	Tf1 op_cfvs(card_count);
+	op_cfvs.setZero();
+	LookaheadResult result = resolver.resolve(node, player_range, op_cfvs, 5, 10);
+
+	std::array<float, card_count> achieved_cfvs = { 240,240,0,960,-720,-720 };
+	AreEq(result.achieved_cfvs, achieved_cfvs);
+
+	std::array<float, card_count> children_cfvs = { 240.000000, 240.000000, 0.000000, 960.000000, -720.000000, -720.000000 };
+	Tf1 children_cfvs_res = RemoveF1D(result.children_cfvs, 1);
+	AreEq(children_cfvs_res, children_cfvs);
+
+	std::array<float, card_count> strategy1 = { 0,  0,  0,  0,  0 , 0 };
+	Tf1 stRes1 = RemoveF1D(result.strategy, 0);
+	AreEq(stRes1, strategy1);
+	std::array<float, card_count> strategy2 = { 1,  1,  1,  1 , 1,  1 };
+	Tf1 stRes2 = RemoveF1D(result.strategy, 1);
+	AreEq(stRes2, strategy2);
 }
 
 //TEST_CASE("test_lookahed_Ks_1200_1200")

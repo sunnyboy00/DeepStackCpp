@@ -2,8 +2,10 @@
 
 
 
-lookahead::lookahead()
+lookahead::lookahead(long long skip_iters, long long iters)
 {
+	_cfr_skip_iters = skip_iters;
+	_cfr_iters = iters;
 }
 
 
@@ -124,7 +126,7 @@ LookaheadResult lookahead::get_results()
 	Tf2 scalerSum = Util::NotReduceSum(scaler, 1);
 
 	scaler = Util::ExpandAs(scalerSum, range_mul);
-	scaler *= scaler.constant(cfr_iters - cfr_skip_iters);
+	scaler *= scaler.constant(_cfr_iters - _cfr_skip_iters);
 
 	out.children_cfvs /= scaler;
 
@@ -191,7 +193,7 @@ void lookahead::_compute_terminal_equities_next_street_box()
 
 void lookahead::_compute_update_average_strategies(size_t iter)
 {
-	if (iter > cfr_skip_iters)
+	if (iter > _cfr_skip_iters)
 	{
 		//--no need to go through layers since we care for the average strategy only in the first node anyway
 		//--note that if you wanted to average strategy on lower layers, you would need to weight the current strategy by the current reach probability
@@ -294,7 +296,7 @@ void lookahead::_compute_cfvs()
 
 void lookahead::_compute_cumulate_average_cfvs(size_t iter)
 {
-	if (iter > cfr_skip_iters)
+	if (iter > _cfr_skip_iters)
 	{
 		average_cfvs_data[P1] += cfvs_data[P1];
 		average_cfvs_data[P2] += cfvs_data[P2];
@@ -303,17 +305,9 @@ void lookahead::_compute_cumulate_average_cfvs(size_t iter)
 
 void lookahead::_compute_normalize_average_strategies()
 {
-	Tensor<float, 2> input(7, 11);
-	std::array<DenseIndex, 3> three_dims{ { 7, 11, 1 } };
-	Tensor<float, 3> result1 = input.reshape(three_dims);
-
-	// Decrease the rank of the input tensor by merging 2 dimensions;
-	std::array<DenseIndex, 1> one_dim{ { 7 * 11 } };
-	Tensor<float, 1> result2 = input.reshape(one_dim);
-
 	//--using regrets_sum as a placeholder container
-	auto player_avg_strategy = average_strategies_data[1];
-	auto player_avg_strategy_sum = regrets_sum[1];
+	Tf4& player_avg_strategy = average_strategies_data[1];
+	Tf4& player_avg_strategy_sum = regrets_sum[1];
 
 	player_avg_strategy_sum = Util::NotReduceSum(player_avg_strategy, 0);
 	player_avg_strategy /= Util::ExpandAs(player_avg_strategy_sum, player_avg_strategy);
@@ -376,13 +370,13 @@ void lookahead::_set_opponent_starting_range()
 
 void lookahead::_compute_normalize_average_cfvs()
 {
-	average_cfvs_data[0] /= average_cfvs_data[0].constant(cfr_iters - cfr_skip_iters);
+	average_cfvs_data[0] /= average_cfvs_data[0].constant(_cfr_iters - _cfr_skip_iters);
 }
 
 void lookahead::_compute()
 {
 	//--1.0 main loop
-	for (size_t iter = 0; iter < cfr_iters; iter++)
+	for (size_t iter = 0; iter <= _cfr_iters; iter++)
 	{
 		_set_opponent_starting_range();
 		_compute_current_strategies();

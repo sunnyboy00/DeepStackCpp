@@ -54,12 +54,14 @@ LookaheadResult Resolving::resolve_first_node(Node& node, const Tf1& player_rang
 //	return _resolve_results;
 //}
 
-LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs)
+LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs, long long cfr_skip_iters, long long iters)
 {
 	assert(_cardTools.is_valid_range(ToAmx(player_range), node.board));
 	_create_lookahead_tree(node);
 
 	_lookBuilder->build_from_tree(*_lookahead_tree);
+	_lookahead._cfr_skip_iters = cfr_skip_iters;
+	_lookahead._cfr_iters = iters;
 	_lookahead.resolve(player_range, opponent_cfvs);
 	_resolve_results = _lookahead.get_results();
 	return _resolve_results;

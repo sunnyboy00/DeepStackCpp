@@ -35,7 +35,7 @@ public:
 	//---- @param player_range a range vector for the re - solving player
 	//---- @param opponent_cfvs a vector of cfvs achieved by the opponent
 	//---- before re - solving
-	LookaheadResult resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs);
+	LookaheadResult resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs, long long cfr_skip_iters = cfr_skip_iters, long long iters = cfr_iters);
 
 	//---- - Gives a list of possible actions at the node being re - solved.
 	//----
