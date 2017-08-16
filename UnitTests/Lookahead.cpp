@@ -198,13 +198,12 @@ TEST_CASE("lookahed_compute_regrets")
 	//Util::Print(look.cfvs_data, 0);
 
 
-	Tf1 p1_csvs_1 = RemoveF4D(look.cfvs_data[1], 1, 0, 0, P1);
-	std::array<float, card_count> p1_target_csvs_1 = { 240,   240,     0,   960,  -720,  -720 };
-	AreEq(p1_csvs_1, p1_target_csvs_1);
+	Tf1 p1_csvs_1 = RemoveF3D(look.regrets_data[1], 0, 0, 0);
+	std::array<float, card_count> p1_target_regret_1 = { 0,   0,     0,   0,  1800,  1800 };
+	AreEq(p1_csvs_1, p1_target_regret_1);
 
-	Tf1 p2_csvs_1 = RemoveF4D(look.cfvs_data[1], 1, 0, 0, P2);
-	std::array<float, card_count> p2_target_csvs_1 = { 600,   600,     0,  2400, -1800, -1800 };
-	AreEq(p2_csvs_1, p2_target_csvs_1);
+	Tf1 p2_csvs_1 = RemoveF3D(look.regrets_data[1], 1, 0, 0);
+	AreEq(p2_csvs_1, 0);
 }
 
 //TEST_CASE("test_lookahed_Ks_1200_1200")

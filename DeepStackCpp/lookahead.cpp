@@ -343,7 +343,8 @@ void lookahead::_compute_regrets()
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
 		{ {{ gp_layer_terminal_actions_count, -1 },{ 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 }, { cur_acting_player, cur_acting_player}, { 0 , -1 }} };
 		Tf5 sliceData = Util::Slice(next_level_cfvs, slices);
-		Util::Copy(parent_inner_nodes, Util::Transpose(next_level_cfvs, { 1, 2 }));
+		
+		Util::Copy(parent_inner_nodes, Util::Transpose(sliceData, { 0, 2, 1, 3, 4 }));
 
 		std::array<int, 4> sizes = { 1, gp_layer_bets_count, -1, card_count };
 		Util::ProcessSizes((int)parent_inner_nodes.size(), sizes);
@@ -351,7 +352,7 @@ void lookahead::_compute_regrets()
 
 		Tf4 ex_parent_inner_nodes = Util::ExpandAs(parrentMap, current_regrets);
 
-		current_regrets /= ex_parent_inner_nodes;
+		current_regrets -= ex_parent_inner_nodes;
 
 		regrets_data[d] += current_regrets;
 
