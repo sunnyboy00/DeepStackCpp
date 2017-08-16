@@ -31,18 +31,18 @@ void Util::Print(Tf5& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "5d: " << tensor.dimension(4) << "x" << tensor.dimension(3) << "x" << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0);
+	ss << "5d: " << tensor.dimension(4) << "x" << tensor.dimension(3) << "x" << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
 
-	for (DenseIndex d5 = 0; d5 < tensor.dimension(4); d5++)
+	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
-		for (DenseIndex d4 = 0; d4 < tensor.dimension(3); d4++)
+		for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
 		{
 			for (DenseIndex d3 = 0; d3 < tensor.dimension(2); d3++)
 			{
-				for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
+				ss << "(" << d1 << "," << d2 << "," << d3 << ")=" << endl;
+				for (DenseIndex d4 = 0; d4 < tensor.dimension(3); d4++)
 				{
-					ss << "(" << d2 << "," << d3 << "," << d4 << "," << d5 << ")=" << endl;
-					for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
+					for (DenseIndex d5 = 0; d5 < tensor.dimension(4); d5++)
 					{
 						ss << tensor(d1, d2, d3, d4, d5) << "; ";
 					}
@@ -63,14 +63,14 @@ void Util::Print(Tf4& tensor)
 	ostringstream ss;
 	ss << "4d: " << tensor.dimension(3) << "x" << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
 
-	for (DenseIndex d4 = 0; d4 < tensor.dimension(3); d4++)
+	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
-		for (DenseIndex d3 = 0; d3 < tensor.dimension(2); d3++)
+		for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
 		{
-			for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
+			ss << "(" << d1 << "," << d2 << ")=" << endl;
+			for (DenseIndex d3 = 0; d3 < tensor.dimension(2); d3++)
 			{
-				ss << "(" << d2 << "," << d3 << "," << d4 << ")=" << endl;
-				for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
+				for (DenseIndex d4 = 0; d4 < tensor.dimension(3); d4++)
 				{
 					ss << tensor(d1, d2, d3, d4) << "; ";
 				}
@@ -88,14 +88,14 @@ void Util::Print(Tf3& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "3d: " << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0);
+	ss << "3d: " << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
 
-	for (DenseIndex d3 = 0; d3 < tensor.dimension(2); d3++)
+	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
+		ss << "(" << d1 << ")=" << endl;
 		for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
 		{
-			ss << "(" << d2 << "," << d3 << "," << ")=" << endl;
-			for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
+			for (DenseIndex d3 = 0; d3 < tensor.dimension(2); d3++)
 			{
 				ss << tensor(d1, d2, d3) << "; ";
 			}
@@ -112,12 +112,11 @@ void Util::Print(Tf2& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "2d: " << "x" << tensor.dimension(1) << "x" << tensor.dimension(0);
+	ss << "2d: " << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
 
-	for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
+	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
-		ss << "(" << d2 << ")=" << endl;
-		for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
+		for (DenseIndex d2 = 0; d2 < tensor.dimension(1); d2++)
 		{
 			ss << tensor(d1, d2) << "; ";
 		}

@@ -21,7 +21,7 @@ void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_
 void lookahead::resolve(Tf1& player_range, Tf1& opponent_cfvs)
 {
 	_reconstruction_gadget = new cfrd_gadget(tree->board, player_range, opponent_cfvs);
-	RemoveF4D(ranges_data[1], 0, 0, 0, P1) = player_range;
+	RemoveF4D(ranges_data[0], 0, 0, 0, P1) = player_range;
 	_reconstruction_opponent_cfvs = opponent_cfvs;
 	_compute();
 }
@@ -364,9 +364,8 @@ void lookahead::_set_opponent_starting_range()
 		const std::array<DenseIndex, 1> dims = { card_count };
 		auto p1_cfvs = Remove4D(cfvs_data[0], P1).reshape(dims);
 
-		const std::array<DenseIndex, 4> range_dims = { 1, 1, 1, card_count };
-		Tf4 opponent_range = _reconstruction_gadget->compute_opponent_range(p1_cfvs).reshape(range_dims);
-		Remove4D(ranges_data[0], P2) = opponent_range;
+		Tf1 opponent_range = _reconstruction_gadget->compute_opponent_range(p1_cfvs);
+		RemoveF4D(ranges_data[0], 0, 0, 0, P2) = opponent_range;
 	}
 }
 
@@ -419,7 +418,7 @@ void lookahead::_compute_current_strategies()
 
 void lookahead::_compute_ranges()
 {
-	for (int d = 0; d < depth; d++)
+	for (int d = 0; d < depth; d++) // d < depth because we are setting next level range[d+1]
 	{
 		Tf5& current_level_ranges = ranges_data[d];
 		Tf5& next_level_ranges = ranges_data[d + 1]; // ToDo: check Is this a copy or a ref to original tensor?
@@ -441,7 +440,7 @@ void lookahead::_compute_ranges()
 		inner_nodes[d] = Util::Transpose(betActionsRanges, { 0, 2, 1, 3, 4}); // Shuffle parent and gp axis;
 		std::array<int, 5> sizes = { { 1, prev_layer_bets_count, -1, players_count, card_count } };
 		Tm5& super_view = Util::View(inner_nodes[d], sizes);
-		Tf5& super_view_t = Util::ExpandAs(super_view, betActionsRanges); // ToDo: Extra copy perf hit
+		Tf5& super_view_t = Util::ExpandAs(super_view, next_level_ranges); // ToDo: Extra copy perf hit
 		Util::Copy(next_level_ranges, super_view_t);
 		Tf4& next_level_strategies = current_strategy_data[d + 1];
 
@@ -449,6 +448,7 @@ void lookahead::_compute_ranges()
 		DenseIndex curPlayer = (DenseIndex)acting_player[d];
 
 		Remove4D(next_level_ranges, curPlayer) *= next_level_strategies;
+		//RemoveF4D(next_level_ranges, 0, 0, 0, curPlayer) *= next_level_strategies;
 			/*Util::Slice(next_level_ranges,
 			{ { { 0, -1 },{ 0, -1 },{ 0, -1 },{ curPlayer, curPlayer },{ 0, -1 } } }) *= next_level_strategies;*/
 	}

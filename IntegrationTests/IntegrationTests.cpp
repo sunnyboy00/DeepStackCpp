@@ -30,7 +30,7 @@ void test_tree_builder()
 	params.root_node->bets << 100, 100;
 
 	tree_builder builder;
-	Node& tree = builder.build_tree(params);
+	Node* tree = builder.build_tree(params);
 }
 
 void test_tree_visualiser()
@@ -45,10 +45,10 @@ void test_tree_visualiser()
 	params.root_node->bets << 100, 100;
 
 	tree_builder builder;
-	Node& tree = builder.build_tree(params);
+	Node* tree = builder.build_tree(params);
 
 	TreeVisualizer visualizer;
-	visualizer.graphviz(tree, "big_tree");
+	visualizer.graphviz(*tree, "big_tree");
 }
 
 void test_tree_cfr()
@@ -63,7 +63,7 @@ void test_tree_cfr()
 	params.root_node->bets << 100, 100;
 
 	tree_builder builder;
-	Node& tree = builder.build_tree(params);
+	Node* tree = builder.build_tree(params);
 	card_tools cradTools;
 
 	ArrayXXf starting_ranges(players_count, card_count);
@@ -71,11 +71,11 @@ void test_tree_cfr()
 	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
 
 	TreeCFR tree_cfr;
-	tree_cfr.run_cfr(tree, starting_ranges, 100000, 499);
+	tree_cfr.run_cfr(*tree, starting_ranges, 100000, 499);
 
 	tree_values tv;
-	tv.compute_values(tree, &starting_ranges);
-	cout << "Exploitability: " << tree.exploitability << endl;
+	tv.compute_values(*tree, &starting_ranges);
+	cout << "Exploitability: " << tree->exploitability << endl;
 }
 
 

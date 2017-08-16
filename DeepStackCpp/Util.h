@@ -15,15 +15,6 @@ class Util
 {
 	public:
 
-		////Coping source tensor to the target tensor when target and source dimensions number are difference
-		//template <int N1>
-		//template <int N2>
-		//static inline void CopyDif(Tensor<float, N1> & target, const Tensor<float, N2>& source)
-		//{
-		//	assert(target.size() >= source.size());
-		//	memcpy(target.data(), source.data(), source.size() * sizeof(float));
-		//}
-
 		//Coping source tensor to the target tensor
 		template <int N>
 		static inline void Copy(TfN& target, const TfN& source)
@@ -106,7 +97,6 @@ class Util
 		//		assert(ceilf(difDim) == difDim && "The coefficients must be integers");
 		//		broadcasts[dim] = (int)difDim;
 		//	}
-
 		//	TensorBase<Derived> res = data.broadcast(broadcasts);
 		//	return res;
 		//}
@@ -148,17 +138,6 @@ class Util
 			TfN output = target.shuffle(dims);
 			return output;
 		}
-
-		//template <int N>
-		//static inline TfN Transpose(const TfN &target, std::array<DenseIndex, 2> const &dims)
-		//{
-		//	Eigen::array<DenseIndex, N> targetDims = target.dimensions();
-		//	int firstSwapDimLen = targetDims[dims[0]];
-		//	targetDims[dims[0]] = targetDims[dims[1]];
-		//	targetDims[dims[1]] = firstSwapDimLen;
-		//	TfN output = target.shuffle(targetDims);
-		//	return output;
-		//}
 
 		// Converters negative indexes offsets to positive zero indexes.
 		template <int N>
@@ -236,86 +215,6 @@ class Util
 			return tensor.sum(sumDims).reshape(dims);
 		}
 
-
-		////Creates a view with different dimensions of the storage associated with tensor.
-		////If one of the dimensions is - 1, the size of that dimension is inferred from the rest of the elements.
-		//template <int N>
-		//static inline TensorMap<TfN, N> View(TfN &target, std::array<int, N>& sizes)
-		//{
-		//	int negativeIndex = -1;
-		//	int sizeLeft = target.size();
-		//	for (int dim = 0; dim < N; dim++)
-		//	{
-		//		int curDimSize = sizes[dim];
-		//		if (curDimSize == -1)
-		//		{
-		//			assert(negativeIndex == -1);
-		//			negativeIndex = curDimSize;
-		//		}
-		//		else
-		//		{
-		//			assert(curDimSize > 0);
-		//			sizeLeft -= curDimSize;
-		//			assert(sizeLeft >= 0);
-		//		}
-		//	}
-		//	if (negativeIndex > 0)
-		//	{
-		//		sizes[negativeIndex] = sizeLeft;
-		//	}
-		//	switch (N)
-		//	{
-		//	case 1:
-		//		return TensorMap<TfN, 1>(target.data(), sizes[0]);
-		//	case 2:
-		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1]);
-		//	case 3:
-		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2]);
-		//	case 4:
-		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
-		//	case 5:
-		//		return TensorMap<TfN, 2>(target.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
-		//	default:
-		//		throw std::invalid_argument("Invalid tensor size");
-		//	};
-		//};
-		//static Tf5 NoReductionSum(Tf5 target, int dim)
-		//{
-		//	assert(dim < target.NumDimensions);
-		//	std::array<DenseIndex, 1> dims = { dim };
-		//	Tf4 res = target.sum(dims);
-		//	std::array<DenseIndex, 5> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3), target.dimension(4) } };
-		//	new_dims[dim] = 1;
-		//	return res.reshape(new_dims);
-		//}
-		//static Tf4 NoReductionSum(Tf4 target, int dim)
-		//{
-		//	assert(dim < target.NumDimensions);
-		//	std::array<DenseIndex, 1> dims = { dim };
-		//	Tf3 res = target.sum(dims);
-		//	std::array<DenseIndex, 4> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2), target.dimension(3)} };
-		//	new_dims[dim] = 1;
-		//	return res.reshape(new_dims);
-		//}
-		//static Tf3 NoReductionSum(Tf3 target, int dim)
-		//{
-		//	assert(dim < target.NumDimensions);
-		//	std::array<DenseIndex, 1> dims = { dim };
-		//	Tf2 res = target.sum(dims);
-		//	std::array<DenseIndex, 3> new_dims{ { target.dimension(0), target.dimension(1), target.dimension(2)} };
-		//	new_dims[dim] = 1;
-		//	return res.reshape(new_dims);
-		//}
-		//static Tf2 NoReductionSum(Tf2 target, int dim)
-		//{
-		//	assert(dim < target.NumDimensions);
-		//	std::array<DenseIndex, 1> dims = { dim };
-		//	Tf1 res = target.sum(dims);
-		//	std::array<DenseIndex, 2> new_dims{ { target.dimension(0), target.dimension(1) } };
-		//	new_dims[dim] = 1;
-		//	return res.reshape(new_dims);
-		//}
-
 		// Calculates and replaces one -1 dimension of tensor from sizes basing on the targetSize.
 		template <int N>
 		static inline void ProcessSizes(int targetSize, std::array<int, N>& sizes)
@@ -340,7 +239,7 @@ class Util
 
 			if (negativeIndex > 0)
 			{ 
-				float difKoef = targetSize / sizeUsed;
+				float difKoef = (float)targetSize / sizeUsed;
 				assert(ceilf(difKoef) == difKoef && "The coefficients must be integers");
 				sizes[negativeIndex] = (int)difKoef;
 			}
@@ -377,125 +276,6 @@ class Util
 			Tf1 resultTensor = cardMap;
 			return resultTensor;
 		}
-
-		
-
-		// Makes 
-		//template <int N>
-		//static void MultiSliceFill(TfN& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &slices, float value)
-		//{
-		//	Eigen::array<DenseIndex, N> offsets;
-		//	Eigen::array<DenseIndex, N> extents;
-
-		//	for (DenseIndex dim = 0; dim < N; dim++)
-		//	{
-		//		std::array<DenseIndex, 2> currentExtent = slices[dim];
-		//		DenseIndex offset = currentExtent[0];
-		//		DenseIndex extent = currentExtent[1];
-
-		//		if (extent != 0) // Means that we will not slice this dimension
-		//		{
-		//			offsets[dim] = 0;
-		//			extents[dim] = target.dimension(dim);
-		//		}
-		//		else
-		//		{
-		//			offsets[dim] = ConvertOffset(target, offset, dim);
-		//			extents[dim] = ConvertOffset(target, extent, dim);
-		//		}
-		//	}
-
-		//	TfN currentRes = target;
-
-		//	bool inited = false;
-
-		//	int missedAxes = 0;
-
-		//	vector<void*> op;
-
-		//	for (size_t i = 0; i < dims.size(); i++)
-		//	{
-		//		if (dims[i] == 0)
-		//		{
-		//			Tensor<float, N - 1> currentRes = target.chip(0, 0);
-		//			//Tensor<float, N - 1> currentRes = target.chip(convertedOffsets[i], missedAxes);
-
-
-		//			//if (!inited)
-		//			//{
-		//			//	currentRes = target.chip(convertedOffsets[i], missedAxes);
-		//			//	inited = true;
-		//			//}
-		//			//else
-		//			//{
-		//			//	currentRes = currentRes.chip(convertedOffsets[i], missedAxes);
-		//			//}
-		//		}
-		//		else
-		//		{
-		//			assert(dims[i] == 1);
-		//			missedAxes++;
-		//		}
-		//	}
-
-		//	currentRes.setConstant(value);
-		////};
-
-		//// Makes 
-		//template <int N>
-		//static void MultiSliceFill(TfN& target, std::array<DenseIndex, N> const &offsets, std::array<DenseIndex, N> const &dims, float value)
-		//{
-		//	std::array<int, N> convertedOffsets;
-		//	std::array<int, N> convertedDims;
-
-		//	for (size_t i = 0; i < offsets.size(); i++)
-		//	{
-		//		if (dims[i] < 0)
-		//		{
-		//			assert(abs(dims[i]) < target.dimension(i));
-		//			convertedOffsets[i] = dims[i] + target.dimension(i);
-		//		}
-		//		else
-		//		{
-		//			convertedOffsets[i] = dims[i];
-		//		}
-		//	}
-
-		//	TfN currentRes = target;
-
-		//	bool inited = false;
-
-		//	int missedAxes = 0;
-
-		//	vector<void*> op;
-
-		//	for (size_t i = 0; i < dims.size(); i++)
-		//	{
-		//		if (dims[i] == 0)
-		//		{
-		//			Tensor<float, N - 1> currentRes = target.chip(0, 0);
-		//			//Tensor<float, N - 1> currentRes = target.chip(convertedOffsets[i], missedAxes);
-
-
-		//			//if (!inited)
-		//			//{
-		//			//	currentRes = target.chip(convertedOffsets[i], missedAxes);
-		//			//	inited = true;
-		//			//}
-		//			//else
-		//			//{
-		//			//	currentRes = currentRes.chip(convertedOffsets[i], missedAxes);
-		//			//}
-		//		}
-		//		else
-		//		{
-		//			assert(dims[i] == 1);
-		//			missedAxes++;
-		//		}
-		//	}
-
-		//	currentRes.setConstant(value);
-		//};
 
 		static inline MatrixXf ExpandAs(VectorXf data, MatrixXf as)
 		{
@@ -538,42 +318,9 @@ class Util
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
-		//static inline void ClipLow(MatrixXf& target, float lowLimin)
-		//{
-		//	target = (target.array() >= lowLimin).select(
-		//		target,
-		//		MatrixXf::Constant(target.rows(), target.cols(), lowLimin)
-		//	);
-		//}
-
 		static void ToString(const ArrayXXf& dataArg);
 
 		static void ToString(const MatrixXf& dataArg);
-
-		//static inline TensorMap<Tensor<float, 2>> ToTensor(ArrayXXf & source)
-		//{
-		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
-		//}
-
-		//static inline TensorMap<Tensor<float, 2>> ToTensor(MatrixXf & source)
-		//{
-		//	return TensorMap<Tensor<float, 2>>(source.data(), source.rows(), source.cols());
-		//}
-
-		//// Returns 2d tensor from 3d 
-		//static Map<ArrayXXf> TensorToArray2d(Tensor<float, 3>& tensor, int offset, int dim, Tensor<float, 2>& tempVar)
-		//{
-		//	tempVar = tensor.chip(offset, dim);
-		//	Map<ArrayXXf> plCfAr(tempVar.data(), tempVar.dimension(0), tempVar.dimension(1));
-		//	return plCfAr;
-		//}
-
-		//static inline void CopyTo(MatrixXf & target, MatrixXf & source)
-		//{
-		//	assert(target.size() >= source.size());
-		//	memcpy(target.data(), source.data(), source.size() * sizeof(float));
-		//}
-
 };
 
 
