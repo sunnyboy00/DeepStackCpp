@@ -226,11 +226,7 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 			{
 				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
 				//auto cfvs = RemoveF1D(cfvs_data[d], 1);
-				ArrayXX rng2 = ToAmxx_ex(ranges, players_count, card_count);
-				ArrayXX targ = ArrayXX(players_count, card_count);
-				_terminal_equity.call_value(rng2, targ);
-				cout << rng2 << endl << "--------------" << endl;
-				cout << targ << endl << endl;
+				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(csvfs_res, players_count, card_count));
 				RemoveF1D(cfvs_data[d], 1) = csvfs_res;
 			}
 			
@@ -239,14 +235,13 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 			Tf4 ranges = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
 			_terminal_equity.fold_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(csvfs_res, players_count, card_count));
 			RemoveF1D(cfvs_data[d], 0) = csvfs_res;
-			Tf5 temp = cfvs_data[d];
 			//--correctly set the folded player by multiplying by - 1
-			float fold_mutliplier = (acting_player[d] * 2 - 3);// ?
-
-			auto chip1 = cfvs_data[d].chip(0, 0);
+			float fold_mutliplier = (acting_player[d] * 2 - 1);
+			Tf5& data = cfvs_data[d];
+			auto chip1 = cfvs_data[d].chip(0, 0).chip(P1, 2);
 			chip1 *= chip1.constant(fold_mutliplier);
-
-			auto chip2 = cfvs_data[d].chip(0, 0);
+			Tf5& data2 = cfvs_data[d];
+			auto chip2 = cfvs_data[d].chip(0, 0).chip(P2, 2);
 			chip2 *= chip2.constant(-fold_mutliplier);
 		}
 	}
@@ -270,7 +265,7 @@ void lookahead::_compute_terminal_equities()
 
 void lookahead::_compute_cfvs()
 {
-	for (int d = depth; d >= 1; d--)
+	for (long long d = depth; d >= 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];

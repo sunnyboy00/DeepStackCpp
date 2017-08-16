@@ -144,19 +144,19 @@ TEST_CASE("lookahed_compute_terminal_equities")
 	Tf1 p2_csvs_1 = RemoveF4D(look.cfvs_data[0], 0, 0, 0, P2);
 	AreEq(p2_csvs_1, 0);
 
-	Tf5 csvs_1 = look.cfvs_data[1];
 	Tf1 p1_csvs_2 = RemoveF4D(look.cfvs_data[1], 0, 0, 0, P1);
 	AreEq(p1_csvs_2, 0);
 	Tf1 p2_csvs_2 = RemoveF4D(look.cfvs_data[1], 0, 0, 0, P2);
-	std::array<float, card_count> p2_target_csvs_2 = { -2.0, -2.0, 0.0, -2.0, -2.0, -2.0 };
+	std::array<float, card_count> p2_target_csvs_2 = { -2400, -2400,     0, -2400, -2400, -2400 };
 	AreEq(p2_csvs_2, p2_target_csvs_2);
 
-	Tf1 p1_csvs_3 = RemoveF4D(look.ranges_data[1], 1, 0, 0, P1);
-	std::array<float, card_count> p1_target_csvs_3 = { 0.2, 0.2, 0.0, 0.8, -0.6, -0.6 };
+
+	Tf1 p1_csvs_3 = RemoveF4D(look.cfvs_data[1], 1, 0, 0, P1);
+	std::array<float, card_count> p1_target_csvs_3 = { 240,   240,     0,   960,  -720,  -720 };
 	AreEq(p1_csvs_3, p1_target_csvs_3);
 
-	Tf1 p2_csvs_3 = RemoveF4D(look.ranges_data[1], 1, 0, 0, P2);
-	std::array<float, card_count> p2_target_csvs_3 = { 0.5, 0.5, 0.0, 2.0, -1.5, -1.5 };
+	Tf1 p2_csvs_3 = RemoveF4D(look.cfvs_data[1], 1, 0, 0, P2);
+	std::array<float, card_count> p2_target_csvs_3 = { 600,   600,     0,  2400, -1800, -1800 };
 	AreEq(p2_csvs_3, p2_target_csvs_3);
 }
 
