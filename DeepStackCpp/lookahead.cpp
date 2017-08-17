@@ -1,7 +1,6 @@
 #include "lookahead.h"
 
 
-
 lookahead::lookahead(long long skip_iters, long long iters)
 {
 	_cfr_skip_iters = skip_iters;
@@ -126,7 +125,7 @@ LookaheadResult lookahead::get_results()
 	Tf2 scalerSum = Util::NotReduceSum(scaler, 1);
 
 	scaler = Util::ExpandAs(scalerSum, range_mul);
-	scaler *= scaler.constant(_cfr_iters - _cfr_skip_iters);
+	scaler *= scaler.constant((float)(_cfr_iters - _cfr_skip_iters));
 
 	out.children_cfvs /= scaler;
 
@@ -193,7 +192,7 @@ void lookahead::_compute_terminal_equities_next_street_box()
 
 void lookahead::_compute_update_average_strategies(size_t iter)
 {
-	if (iter > _cfr_skip_iters)
+	if (iter >= _cfr_skip_iters)
 	{
 		//--no need to go through layers since we care for the average strategy only in the first node anyway
 		//--note that if you wanted to average strategy on lower layers, you would need to weight the current strategy by the current reach probability
@@ -219,30 +218,22 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 		else
 		{
 			assert(tree->street == 2);
-
 			size_t sizeToUse = cfvs_data[d].dimension(4) * cfvs_data[d].dimension(3) * cfvs_data[d].dimension(2) * cfvs_data[d].dimension(1);
-			float rows = sizeToUse / card_count;
+			float rows = (float)sizeToUse / card_count;
 			assert(ceilf(rows) == rows && "The coefficients must be integers");
 			Tf2 csvfs_res((int)rows, card_count);  // ToDo: Extra copy
 
 			//--on river, any call is terminal
 			if (d > 1 || first_call_terminal)
 			{
-				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
-				Eigen::Map<ArrayXX>& m1 = ToAmxx_ex(ranges, rows, card_count);
-				Eigen::Map<ArrayXX>& m2 = ToAmxx_ex(csvfs_res, rows, card_count);
-				//Util::Copy(csvfs_res, ranges);
-				//auto cfvs = RemoveF1D(cfvs_data[d], 1);
-				_terminal_equity.call_value(m1, m2);
-				//RemoveF1D(cfvs_data[d], 1) = csvfs_res.data();
+				Tf4 ranges_1 = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
+				_terminal_equity.call_value(ToAmxx_ex(ranges_1, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
 				Util::CopyToSlice(cfvs_data[d], { { {1, 1}, {0, -1}, {0, -1}, {0, -1}, {0, -1} } }, csvfs_res);
 			}
 			
-
 			//--folds
-			Tf4 ranges = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
-			_terminal_equity.fold_value(ToAmxx_ex(ranges, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
-			//RemoveF1D(cfvs_data[d], 0) = csvfs_res;
+			Tf4 ranges_0 = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
+			_terminal_equity.fold_value(ToAmxx_ex(ranges_0, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
 			Util::CopyToSlice(cfvs_data[d], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
 
 
@@ -276,7 +267,7 @@ void lookahead::_compute_terminal_equities()
 
 void lookahead::_compute_cfvs()
 {
-	for (long long d = depth; d >= 1; d--)
+	for (int d = depth; d >= 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
@@ -305,7 +296,7 @@ void lookahead::_compute_cfvs()
 
 void lookahead::_compute_cumulate_average_cfvs(size_t iter)
 {
-	if (iter > _cfr_skip_iters)
+	if (iter >= _cfr_skip_iters)
 	{
 		average_cfvs_data[P1] += cfvs_data[P1];
 		average_cfvs_data[P2] += cfvs_data[P2];
@@ -330,7 +321,7 @@ void lookahead::_compute_normalize_average_strategies()
 
 void lookahead::_compute_regrets()
 {
-	for (long long d = depth; d >= 1; d--)
+	for (int d = depth; d >= 1; d--)
 	{
 		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
 		int gp_layer_bets_count = bets_count[d - 2];
@@ -385,7 +376,7 @@ void lookahead::_compute_normalize_average_cfvs()
 void lookahead::_compute()
 {
 	//--1.0 main loop
-	for (size_t iter = 0; iter <= _cfr_iters; iter++)
+	for (size_t iter = 0; iter < _cfr_iters; iter++)
 	{
 		_set_opponent_starting_range();
 		_compute_current_strategies();
@@ -421,6 +412,7 @@ void lookahead::_compute_current_strategies()
 		Tf4& player_regrets_sum = regrets_sum[d];
 
 		player_current_strategy = player_regrets / Util::ExpandAs(player_regrets_sum, player_regrets);
+		int test = 1;
 	}
 }
 

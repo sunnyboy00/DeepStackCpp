@@ -66,7 +66,7 @@ struct Node
 	ArrayX actions;
 
 	// Depth of the node inside the tree
-	long long depth;
+	int depth;
 
 	// Player regrets. A tensor of [actions_count x card_count] size.
 	ArrayXX regrets;

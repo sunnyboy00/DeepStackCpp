@@ -27,12 +27,12 @@ public:
 	// Game tree
 	Node* tree = nullptr;
 
-	long long _cfr_skip_iters;
+	size_t _cfr_skip_iters;
 
-	long long _cfr_iters;
+	size_t _cfr_iters;
 
 	// Lookahead depth to solve
-	long long depth;
+	int depth;
 
 	const float regret_epsilon = 1.0f / 1000000000;
 

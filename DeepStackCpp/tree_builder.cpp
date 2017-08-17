@@ -175,7 +175,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 	vector<Node*> children = _get_children_nodes(current_node);
 	current_node.children = children;
 
-	long long depth = -1;
+	int depth = -1;
 
 	current_node.actions = ArrayX(children.size());
 	for (size_t i = 0; i < children.size(); i++)
