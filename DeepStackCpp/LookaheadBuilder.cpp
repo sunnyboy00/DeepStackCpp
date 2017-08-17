@@ -33,11 +33,11 @@ void LookaheadBuilder::build_from_tree(Node& tree)
 	//--construct the initial data structures using the bet counts
 	construct_data_structures();
 
-		//--traverse the tree and fill the data structures(pot sizes, non - existing actions, ...)
-		//--node, layer, action, parent_action, gp_id
+	//--traverse the tree and fill the data structures(pot sizes, non - existing actions, ...)
+	//--node, layer, action, parent_action, gp_id
 	set_datastructures_from_tree_dfs(tree, 0, 0, 0, 0);
 
-		//--set additional info
+	//--set additional info
 	assert(_lookahead->terminal_actions_count[0] == 1 || _lookahead->terminal_actions_count[0] == 2);
 
 	_lookahead->first_call_terminal = _lookahead->tree->children[1]->terminal;
@@ -129,7 +129,6 @@ void LookaheadBuilder::set_datastructures_from_tree_dfs(Node & node, int layer, 
 	node.lookahead_coordinates.resize(action_id, parent_id, gp_id);
 
 	//--transition call cannot be allin call
-
 #ifdef _DEBUG
 	if (node.current_player == chance)
 	{

@@ -32,7 +32,8 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		static inline void Copy(ArrayXX & target, ArrayXX & source)
+		template <typename Derived>
+		static inline void Copy(ArrayBase<Derived> & target, ArrayBase<Derived> & source)
 		{
 			assert(target.size() >= source.size());
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
@@ -211,14 +212,41 @@ class Util
 			target.slice(offsets, extentsLen).setConstant(value);
 		}
 
-		template <int N>
-		static inline void CopyToSlice(TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices, TfN source)
+		//template <int N>
+		//static inline void CopyToSlice(TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices, TfN source)
+		//{
+		//	Eigen::array<DenseIndex, N> offsets;
+		//	Eigen::array<DenseIndex, N> extentsLen;
+
+		//	PreprocessExtents(slices, target, offsets, extentsLen);
+		//	target.slice(offsets, extentsLen) = source;
+		//}
+
+		template <int N, int N2>
+		static void CopyToSlice(TfN &target, std::array<std::array<DenseIndex, 2>, N> const &slices, TfN2 source)
 		{
 			Eigen::array<DenseIndex, N> offsets;
 			Eigen::array<DenseIndex, N> extentsLen;
 
-			PreprocessExtents(slices, target, offsets, extentsLen);
-			target.slice(offsets, extentsLen) = source;
+			Util::PreprocessExtents(slices, target, offsets, extentsLen);
+			auto slicedTarget = target.slice(offsets, extentsLen);
+
+#ifdef _DEBUG
+			size_t size = 1;
+			for (size_t i = 0; i < N; i++)
+			{
+				size *= extentsLen[i];
+			}
+			assert(size == source.size());
+#endif
+
+			Eigen::array<Eigen::DenseIndex, N> dims;
+			for (size_t i = 0; i < N; i++)
+			{
+				dims[i] = extentsLen[i];
+			}
+
+			slicedTarget = source.reshape(dims);
 		}
 
 		template <int N>
@@ -262,8 +290,8 @@ class Util
 
 		static inline Tm2 View(Tf2 &source, std::array<int, 2>& sizes)
 		{
-			assert(source.size() == sizes[0] * sizes[1]);
 			Util::ProcessSizes((int)source.size(), sizes);
+			assert(source.size() == sizes[0] * sizes[1]);
 			return Tm2(source.data(), sizes[0], sizes[1]);
 		}
 
@@ -283,6 +311,49 @@ class Util
 		{
 			Util::ProcessSizes((int)source.size(), sizes);
 			return Tm5(source.data(), sizes[0], sizes[1], sizes[2], sizes[3], sizes[4]);
+		}
+
+		static inline void Process2dSizes(size_t size, int& rows, int& cols)
+		{
+			assert(rows < 0 || cols < 0);
+			if (rows == -1)
+			{
+				float newRows = (float)cols / size;
+				assert(ceilf(newRows) == newRows && "The coefficients must be integers");
+				rows = (int)newRows;
+			}
+			else if (cols == -1)
+			{
+				float newCols = (float)cols / size;
+				assert(ceilf(newCols) == newCols && "The coefficients must be integers");
+				cols = (int)newCols;
+			}
+
+			assert(rows * cols == size);
+		}
+
+		static inline TmAxx ArXXView(Tf5 &source, int rows, int cols)
+		{
+			Process2dSizes(source.size(), rows, cols);
+			return TmAxx(source.data(), rows, cols);
+		}
+
+		static inline TmAxx ArXXView(Tf4 &source, int rows, int cols)
+		{
+			Process2dSizes(source.size(), rows, cols);
+			return TmAxx(source.data(), rows, cols);
+		}
+
+		static inline TmAxx ArXXView(Tf3 &source, int rows, int cols)
+		{
+			Process2dSizes(source.size(), rows, cols);
+			return TmAxx(source.data(), rows, cols);
+		}
+
+		static inline TmAxx ArXXView(Tf2 &source, int rows, int cols)
+		{
+			Process2dSizes(source.size(), rows, cols);
+			return TmAxx(source.data(), rows, cols);
 		}
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)

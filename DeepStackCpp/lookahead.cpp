@@ -210,10 +210,9 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 		{
 			if (d > 1 || first_call_terminal)
 			{
-				//Eigen::array<Eigen::DenseIndex, 2> rangesDims = { players_count, card_count };
+				Eigen::array<Eigen::DenseIndex, 2> rangesDims = { players_count, card_count };
 				Tf3 ranges = RemoveF2D(ranges_data[d], 1, -1);//.reshape(rangesDims); // ToDo: Extra copy
 				Tf3 cfvs = RemoveF2D(cfvs_data[d], 1, -1);// .reshape(rangesDims);
-
 				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
 			}
 		}
@@ -221,22 +220,32 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 		{
 			assert(tree->street == 2);
 
-			Tf4 csvfs_res(1, 1, players_count, card_count);  // ToDo: Extra copy
+			size_t sizeToUse = cfvs_data[d].dimension(4) * cfvs_data[d].dimension(3) * cfvs_data[d].dimension(2) * cfvs_data[d].dimension(1);
+			float rows = sizeToUse / card_count;
+			assert(ceilf(rows) == rows && "The coefficients must be integers");
+			Tf2 csvfs_res((int)rows, card_count);  // ToDo: Extra copy
 
 			//--on river, any call is terminal
 			if (d > 1 || first_call_terminal)
 			{
 				Tf4 ranges = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
+				Eigen::Map<ArrayXX>& m1 = ToAmxx_ex(ranges, rows, card_count);
+				Eigen::Map<ArrayXX>& m2 = ToAmxx_ex(csvfs_res, rows, card_count);
+				//Util::Copy(csvfs_res, ranges);
 				//auto cfvs = RemoveF1D(cfvs_data[d], 1);
-				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(csvfs_res, players_count, card_count));
-				RemoveF1D(cfvs_data[d], 1) = csvfs_res;
+				_terminal_equity.call_value(m1, m2);
+				//RemoveF1D(cfvs_data[d], 1) = csvfs_res.data();
+				Util::CopyToSlice(cfvs_data[d], { { {1, 1}, {0, -1}, {0, -1}, {0, -1}, {0, -1} } }, csvfs_res);
 			}
 			
 
 			//--folds
 			Tf4 ranges = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
-			_terminal_equity.fold_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(csvfs_res, players_count, card_count));
-			RemoveF1D(cfvs_data[d], 0) = csvfs_res;
+			_terminal_equity.fold_value(ToAmxx_ex(ranges, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
+			//RemoveF1D(cfvs_data[d], 0) = csvfs_res;
+			Util::CopyToSlice(cfvs_data[d], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
+
+
 			//--correctly set the folded player by multiplying by - 1
 			float fold_mutliplier = (acting_player[d] * 2 - 1);
 			Tf5& data = cfvs_data[d];

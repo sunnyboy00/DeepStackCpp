@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <Eigen/Dense>
-
+#include <numeric>
 #include "Node.h"
 #include "assert.h"
 #include "arguments.h"
@@ -35,6 +35,12 @@ public:
 	long long depth;
 
 	const float regret_epsilon = 1.0f / 1000000000;
+
+	//Action order:
+	// - fold
+	// - call
+	// - not all int bets
+	// - all inn bet.
 
 	//-----------------------------------------------------------------------
 	//--Per layer information about tree actions
@@ -70,7 +76,7 @@ public:
 	//--lookahead main data structures
 	//--all the structures are per - layer tensors, that is, each layer holds the data in n - dimensional tensors
 
-	//[actions x parent_action x grandparent_id x batch x players x range]
+	//[actions x parent_action x grandparent_id x players x range] - (([actions x parent_action x grandparent_id x batch x players x range]))
 	map<int, Tf5> ranges_data;
 	map<int, Tf5> cfvs_data;
 	map<int, Tf5> average_cfvs_data;

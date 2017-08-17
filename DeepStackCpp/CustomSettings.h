@@ -16,6 +16,7 @@ typedef float mainDataType;
 #define RowVectorX Eigen::Matrix<float, 1, Eigen::Dynamic>
 
 #define TfN Eigen::Tensor<float, N, MyLayoutType>
+#define TfN2 Eigen::Tensor<float, N2, MyLayoutType>
 #define Tf5 Eigen::Tensor<float, 5, MyLayoutType>
 #define Tf4 Eigen::Tensor<float, 4, MyLayoutType>
 #define Tf3 Eigen::Tensor<float, 3, MyLayoutType>
@@ -40,7 +41,7 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define Tm1 Eigen::TensorMap<Tf1, 1>
 
 #define TmAxx Eigen::Map<ArrayXX>
-#define TmAxx Eigen::Map<ArrayXX>
+#define TmAx Eigen::Map<ArrayX>
 
 #define CardsT Eigen::TensorFixedSize<float, Eigen::Sizes<card_count>>
 #define CfvsT Eigen::TensorFixedSize<float, Eigen::Sizes<players_count, card_count>>
