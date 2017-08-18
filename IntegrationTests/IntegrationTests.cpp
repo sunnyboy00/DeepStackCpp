@@ -9,13 +9,15 @@
 #include "card_to_string_conversion.h"
 #include "Node.h"
 #include "tree_values.h"
+#include "Resolving.h"
 #include "Constants.h"
 #include "tree_builder.h"
 #include "TreeVisualizer.h"
+#include "lookahead.h"
 #include "TreeCFR.h"
 #include <Eigen/Dense>
 #include <iostream>
-
+#include <ctime>
 
 void test_tree_builder()
 {
@@ -39,8 +41,8 @@ void test_tree_visualiser()
 	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("");
-	params.root_node->street = 1;
+	params.root_node->board = converter.string_to_board("Ks");
+	params.root_node->street = 2;
 	params.root_node->current_player = P1;
 	params.root_node->bets << 100, 100;
 
@@ -78,21 +80,61 @@ void test_tree_cfr()
 	cout << "Exploitability: " << tree->exploitability << endl;
 }
 
+void test_run_cfr()
+{
+	TreeBuilderParams params;
+	Node node;
+	params.root_node = &node;
+	card_to_string_conversion converter;
+	params.root_node->board = converter.string_to_board("Ks");
+	params.root_node->street = 2;
+	params.root_node->current_player = P1;
+	params.root_node->bets << 100, 100;
+
+	tree_builder builder;
+	Node* tree = builder.build_tree(params);
+	card_tools cradTools;
+
+	ArrayXX starting_ranges(players_count, card_count);
+	starting_ranges.row(0) = cradTools.get_uniform_range(params.root_node->board);
+	starting_ranges.row(1) = cradTools.get_uniform_range(params.root_node->board);
+
+	TreeCFR tree_cfr;
+	tree_cfr.run_cfr(*tree, starting_ranges);
+}
+
+void Resolve()
+{
+	Resolving resolver;
+
+	Node node;
+	card_to_string_conversion converter;
+	node.board = converter.string_to_board("Ks");
+	node.street = 2;
+	node.current_player = P1;
+	node.bets << 100, 100;
+
+	card_tools tools;
+	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
+	Tf1 op_cfvs(card_count);
+	op_cfvs(0) = -500;
+	op_cfvs(1) = 0;
+	op_cfvs(2) = 700;
+	op_cfvs(3) = -900;
+	op_cfvs(4) = 800;
+	op_cfvs(5) = 1200;
+
+	LookaheadResult result = resolver.resolve(node, player_range, op_cfvs);
+}
 
 int main()
 {
-	Tf2 a1(4, 3);
-	a1.setZero();
-
-	Tf2 a2(4, 3);
-	a2.setValues({ { 0, 100, 200 },{ 300, 400, 500 },
-	{ 600, 700, 800 },{ 900, 1000, 1100 } });
-
-	Tf2& a3 = a1;
-
-	cout << "a1" << endl << a1.data() << endl;
-	cout << "a3" << endl << a3.data() << endl;
-
-	cout << "Done";
+	clock_t begin = clock();
+	test_run_cfr();
+	//test_tree_visualiser();
+	//Resolve();
+	clock_t end = clock();
+	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+	cout << elapsed_secs << endl;
 }
 

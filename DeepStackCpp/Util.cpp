@@ -92,7 +92,7 @@ void Util::Print(Tf5& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "5d: " << tensor.dimension(4) << "x" << tensor.dimension(3) << "x" << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
+	ss << "5d: " << tensor.dimension(0) << "x" << tensor.dimension(1) << "x" << tensor.dimension(2) << "x" << tensor.dimension(3) << "x" << tensor.dimension(4) << endl;
 
 	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
@@ -122,7 +122,7 @@ void Util::Print(Tf4& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "4d: " << tensor.dimension(3) << "x" << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
+	ss << "4d: " << tensor.dimension(0) << "x" << tensor.dimension(1) << "x" << tensor.dimension(2) << "x" << tensor.dimension(3) << endl;
 
 	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
@@ -149,7 +149,7 @@ void Util::Print(Tf3& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "3d: " << tensor.dimension(2) << "x" << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
+	ss << "3d: " << tensor.dimension(0) << "x" << tensor.dimension(1) << "x" << tensor.dimension(2) << endl;
 
 	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
@@ -173,7 +173,7 @@ void Util::Print(Tf2& tensor)
 {
 	std::wostringstream result;
 	ostringstream ss;
-	ss << "2d: " << tensor.dimension(1) << "x" << tensor.dimension(0) << endl;
+	ss << "2d: " << tensor.dimension(0) << "x" << tensor.dimension(1) << endl;
 
 	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{

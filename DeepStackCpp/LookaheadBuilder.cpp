@@ -207,12 +207,6 @@ void LookaheadBuilder::ProcessNodeWithEmptyActions(Node &node, int layer, int ac
 	}
 
 	// We are masking out as 0 all impossible actions except allin(empty actions).
-	//size_t upperBound = _lookahead->empty_action_mask[layer + 1].dimension(0) - existing_bets_count;
-	//for (int actionToMask = terminal_actions_count; actionToMask < upperBound; actionToMask++)
-	//{
-	//	RemoveF3D(_lookahead->empty_action_mask[layer + 1], actionToMask, next_parent_id, next_gp_id).setZero();
-	//}
-
 	Util::FillSlice(_lookahead->empty_action_mask[layer + 1],
 	{{ 
 		{ terminal_actions_count,-(existing_bets_count + 1) },
@@ -255,7 +249,7 @@ void LookaheadBuilder::_compute_structure()
 
 	_lookahead->nonterminal_nonallin_nodes_count[-1] = 1; // Fake layer, mb chance?
 	_lookahead->nonterminal_nonallin_nodes_count[0] = 1; // The root node
-	_lookahead->nonterminal_nonallin_nodes_count[1] = _lookahead->bets_count[0] - 1;
+	_lookahead->nonterminal_nonallin_nodes_count[1] = _lookahead->bets_count[0] - 1; //?
 
 	for (int d = 1; d <= _lookahead->depth; d++)
 	{
@@ -301,7 +295,6 @@ void LookaheadBuilder::construct_data_structures()
 	Util::ResizeAndFill(_lookahead->current_strategy_data[1], one_pl_dims);
 	Util::ResizeAndFill(_lookahead->regrets_data[1], one_pl_dims);
 	Util::ResizeAndFill(_lookahead->current_regrets_data[1], one_pl_dims);
-	Util::ResizeAndFill(_lookahead->positive_regrets_data[1], one_pl_dims);
 	Util::ResizeAndFill(_lookahead->empty_action_mask[1], one_pl_dims, 1.0f);
 
 
@@ -351,7 +344,6 @@ void LookaheadBuilder::construct_data_structures()
 		Util::ResizeAndFill(_lookahead->regrets_data[d], deep_player_dims);
 		Util::ResizeAndFill(_lookahead->current_regrets_data[d], deep_player_dims);
 		Util::ResizeAndFill(_lookahead->empty_action_mask[d], deep_player_dims, 1.0f);
-		Util::ResizeAndFill(_lookahead->positive_regrets_data[d], deep_player_dims);
 
 		//--data structures[1 x parent_action x grandparent_id x batch x players x range]
 		Util::ResizeAndFill(_lookahead->regrets_sum[d], { _lookahead->bets_count[d - 2],

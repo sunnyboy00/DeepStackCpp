@@ -46,6 +46,9 @@
     <Filter Include="Source Files\NN">
       <UniqueIdentifier>{211bc78b-e871-4f1f-a08b-62e9e9aae3f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\DataGeneration">
+      <UniqueIdentifier>{eb145677-231f-45e1-985b-37c9aa87cac1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

@@ -41,6 +41,9 @@ public:
 	// - call
 	// - not all int bets
 	// - all inn bet.
+	enum Actions {
+		Fold = 0, Call = 1, FirstNotAllInnBet = 2, AllInnBet = -1 
+	};
 
 	//-----------------------------------------------------------------------
 	//--Per layer information about tree actions
@@ -77,21 +80,32 @@ public:
 	//--all the structures are per - layer tensors, that is, each layer holds the data in n - dimensional tensors
 
 	//[actions x parent_action x grandparent_id x players x range] - (([actions x parent_action x grandparent_id x batch x players x range]))
+	enum LookaheadMainDims {
+		ActionsDim = 0, ParActionDim = 1, GpActionDim = 2, PlayersDim = 3, RangeDim = 4
+	};
+
 	map<int, Tf5> ranges_data;
 	map<int, Tf5> cfvs_data;
 	map<int, Tf5> average_cfvs_data;
 	map<int, Tf5> placeholder_data;
 
 	//--data structures for one player[actions x parent_action x grandparent_id x 1 x range]
+	enum LookaheadOnPlDims {
+		ActionsDim_1 = 0, ParActionDim_1 = 1, GpActionDim_1 = 2, RangeDim_1 = 3
+	};
+
 	map<int, Tf4> average_strategies_data;
 	map<int, Tf4> current_strategy_data;
 	map<int, Tf4> regrets_data;
 	map<int, Tf4> current_regrets_data;
-	map<int, Tf4> positive_regrets_data;
 	//--used to mask empty actions
-	map<int, Tf4> empty_action_mask;
+	map<int, Tf4> empty_action_mask; //ToDo: possible we can remove it by not using empty actions in calulation of CSVs
 
 	//--data structures for summing over the actions [1 x parent_action x grandparent_id x range]
+	enum LookaheadSumDims {
+		ParActionDim_sum = 0, GpActionDim_sum = 2, RangeDim_sum = 3
+	};
+
 	map<int, Tf4> regrets_sum;
 
 
@@ -198,6 +212,12 @@ public:
 	//-- - Using the players' reach probabilities, computes their counterfactual
 	//--values at each lookahead state which is a terminal state of the game. Saves it in the cfvs_data.
 	void _compute_terminal_equities_terminal_equity();
+
+	// Filling terminal equities for the second street
+	void _processSecondStreetTermEq(int d, Tf2& csvfs_res);
+
+	// Filling terminal equities for the first street
+	void _processFirstStreetTermEq(int d, Tf2& csvfs_res);
 
 	//-- - Using the players' reach probabilities, computes their counterfactual
 	//	--values at all terminal states of the lookahead.

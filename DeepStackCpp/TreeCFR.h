@@ -24,7 +24,7 @@ public:
 	//	-- @param[opt] iter_count the number of iterations to run CFR for
 	//	--(default @{arguments.cfr_iters
 	//})
-	void run_cfr(Node& root, const ArrayXX&  starting_ranges, size_t iter_count = 0, size_t skip_iters = cfr_skip_iters);
+	void run_cfr(Node& root, const ArrayXX&  starting_ranges, size_t iter_count = cfr_iters, size_t skip_iters = cfr_skip_iters);
 
 private:
 

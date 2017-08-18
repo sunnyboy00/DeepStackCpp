@@ -204,49 +204,66 @@ void lookahead::_compute_terminal_equities_terminal_equity()
 {
 	for (int d = 1; d <= depth; d++)
 	{
+		size_t sizeToUse = cfvs_data[d].dimension(4) * cfvs_data[d].dimension(3) * cfvs_data[d].dimension(2) * cfvs_data[d].dimension(1);
+		assert(tree->street == 2);
+		float rows = (float)sizeToUse / card_count;
+		assert(ceilf(rows) == rows && "The coefficients must be integers");
+		Tf2 csvfs_res((int)rows, card_count);  // ToDo: Extra copy 
+
 		//--call term eq evaluation
 		if (tree->street == 1)
 		{
-			if (d > 1 || first_call_terminal)
-			{
-				Eigen::array<Eigen::DenseIndex, 2> rangesDims = { players_count, card_count };
-				Tf3 ranges = RemoveF2D(ranges_data[d], 1, -1);//.reshape(rangesDims); // ToDo: Extra copy
-				Tf3 cfvs = RemoveF2D(cfvs_data[d], 1, -1);// .reshape(rangesDims);
-				_terminal_equity.call_value(ToAmxx_ex(ranges, players_count, card_count), ToAmxx_ex(cfvs, players_count, card_count));
-			}
+			_processFirstStreetTermEq(d, csvfs_res);
 		}
 		else
 		{
-			assert(tree->street == 2);
-			size_t sizeToUse = cfvs_data[d].dimension(4) * cfvs_data[d].dimension(3) * cfvs_data[d].dimension(2) * cfvs_data[d].dimension(1);
-			float rows = (float)sizeToUse / card_count;
-			assert(ceilf(rows) == rows && "The coefficients must be integers");
-			Tf2 csvfs_res((int)rows, card_count);  // ToDo: Extra copy
-
-			//--on river, any call is terminal
-			if (d > 1 || first_call_terminal)
-			{
-				Tf4 ranges_1 = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
-				_terminal_equity.call_value(ToAmxx_ex(ranges_1, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
-				Util::CopyToSlice(cfvs_data[d], { { {1, 1}, {0, -1}, {0, -1}, {0, -1}, {0, -1} } }, csvfs_res);
-			}
-			
-			//--folds
-			Tf4 ranges_0 = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
-			_terminal_equity.fold_value(ToAmxx_ex(ranges_0, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
-			Util::CopyToSlice(cfvs_data[d], { { { 0, 0 },{ 0, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
-
-
-			//--correctly set the folded player by multiplying by - 1
-			float fold_mutliplier = (acting_player[d] * 2 - 1);
-			Tf5& data = cfvs_data[d];
-			auto chip1 = cfvs_data[d].chip(0, 0).chip(P1, 2);
-			chip1 *= chip1.constant(fold_mutliplier);
-			Tf5& data2 = cfvs_data[d];
-			auto chip2 = cfvs_data[d].chip(0, 0).chip(P2, 2);
-			chip2 *= chip2.constant(-fold_mutliplier);
+			_processSecondStreetTermEq(d, csvfs_res);
 		}
+
+		//--multiply by pot scale factor
+		cfvs_data[d] *= pot_size[d];
 	}
+}
+
+void lookahead::_processFirstStreetTermEq(int d, Tf2& csvfs_res)
+{
+	const int rows = csvfs_res.dimension(0);
+
+	if (d > 1 || first_call_terminal)
+	{
+		Eigen::array<Eigen::DenseIndex, 2> rangesDims = { players_count, card_count };
+		Tf3 ranges = RemoveF2D(ranges_data[d], 1, -1);//.reshape(rangesDims); // ToDo: Extra copy
+		_terminal_equity.call_value(ToAmxx_ex(ranges, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
+		Util::CopyToSlice(cfvs_data[d], { { { Call, Call },{ -1, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
+	}
+}
+
+void lookahead::_processSecondStreetTermEq(int d, Tf2& csvfs_res)
+{
+	const int rows = csvfs_res.dimension(0);
+
+	//--on river, any call is terminal
+	if (d > 1 || first_call_terminal)
+	{
+		Tf4 ranges_1 = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
+		_terminal_equity.call_value(ToAmxx_ex(ranges_1, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
+		Util::CopyToSlice(cfvs_data[d], { { {Call, Call}, {0, -1}, {0, -1}, {0, -1}, {0, -1} } }, csvfs_res);
+	}
+
+	//--folds
+	Tf4 ranges_0 = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
+	_terminal_equity.fold_value(ToAmxx_ex(ranges_0, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
+	Util::CopyToSlice(cfvs_data[d], { { { Fold, Fold },{ 0, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
+
+	//--correctly set the folded player by multiplying by - 1
+	float fold_mutliplier = (acting_player[d] * 2 - 1);
+	auto flodCfvs = cfvs_data[d].chip(ActionsDim, Fold);
+
+	auto chip1 = flodCfvs.chip(P1, PlayersDim - 1); // - 1 because of after a chip
+	chip1 *= chip1.constant(fold_mutliplier);
+
+	auto chip2 = flodCfvs.chip(P2, PlayersDim - 1);
+	chip2 *= chip2.constant(-fold_mutliplier);
 }
 
 void lookahead::_compute_terminal_equities()
@@ -257,12 +274,6 @@ void lookahead::_compute_terminal_equities()
 	}
 
 	_compute_terminal_equities_terminal_equity();
-
-	//--multiply by pot scale factor
-	for (int d = 1; d <= depth; d++)
-	{
-		cfvs_data[d] *= pot_size[d];
-	}
 }
 
 void lookahead::_compute_cfvs()
@@ -278,7 +289,7 @@ void lookahead::_compute_cfvs()
 		//--player indexing is swapped for cfvs
 		Remove4D(placeholder_data[d], (int)acting_player[d]) *= current_strategy_data[d];
 
-		std::array<int, 1> dims = { 0 };
+		std::array<int, 1> dims = { ActionsDim };
 		regrets_sum[d] = placeholder_data[d].sum(dims);
 		//regrets_sum[d] = Util::NotReduceSum(placeholder_data[d], 0);
 
@@ -287,9 +298,9 @@ void lookahead::_compute_cfvs()
 		CopyDif(swap, regrets_sum[d]);
 
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
-		{ { { gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 },{ 0 , -1 },{ 0, -1 } } };
+		{ { { gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 }, { 0 , -1 }, { 0 , -1 }, { 0, -1 } } };
 
-		auto transposedRegretSum = Util::Transpose(swap, { 0, 2, 1, 3, 4 });
+		auto transposedRegretSum = Util::Transpose(swap, { ActionsDim, GpActionDim, ParActionDim, PlayersDim, RangeDim });
 		Util::CopyToSlice(cfvs_data[d - 1], slices, transposedRegretSum);
 	}
 }
@@ -331,23 +342,20 @@ void lookahead::_compute_regrets()
 		DenseIndex cur_acting_player = (DenseIndex)acting_player[d];
 		Tf4 dataToCopy = Remove4D(cfvs_data[d], cur_acting_player);
 		Util::Copy(current_regrets, dataToCopy);
-		Tf5& next_level_cfvs = cfvs_data[d - 1];
 
 		auto parent_inner_nodes = inner_nodes_p1[d - 1];
 		std::array<std::array<DenseIndex, 2>, 5> const slices =
-		{ {{ gp_layer_terminal_actions_count, -1 },{ 0, ggp_layer_nonallin_bets_count - 1 },{ 0 , -1 }, { cur_acting_player, cur_acting_player}, { 0 , -1 }} };
-		Tf5 sliceData = Util::Slice(next_level_cfvs, slices);
-		
-		Util::Copy(parent_inner_nodes, Util::Transpose(sliceData, { 0, 2, 1, 3, 4 }));
+		{ {{ gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 }, { 0 , -1 }, { cur_acting_player, cur_acting_player}, { 0 , -1 }} };
+		Tf5 sliceData = Util::Slice(cfvs_data[d - 1], slices);
+		Tf5 c =Util::Transpose(sliceData, { ActionsDim, GpActionDim, ParActionDim, PlayersDim, RangeDim });
+		Util::Copy(parent_inner_nodes, Util::Transpose(sliceData, { ActionsDim, GpActionDim, ParActionDim, PlayersDim, RangeDim }));
 
 		std::array<int, 4> sizes = { 1, gp_layer_bets_count, -1, card_count };
 		Util::ProcessSizes((int)parent_inner_nodes.size(), sizes);
+
 		Tm4 parrentMap(parent_inner_nodes.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
-
 		Tf4 ex_parent_inner_nodes = Util::ExpandAs(parrentMap, current_regrets);
-
 		current_regrets -= ex_parent_inner_nodes;
-
 		regrets_data[d] += current_regrets;
 
 		//--(CFR + )
@@ -398,21 +406,15 @@ void lookahead::_compute_current_strategies()
 {
 	for (int d = 1; d <= depth; d++)
 	{
-		positive_regrets_data[d] = regrets_data[d];
-		Util::ClipLow(positive_regrets_data[d], regret_epsilon);
+		Util::ClipLow(regrets_data[d], regret_epsilon);
 
 		//--1.0 set regret of empty actions to 0
-		positive_regrets_data[d] *= empty_action_mask[d]; //ToDo: how can we get non zero regret of impossible actions? Remove?
+		regrets_data[d] *= empty_action_mask[d]; //ToDo: how can we get non zero regret of impossible actions? Remove?
 
 		//--1.1  regret matching
 		//--note that the regrets as well as the CFVs have switched player indexing
-		regrets_sum[d] = Util::NotReduceSum(positive_regrets_data[d], 0);
-		Tf4& player_current_strategy = current_strategy_data[d];
-		Tf4& player_regrets = positive_regrets_data[d];
-		Tf4& player_regrets_sum = regrets_sum[d];
-
-		player_current_strategy = player_regrets / Util::ExpandAs(player_regrets_sum, player_regrets);
-		int test = 1;
+		regrets_sum[d] = Util::NotReduceSum(regrets_data[d], ActionsDim);
+		current_strategy_data[d] = regrets_data[d] / Util::ExpandAs(regrets_sum[d], regrets_data[d]);
 	}
 }
 
