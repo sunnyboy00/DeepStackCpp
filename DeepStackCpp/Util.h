@@ -16,6 +16,12 @@ class Util
 {
 	public:
 
+		template <typename Derived>
+		static inline void Sort(ArrayBase<Derived>& target)
+		{
+			std::sort(target.data(), target.data() + target.size());
+		}
+
 		//Coping source tensor to the target tensor
 		template <int N>
 		static inline void Copy(TfN& target, const TfN& source)

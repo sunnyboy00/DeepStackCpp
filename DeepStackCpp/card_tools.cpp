@@ -31,7 +31,7 @@ bool card_tools::hand_is_possible(const ArrayX& hand) // Perfomance warning: Can
 
 CardArray card_tools::get_possible_hand_indexes(const ArrayX& board)
 {
-	CardArray out = CardArray();
+	CardArray out
 
 	out.setZero();
 
