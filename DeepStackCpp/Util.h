@@ -409,9 +409,11 @@ class Util
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
-		static void ToString(const ArrayXX& dataArg);
+		static void Print(const ArrayXX& dataArg);
 
-		static void ToString(const MatrixX& dataArg);
+		static void Print(const MatrixX& dataArg);
+
+		static void Print(const ArrayX& dataArg);
 };
 
 

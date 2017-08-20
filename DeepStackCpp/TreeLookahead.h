@@ -8,11 +8,22 @@
 #include "Util.h"
 #include "terminal_equity.h"
 #include "cfrd_gadget_f.h"
-#include "LookaheadResult.h"
+#include "LookaheadResult_f.h"
 
 class TreeLookahead
 {
 public:
+
+	//Action order:
+	// - fold
+	// - call
+	// - not all int bets
+	// - all inn bet.
+	enum Actions {
+		Fold = 0, Call = 1, FirstNotAllInnBet = 2, AllInnBet = -1
+	};
+
+
 	TreeLookahead(Node& root, long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
 
 	~TreeLookahead();
@@ -41,7 +52,10 @@ public:
 	map<ArrayX*, terminal_equity*> _cached_terminal_equities;
 
 	// Contains sum of cfvs data for the root node that are accumulated after skip_iters iterations
-	Ranges _average_cfvs_data;
+	Ranges _average_root_cfvs_data;
+
+	// Average average strategy data
+	ArrayXX _average_root_strategy;
 
 	//	--- Re - solves the lookahead using input ranges.
 	//	--
@@ -94,7 +108,7 @@ public:
 	//	--
 	//	-- * `children_cfvs`: an AxK tensor of opponent average counterfactual values after
 	//	-- each action that the re - solve player can take at the root of the lookahead
-	LookaheadResult get_results();
+	LookaheadResult_f get_results();
 
 	//-- - Re - solves the lookahead.
 	void _compute();
@@ -171,9 +185,9 @@ public:
 
 	ArrayXX ComputeRegrets(Node &node, ArrayXX &current_strategy, ArrayXX * cf_values_allactions);
 
-	void _fillChanceRangesAndStrategy(Node &node, map<int, ArrayXX> &children_ranges_absolute, ArrayXX& current_strategy);
+	void _fillChanceRangesAndStrategy(Node &node, map<int, Ranges> &children_ranges_absolute, ArrayXX& current_strategy);
 
-	void _fillPlayersRangesAndStrategy(Node & node, map<int, ArrayXX>& children_ranges_absolute, ArrayXX & current_strategy);
+	void _fillPlayersRangesAndStrategy(Node & node, map<int, Ranges>& children_ranges_absolute, ArrayXX & current_strategy);
 
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update

@@ -16,8 +16,10 @@
 //	terminal = terminal;
 //}
 
-Node::Node() : street(1), current_player(chance), bets(2), terminal(false), depth(-1), type(uninitialized), board_string(""), pot(0) //ToDo: Perfomance Warning: do we realy need default constructor to save perfomance?
+Node::Node() : street(1), current_player(chance), bets(2), terminal(false), depth(-1), type(uninitialized), board_string(""), pot(0), 
+ranges(2, card_count) //ToDo: Perfomance Warning: do we realy need default constructor to save perfomance?
 {
+	cf_values = ArrayXX::Zero(players_count, card_count);
 }
 
 Node::~Node()

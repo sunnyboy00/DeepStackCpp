@@ -5,7 +5,7 @@ std::wstring string_to_wstring(const std::string& str) {
 	return std::wstring(str.begin(), str.end());
 }
 
-void Util::ToString(const ArrayXX& dataArg)
+void Util::Print(const ArrayXX& dataArg)
 {
 	IOFormat CleanFmt(3, 0, ", ", "\n", "[", "]");
 
@@ -17,7 +17,7 @@ void Util::ToString(const ArrayXX& dataArg)
 	OutputDebugString(result.str().c_str());
 }
 
-void Util::ToString(const MatrixX& dataArg)
+void Util::Print(const MatrixX& dataArg)
 {
 	IOFormat CleanFmt(3, 0, ", ", "\n", "[", "]");
 	ostringstream ss;
@@ -198,6 +198,20 @@ void Util::Print(Tf1 & tensor)
 	for (DenseIndex d1 = 0; d1 < tensor.dimension(0); d1++)
 	{
 		ss << tensor(d1) << "; ";
+	}
+
+	result << string_to_wstring(ss.str());
+	OutputDebugString(result.str().c_str());
+}
+
+void Util::Print(const ArrayX& dataArg)
+{
+	std::wostringstream result;
+	ostringstream ss;
+
+	for (DenseIndex d1 = 0; d1 < dataArg.rows(); d1++)
+	{
+		ss << dataArg(d1) << "; ";
 	}
 
 	result << string_to_wstring(ss.str());

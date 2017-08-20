@@ -25,11 +25,11 @@ void test_tree_builder()
 	Node node;
 	params.root_node = &node;
 	card_to_string_conversion converter;
-	params.root_node->board = converter.string_to_board("");
-	params.root_node->street = 1;
-	params.root_node->current_player = P1;
+	params.root_node->board = converter.string_to_board("Ks");
+	params.root_node->street = 2;
+	params.root_node->current_player = P2;
 	params.root_node->bets = Array2();
-	params.root_node->bets << 100, 100;
+	params.root_node->bets << 1200, 1200;
 
 	tree_builder builder;
 	Node* tree = builder.build_tree(params);
@@ -43,8 +43,8 @@ void test_tree_visualiser()
 	card_to_string_conversion converter;
 	params.root_node->board = converter.string_to_board("Ks");
 	params.root_node->street = 2;
-	params.root_node->current_player = P1;
-	params.root_node->bets << 100, 100;
+	params.root_node->current_player = P2;
+	params.root_node->bets << 1200, 1200;
 
 	tree_builder builder;
 	Node* tree = builder.build_tree(params);
@@ -130,7 +130,8 @@ void Resolve()
 int main()
 {
 	clock_t begin = clock();
-	test_run_cfr();
+	test_tree_visualiser();
+	//test_run_cfr();
 	//test_tree_visualiser();
 	//Resolve();
 	clock_t end = clock();

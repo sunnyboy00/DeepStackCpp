@@ -19,7 +19,7 @@ TreeCFR::~TreeCFR()
 void TreeCFR::run_cfr(Node& root, const ArrayXX& starting_ranges, size_t iter_count, size_t skip_iters)
 {
 	_cfr_skip_iters = skip_iters;
-	Util::ToString(starting_ranges);
+	Util::Print(starting_ranges);
 
 	assert(starting_ranges.size() > 0);
 	assert(iter_count >= _cfr_skip_iters);

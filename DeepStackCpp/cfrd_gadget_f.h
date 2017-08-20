@@ -15,7 +15,7 @@ using namespace Eigen;
 class cfrd_gadget_f
 {
 public:
-	cfrd_gadget_f(const Range& board, const Range& player_range, const Range& opponent_cfvs);
+	cfrd_gadget_f(const ArrayX& board, const Range_f& player_range, const Range_f& opponent_cfvs);
 
 	//-- - Uses one iteration of the gadget game to generate an opponent range for
 	//	-- the current re-solving iteration.
@@ -23,7 +23,7 @@ public:
 	//	-- with the current strategy in the re - solve game
 	//	-- @param iteration the current iteration number of re-solving
 	//	-- @return the opponent range vector for this iteration
-	Range compute_opponent_range(const Range& current_opponent_cfvs);
+	Range_f compute_opponent_range(const Range_f& current_opponent_cfvs);
 
 private:
 	const float regret_epsilon = 1.0f / 100000000;
@@ -31,33 +31,33 @@ private:
 	// Arbitrarily large number used for clamping regrets.
 	const float max_number = 999999;
 
-	Range _input_opponent_range;
+	Range_f _input_opponent_range;
 
-	Range _input_opponent_value;
+	Range_f _input_opponent_value;
 
-	Range _curent_opponent_values;
+	Range_f _curent_opponent_values;
 
-	Range _play_current_strategy;
+	Range_f _play_current_strategy;
 
-	Range _terminate_current_strategy;
+	Range_f _terminate_current_strategy;
 
-	Range _play_current_regret;
-	Range _terminate_current_regret;
+	Range_f _play_current_regret;
+	Range_f _terminate_current_regret;
 
-	Range _regret_sum;
+	Range_f _regret_sum;
 
 
 	// Holds achieved CFVs for both players at each iteration so that we can compute regret
-	Range _total_values;
+	Range_f _total_values;
 
 	// Holds achieved CFVs for p2
-	Range _total_values_p2;
+	Range_f _total_values_p2;
 
-	Range _terminate_regrets;
-	Range _play_regrets;
+	Range_f _terminate_regrets;
+	Range_f _play_regrets;
 
 	//masking out impossible hands
-	Range _range_mask;
+	Range_f _range_mask;
 
 	card_tools _card_tools;
 };

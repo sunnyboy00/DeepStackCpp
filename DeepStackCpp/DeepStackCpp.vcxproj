@@ -203,6 +203,7 @@
     <ClCompile Include="lookahead.cpp" />
     <ClCompile Include="LookaheadBuilder.cpp" />
     <ClCompile Include="LookaheadManager.cpp" />
+    <ClCompile Include="LookaheadResult_f.h" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Resolving.cpp" />
     <ClCompile Include="stdafx.cpp" />

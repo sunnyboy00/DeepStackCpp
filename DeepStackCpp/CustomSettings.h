@@ -16,9 +16,9 @@ typedef float mainDataType;
 #define Ranges Eigen::Array<float, 2, Eigen::Dynamic, MyLayoutType>
 #define CFVS ArrayXX
 
-//#define Range Eigen::Array<float, card_count, MyLayoutType>
-//#define Ranges Eigen::Array<float, 2, card_count, MyLayoutType>
-//#define CFVS Eigen::Array<float, Eigen::Dynamic, card_count, MyLayoutType>
+#define Range_f Eigen::Array<float, card_count, MyLayoutType>
+#define Ranges_f Eigen::Array<float, 2, card_count, MyLayoutType>
+#define CFVS_f Eigen::Array<float, Eigen::Dynamic, card_count, MyLayoutType>
 
 #define VectorX Eigen::Matrix<float, Eigen::Dynamic, 1>
 #define RowVectorX Eigen::Matrix<float, 1, Eigen::Dynamic>

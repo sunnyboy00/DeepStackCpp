@@ -20,6 +20,9 @@ struct Node
 	// Type of the node. An element of @{constants.node_types} (if applicable)
 	node_types type;
 
+	// Fold that is masked out because there is a free call. If zero - we need to mask out this fold.
+	float foldMask = 1.0f;
+
 	// The current betting round
 	int street;
 
@@ -73,7 +76,7 @@ struct Node
 
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
-	ArrayXX ranges;
+	Ranges ranges;
 
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against

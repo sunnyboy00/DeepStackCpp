@@ -1,6 +1,6 @@
 #include "cfrd_gadget_f.h"
 
-cfrd_gadget_f::cfrd_gadget_f(const Range& board, const Range& player_range, const Range& opponent_cfvs)
+cfrd_gadget_f::cfrd_gadget_f(const ArrayX& board, const Range_f& player_range, const Range_f& opponent_cfvs)
 {
 	_input_opponent_value = opponent_cfvs;
 
@@ -20,10 +20,10 @@ cfrd_gadget_f::cfrd_gadget_f(const Range& board, const Range& player_range, cons
 	_range_mask = _card_tools.get_possible_hand_indexes(board);
 }
 
-Range cfrd_gadget_f::compute_opponent_range(const Range& current_opponent_cfvs)
+Range_f cfrd_gadget_f::compute_opponent_range(const Range_f& current_opponent_cfvs)
 {
-	Range play_values = current_opponent_cfvs;
-	Range& terminate_values = _input_opponent_value;
+	Range_f play_values = current_opponent_cfvs;
+	Range_f& terminate_values = _input_opponent_value;
 
 	//--1.0 compute current regrets
 	_total_values = play_values * _play_current_strategy; /* In the beginning we assume that we never Follow
@@ -67,7 +67,7 @@ Range cfrd_gadget_f::compute_opponent_range(const Range& current_opponent_cfvs)
 	_play_current_strategy *= _range_mask;
 	_terminate_current_strategy *= _range_mask;
 
-	_input_opponent_range = Range(_play_current_strategy);
+	_input_opponent_range = _play_current_strategy;
 
 	return _input_opponent_range; // Only in this range opponent have reason to play(F) and not to fall-back to trunk strategy(T) 
 }
