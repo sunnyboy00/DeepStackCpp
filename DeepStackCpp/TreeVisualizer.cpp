@@ -56,10 +56,10 @@ string TreeVisualizer::add_range_info(const Node& node)
 {
 	string out = "";
 
-	if (node.ranges_absolute.size() > 0)
+	if (node.ranges.size() > 0)
 	{
-		out += add_tensor(node.ranges_absolute.row(0), "abs_range1");
-		out += add_tensor(node.ranges_absolute.row(1), "abs_range2");
+		out += add_tensor(node.ranges.row(0), "abs_range1");
+		out += add_tensor(node.ranges.row(1), "abs_range2");
 	}
 
 	if (node.cf_values.size() > 0)

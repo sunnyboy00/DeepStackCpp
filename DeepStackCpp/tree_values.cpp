@@ -7,7 +7,7 @@ tree_values::tree_values(){}
 
 void tree_values::_fill_ranges_dfs(Node & node, ArrayXX & ranges_absolute)
 {
-	node.ranges_absolute = ranges_absolute;
+	node.ranges = ranges_absolute;
 
 	if (node.terminal)
 	{
@@ -32,17 +32,17 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXX & ranges_absolute)
 		assert((checksum < 1.001f).all());
 	}
 
-	assert((node.ranges_absolute >= 0).all());
-	assert((node.ranges_absolute < 1).all());
+	assert((node.ranges >= 0).all());
+	assert((node.ranges < 1).all());
 
 	//--check if the range consists only of cards that don't overlap with the board
 
 #ifdef _DEBUG
 	ArrayXX hands_mask = _cardTools.get_possible_hand_indexes(node.board);
 	hands_mask.resize(1, card_count);
-	hands_mask = Util::ExpandAs(hands_mask, node.ranges_absolute);
+	hands_mask = Util::ExpandAs(hands_mask, node.ranges);
 
-	assert((hands_mask * node.ranges_absolute).sum() == node.ranges_absolute.sum()); // Checking that multiplication with possible hands range did not changed anything.
+	assert((hands_mask * node.ranges).sum() == node.ranges.sum()); // Checking that multiplication with possible hands range did not changed anything.
 
 	//impossible_hands_mask.conservativeResize(1, card_count);
 	//Util::ExpandAs(impossible_hands_mask, node.ranges_absolute);
@@ -59,8 +59,8 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXX & ranges_absolute)
 	{
 		for (size_t i = 0; i < actions_count; i++)
 		{
-			child_range.row(0) = node.ranges_absolute.row(0) * node.strategy.row(i);
-			child_range.row(1) = node.ranges_absolute.row(1) * node.strategy.row(i);
+			child_range.row(0) = node.ranges.row(0) * node.strategy.row(i);
+			child_range.row(1) = node.ranges.row(1) * node.strategy.row(i);
 
 			//--go deeper
 			_fill_ranges_dfs(*node.children[i], child_range);
@@ -73,10 +73,10 @@ void tree_values::_fill_ranges_dfs(Node & node, ArrayXX & ranges_absolute)
 		for (size_t i = 0; i < actions_count; i++)
 		{
 			//--copy the range for the non-acting player  
-			child_range.row(opponentIndex) = node.ranges_absolute.row(opponentIndex);
+			child_range.row(opponentIndex) = node.ranges.row(opponentIndex);
 
 			//  --multiply the range for the acting player using his strategy    
-			child_range.row(currentPlayerIndex) = node.ranges_absolute.row(currentPlayerIndex) * node.strategy.row(i);
+			child_range.row(currentPlayerIndex) = node.ranges.row(currentPlayerIndex) * node.strategy.row(i);
 
 			//--go deeper
 			_fill_ranges_dfs(*node.children[i], child_range);
@@ -100,11 +100,11 @@ void tree_values::_compute_values_dfs(Node& node)
 
 		if (node.type == terminal_fold)
 		{
-			_terminal_equity.tree_node_fold_value(node.ranges_absolute, values, opponent);
+			_terminal_equity.tree_node_fold_value(node.ranges, values, opponent);
 		}
 		else
 		{
-			_terminal_equity.tree_node_call_value(node.ranges_absolute, values);
+			_terminal_equity.tree_node_call_value(node.ranges, values);
 		}
 
 		//--multiply by the pot
@@ -151,13 +151,13 @@ void tree_values::_compute_values_dfs(Node& node)
 
 	//--counterfactual values weighted by the reach prob
 	node.cfv_infset = ArrayX(players_count);
-	node.cfv_infset.row(P1) = node.cf_values.row(P1).matrix().dot(node.ranges_absolute.row(P1).matrix());
-	node.cfv_infset.row(P2) = node.cf_values.row(P2).matrix().dot(node.ranges_absolute.row(P2).matrix());
+	node.cfv_infset.row(P1) = node.cf_values.row(P1).matrix().dot(node.ranges.row(P1).matrix());
+	node.cfv_infset.row(P2) = node.cf_values.row(P2).matrix().dot(node.ranges.row(P2).matrix());
 
 	//--compute CFV - BR values weighted by the reach prob
 	node.cfv_br_infset = ArrayX(players_count);
-	node.cfv_br_infset.row(P1) = node.cf_values_br.row(P1).matrix().dot(node.ranges_absolute.row(P1).matrix());
-	node.cfv_br_infset.row(P2) = node.cf_values_br.row(P2).matrix().dot(node.ranges_absolute.row(P2).matrix());
+	node.cfv_br_infset.row(P1) = node.cf_values_br.row(P1).matrix().dot(node.ranges.row(P1).matrix());
+	node.cfv_br_infset.row(P2) = node.cf_values_br.row(P2).matrix().dot(node.ranges.row(P2).matrix());
 	
 	node.epsilon = node.cfv_br_infset - node.cfv_infset;
 	node.exploitability = node.epsilon.mean();

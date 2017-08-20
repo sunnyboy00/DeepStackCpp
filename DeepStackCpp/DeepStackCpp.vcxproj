@@ -166,6 +166,7 @@
     <ClInclude Include="card_tools.h" />
     <ClInclude Include="card_to_string_conversion.h" />
     <ClInclude Include="cfrd_gadget.h" />
+    <ClInclude Include="cfrd_gadget_f.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSettings.h" />
     <ClInclude Include="game_settings.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="terminal_equity.h" />
     <ClInclude Include="TreeBuilderParams.h" />
     <ClInclude Include="TreeCFR.h" />
+    <ClInclude Include="TreeLookahead.h" />
     <ClInclude Include="TreeVisualizer.h" />
     <ClInclude Include="tree_builder.h" />
     <ClInclude Include="tree_values.h" />
@@ -196,6 +198,7 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="cfrd_gadget.cpp" />
+    <ClCompile Include="cfrd_gadget_f.cpp" />
     <ClCompile Include="LeducEvaluator.cpp" />
     <ClCompile Include="lookahead.cpp" />
     <ClCompile Include="LookaheadBuilder.cpp" />
@@ -207,6 +210,7 @@
     <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="TreeBuilderParams.cpp" />
     <ClCompile Include="TreeCFR.cpp" />
+    <ClCompile Include="TreeLookahead.cpp" />
     <ClCompile Include="TreeVisualizer.cpp" />
     <ClCompile Include="tree_builder.cpp" />
     <ClCompile Include="tree_values.cpp" />

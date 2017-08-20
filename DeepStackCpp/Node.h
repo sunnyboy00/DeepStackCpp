@@ -73,7 +73,7 @@ struct Node
 
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand
-	ArrayXX ranges_absolute;
+	ArrayXX ranges;
 
 	//-- Recursively calculated counterfactual values for each player 
 	//-- using the saved strategy profile when playing against

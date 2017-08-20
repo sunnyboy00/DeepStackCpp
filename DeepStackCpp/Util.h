@@ -388,6 +388,11 @@ class Util
 
 		}
 
+		static inline void Clip(ArrayX& target, float lowLimin, float maxValue)
+		{
+			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
+		}
+
 		static inline void Clip(ArrayXX& target, float lowLimin, float maxValue)
 		{
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
