@@ -16,8 +16,12 @@ class Util
 {
 	public:
 
-		template <typename Derived>
-		static inline void Sort(ArrayBase<Derived>& target)
+		static inline void SortReverse(ArrayX & target)
+		{
+			std::sort(target.data(), target.data() + target.size(), greater());
+		}
+
+		static inline void Sort(ArrayX& target)
 		{
 			std::sort(target.data(), target.data() + target.size());
 		}
@@ -38,8 +42,32 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		template <typename Derived>
-		static inline void Copy(ArrayBase<Derived> & target, ArrayBase<Derived> & source)
+		//template <typename Derived>
+		//static inline void Copy(ArrayBase<Derived> & target, ArrayBase<Derived> & source)
+		//{
+		//	assert(target.size() >= source.size());
+		//	memcpy(target.da.data(), source.data(), source.size() * sizeof(float));
+		//}
+
+		static inline void Copy(ArrayXX target, ArrayXX & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayX target, ArrayX & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayXX target, ArrayX & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayX target, ArrayXX & source)
 		{
 			assert(target.size() >= source.size());
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
@@ -413,6 +441,13 @@ class Util
 		static void ToString(const ArrayXX& dataArg);
 
 		static void ToString(const MatrixX& dataArg);
+
+private:
+	struct greater
+	{
+		template<class T>
+		bool operator()(T const &a, T const &b) const { return a > b; }
+	};
 };
 
 

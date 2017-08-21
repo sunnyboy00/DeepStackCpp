@@ -2,6 +2,8 @@
 #include "CustomSettings.h"
 #include "LeducEvaluator.h"
 #include "card_tools.h"
+#include "Util.h"
+#include <stdlib.h>  
 
 class range_generator
 {
@@ -45,15 +47,21 @@ private:
 
 	size_t _possible_hands_count;
 
-	CardArray _possible_hands_mask;
-
-	ArrayXX _sorted_range;
+	ArrayX _possible_hands_mask;
 
 	//-- - Recursively samples a section of the range vector.
 	//-- @param cards an NxJ section of the range tensor, where N is the batch size
 	//-- and J is the length of the range sub - vector
 	//-- @param mass a vector of remaining probability mass for each batch member
 	//-- @see generate_range
-	void _generate_recursion(const ArrayXX& cards, const ArrayX& mass);
+	void _generate_recursion(ArrayXX& cards, ArrayX& mass);
+
+	ArrayX _order;
+
+	ArrayX _reverse_order;
+
+	ArrayX _reordered_range;
+
+	ArrayXX _sorted_range;
 };
 

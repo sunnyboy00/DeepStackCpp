@@ -142,7 +142,7 @@
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
     <ClInclude Include="range_generator.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DataGeneration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -204,7 +204,7 @@
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="range_generator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\DataGeneration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
