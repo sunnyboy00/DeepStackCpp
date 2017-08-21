@@ -25,7 +25,7 @@ ArrayX random_card_generator::generate_cards(size_t count)
 		if (used_cards[card] == 0)
 		{
 			generated_cards_count++;
-			out(generated_cards_count) = card;
+			out(generated_cards_count) = (float)card;
 			used_cards[card] = 1;
 		}
 	}
