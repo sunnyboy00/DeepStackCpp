@@ -170,6 +170,7 @@
     <ClInclude Include="cfrd_gadget.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSettings.h" />
+    <ClInclude Include="data_generation.h" />
     <ClInclude Include="game_settings.h" />
     <ClInclude Include="GraphvizConnection.h" />
     <ClInclude Include="GraphvizNode.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="LookaheadBuilder.h" />
     <ClInclude Include="LookaheadResult.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="random_card_generator.h" />
     <ClInclude Include="range_generator.h" />
     <ClInclude Include="Resolving.h" />
     <ClInclude Include="resource.h" />
@@ -200,10 +202,12 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="cfrd_gadget.cpp" />
+    <ClCompile Include="data_generation.cpp" />
     <ClCompile Include="LeducEvaluator.cpp" />
     <ClCompile Include="lookahead.cpp" />
     <ClCompile Include="LookaheadBuilder.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="random_card_generator.cpp" />
     <ClCompile Include="range_generator.cpp" />
     <ClCompile Include="Resolving.cpp" />
     <ClCompile Include="stdafx.cpp" />
