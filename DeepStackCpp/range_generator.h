@@ -5,6 +5,7 @@
 #include "Util.h"
 #include <stdlib.h>  
 
+//--- Samples random probability vectors for use as player ranges.
 class range_generator
 {
 public:

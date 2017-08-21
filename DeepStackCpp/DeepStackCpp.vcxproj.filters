@@ -52,6 +52,9 @@
     <Filter Include="Source Files\DataGeneration">
       <UniqueIdentifier>{a732f0d3-5b0b-4939-8797-7496899db932}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NN">
+      <UniqueIdentifier>{2939f731-2c95-4fc6-a445-866903cf6a0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -144,6 +147,9 @@
     <ClInclude Include="range_generator.h">
       <Filter>Header Files\DataGeneration</Filter>
     </ClInclude>
+    <ClInclude Include="bucketer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -205,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="range_generator.cpp">
       <Filter>Source Files\DataGeneration</Filter>
+    </ClCompile>
+    <ClCompile Include="bucketer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
