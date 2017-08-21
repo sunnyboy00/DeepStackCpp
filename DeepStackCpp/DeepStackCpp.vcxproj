@@ -164,6 +164,7 @@
     <ClInclude Include="arguments.h" />
     <ClInclude Include="bet_sizing.h" />
     <ClInclude Include="bucketer.h" />
+    <ClInclude Include="bucket_conversion.h" />
     <ClInclude Include="card_tools.h" />
     <ClInclude Include="card_to_string_conversion.h" />
     <ClInclude Include="cfrd_gadget.h" />
@@ -195,6 +196,7 @@
   <ItemGroup>
     <ClCompile Include="bet_sizing.cpp" />
     <ClCompile Include="bucketer.cpp" />
+    <ClCompile Include="bucket_conversion.cpp" />
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="cfrd_gadget.cpp" />

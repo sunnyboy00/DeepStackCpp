@@ -150,6 +150,9 @@
     <ClInclude Include="bucketer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bucket_conversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -213,6 +216,9 @@
       <Filter>Source Files\DataGeneration</Filter>
     </ClCompile>
     <ClCompile Include="bucketer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bucket_conversion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
