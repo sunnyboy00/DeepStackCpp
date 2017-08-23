@@ -62,6 +62,8 @@ struct Node
 	// `i`th child for either player when that player holds the `j`th card.
 	ArrayXX strategy;
 
+	ArrayXX current_strategy; //Do we need this?
+
 	// A list of children nodes
 	vector<Node*> children;
 
@@ -73,6 +75,8 @@ struct Node
 
 	// Player regrets. A tensor of [actions_count x card_count] size.
 	ArrayXX regrets;
+
+	ArrayXX regrets_sum;
 
 	// A 2xK tensor containing the probabilities of each
 	// player reaching the current node with each private hand

@@ -99,6 +99,15 @@ class Util
 
 		static void Print(const vector<Tf1>& target, int index);
 		static void Print(const std::map<int, Tf1>& target, int index);
+
+		static void Print(const ArrayXX& dataArg);
+
+		static void Print(const MatrixX& dataArg);
+
+		static void Print(const ArrayX& dataArg);
+
+		//static void Print(const Ranges& dataArg);
+
 		//// Expands one tensor as other one
 		//template<typename Derived, typename OtherDerived>
 		//static inline TensorBase<Derived> ExpandAs(TensorBase<Derived>& data, const TensorBase<OtherDerived>& as)
@@ -408,12 +417,6 @@ class Util
 		{
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
-
-		static void Print(const ArrayXX& dataArg);
-
-		static void Print(const MatrixX& dataArg);
-
-		static void Print(const ArrayX& dataArg);
 };
 
 

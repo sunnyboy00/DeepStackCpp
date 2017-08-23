@@ -57,6 +57,13 @@ public:
 	// Average average strategy data
 	ArrayXX _average_root_strategy;
 
+	// Current strategy
+	ArrayXX _current_strategy;
+
+	// Do wee need to swap players(if the first player to act in the lookahed is the second player)
+	bool _playersSwap;
+
+
 	//	--- Re - solves the lookahead using input ranges.
 	//	--
 	//	--Uses the input range for the opponent instead of a gadget range, so only
@@ -128,7 +135,7 @@ public:
 
 	//-- - Updates the players' average strategies with their current strategies.
 	//-- @param iter the current iteration number of re - solving
-	void _compute_update_average_strategies();
+	void _compute_update_average_strategies(ArrayXX& current_strategy);
 
 	//-- - Using the players' reach probabilities, computes their counterfactual
 	//--values at each lookahead state which is a terminal state of the game. Saves it in the cfvs_data.
@@ -183,22 +190,16 @@ public:
 
 	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
 
-	ArrayXX ComputeRegrets(Node &node, ArrayXX &current_strategy, ArrayXX * cf_values_allactions);
+	ArrayXX ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count]);
 
-	void _fillChanceRangesAndStrategy(Node &node, map<int, Ranges> &children_ranges_absolute, ArrayXX& current_strategy);
+	void _fillChanceRangesAndStrategy(Node &node, Ranges(&children_ranges_absolute)[players_count]);
 
-	void _fillPlayersRangesAndStrategy(Node & node, map<int, Ranges>& children_ranges_absolute, ArrayXX & current_strategy);
+	void _fillPlayersRangesAndStrategy(Node & node, Ranges(&children_ranges_absolute)[players_count]);
 
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update
 	//-- @param current_regrets the regrets from the current iteration of CFR
 	void update_regrets(Node& node, const ArrayXX& current_regrets);
-
-	//-- - Update a node's average strategy with the current iteration strategy.
-	//-- @param node the node to update
-	//-- @param current_strategy the CFR strategy for the current iteration
-	//-- @param iter the iteration number of the current CFR iteration
-	void update_average_strategy(Node& node, ArrayXX& current_strategy, size_t iter);
 
 	// Fill cf_values for terminal nodes
 	void _fillCFvaluesForTerminalNode(Node &node);

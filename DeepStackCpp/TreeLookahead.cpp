@@ -6,6 +6,14 @@ TreeLookahead::TreeLookahead(Node& root, long long skip_iters, long long iters)
 	_cfr_skip_iters = skip_iters;
 	_cfr_iters = iters;
 	_root = root;
+	if (_root.current_player == P2)
+	{
+		_playersSwap = true;
+	}
+	else
+	{
+		_playersSwap = false;
+	}
 }
 
 TreeLookahead::~TreeLookahead()
@@ -39,19 +47,18 @@ LookaheadResult_f TreeLookahead::get_results()
 {
 	LookaheadResult_f out;
 
-
 	//--1.0 average strategy
 	//--[actions x range]
 	//--lookahead already computes the average strategy we just convert the dimensions
 	out.strategy = _average_root_strategy;
 
 	//--2.0 achieved opponent's CFVs at the starting node 
-	out.achieved_cfvs = _average_root_cfvs_data.row(P1);
+	out.achieved_cfvs = _average_root_cfvs_data.row(P2);
 
 	//--3.0 CFVs for the acting player only when resolving first node
 	if (_reconstruction)
 	{
-		out.root_cfvs = _average_root_cfvs_data.row(P2);
+		out.root_cfvs = _average_root_cfvs_data.row(P1);
 	}
 	//else
 	//{
@@ -108,7 +115,7 @@ void TreeLookahead::_compute()
 		{
 			//--no need to go through layers since we care for the average strategy only in the first node anyway
 			//--note that if you wanted to average strategy on lower layers, you would need to weight the current strategy by the current reach probability
-			_compute_update_average_strategies();
+			_compute_update_average_strategies(_root.current_strategy);
 			_compute_cumulate_average_cfvs();
 		}
 	}
@@ -121,7 +128,9 @@ void TreeLookahead::_compute()
 
 void TreeLookahead::_set_opponent_starting_range()
 {
-	_root.ranges.row(P2) = _reconstruction_gadget->compute_opponent_range(_root.cf_values.row(P1));
+	//int oponent = 1 - P1; // In the reconstruction CFR-D gadget we are adding opponent as the first node. So for this root we are just swapping players.
+	//_root.ranges.row(oponent) = _reconstruction_gadget->compute_opponent_range(_root.cf_values.row(oponent));
+	_root.ranges.row(P2) = _reconstruction_gadget->compute_opponent_range(_root.cf_values.row(P2));
 }
 
 void TreeLookahead::_compute_normalize_average_cfvs()
@@ -134,16 +143,22 @@ void TreeLookahead::_compute_terminal_equities_next_street_box()
 	_average_root_strategy /= _average_root_strategy.rowwise().sum();
 }
 
-void TreeLookahead::_compute_update_average_strategies()
+void TreeLookahead::_compute_update_average_strategies(ArrayXX& current_strategy)
 {
 	if (_average_root_strategy.size() == 0)
 	{
-		_average_root_strategy = _root.strategy;
+		_average_root_strategy = current_strategy;
 	}
 	else
 	{
-		_average_root_strategy += _root.strategy;
+		_average_root_strategy += current_strategy;
 	}
+
+	//ToDo:
+	//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
+	//--it sums to one->now we set to always fold
+	//player_avg_strategy[1][player_avg_strategy[1]:ne(player_avg_strategy[1])] = 1
+	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
 }
 
 void TreeLookahead::_compute_terminal_equities_terminal_equity()
@@ -175,6 +190,17 @@ void TreeLookahead::_compute_cumulate_average_cfvs()
 
 void TreeLookahead::_compute_normalize_average_strategies()
 {
+	ArrayXX player_avg_strategy_sum = _average_root_strategy.colwise().sum();
+	player_avg_strategy_sum.resize(1, _average_root_strategy.cols());
+	//_root.cf_values
+	ArrayXX divis = player_avg_strategy_sum.replicate(_average_root_strategy.rows(), 1);
+	_average_root_strategy /= divis;
+
+		//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
+	//--it sums to one->now we set to always fold
+	//ToDo: BuG! Fix!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//player_avg_strategy[1][player_avg_strategy[1]:ne(player_avg_strategy[1])] = 1
+	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
 }
 
 //------------------------------------------
@@ -205,6 +231,11 @@ void TreeLookahead::_fillCFvaluesForTerminalNode(Node &node)
 
 	if (node.type == terminal_fold)
 	{
+		if (node.foldMask = 0)
+		{
+			return;
+		}
+
 		termEquity->tree_node_fold_value(node.ranges, node.cf_values, opponnent);
 	}
 	else
@@ -223,34 +254,36 @@ void TreeLookahead::_fillCFvaluesForTerminalNode(Node &node)
 void TreeLookahead::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 {
 	const int actions_count = (int)node.children.size();
-	ArrayXX current_strategy;
-
-
 	//--current cfv[[actions, players, ranges]]
 	//[actions_count x card_count][players_count]
 	CFVS cf_values_allactions[players_count];
-	cf_values_allactions[P1] = CFVS(actions_count, card_count);
-	cf_values_allactions[P2] = CFVS(actions_count, card_count);
+	cf_values_allactions[P1] = CFVS::Zero(actions_count, card_count);
+	cf_values_allactions[P2] = CFVS::Zero(actions_count, card_count);
 
-	//map <player/[actions, ranges]>
-	map <int, Ranges> children_ranges_absolute;
+	//Tensor like <player/[actions, ranges]>
+	Ranges children_ranges_absolute[players_count];
 
 	static const int PLAYERS_DIM = 1;
 
 	//cf_values_allactions.setZero();
 
-	if (node.current_player == chance) // ToDO: Possible need to remove 
+	if (node.current_player == chance) // ToDO: Possible need to remove because no chance for lookahead
 	{
-		_fillChanceRangesAndStrategy(node, children_ranges_absolute, current_strategy);
+		_fillChanceRangesAndStrategy(node, children_ranges_absolute);
 	}
 	else
 	{
-		_fillPlayersRangesAndStrategy(node, children_ranges_absolute, current_strategy);
+		_fillPlayersRangesAndStrategy(node, children_ranges_absolute);
 	}
 
 	for (size_t i = 0; i < node.children.size(); i++)
 	{
 		Node* child_node = node.children[i];
+		if (child_node->foldMask == 0)
+		{
+			continue;
+		}
+
 		//--set new absolute ranges(after the action) for the child
 		child_node->ranges = node.ranges;
 
@@ -259,6 +292,7 @@ void TreeLookahead::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 		cfrs_iter_dfs(*child_node, iter);
 
 		// Now coping cf_values from children to calculate the regret
+
 		cf_values_allactions[P1].row(i) = child_node->cf_values.row(P1); //ToDo: Can be single copy operation(two rows copy)? ToDo:remove convention to Range
 		cf_values_allactions[P2].row(i) = child_node->cf_values.row(P2); 
 	}
@@ -268,7 +302,7 @@ void TreeLookahead::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 
 	Tensor<float, 2> tempVar;
 
-	if (node.current_player == chance)
+	if (node.current_player == chance) //ToDo: possible we can remove this because we have no chance for lookahead
 	{
 		// For the chance node just sum regrets from all cards
 		node.cf_values.row(P1) = cf_values_allactions[P1].colwise().sum();
@@ -278,7 +312,7 @@ void TreeLookahead::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 	}
 	else
 	{
-		ArrayXX current_regrets = ComputeRegrets(node, current_strategy, cf_values_allactions);
+		ArrayXX current_regrets = ComputeRegrets(node, cf_values_allactions);
 		update_regrets(node, current_regrets);
 	}
 }
@@ -311,22 +345,24 @@ void TreeLookahead::update_regrets(Node& node, const ArrayXX& current_regrets)
 
 	node.regrets = (node.regrets.array() >= regret_epsilon).select(
 		node.regrets,
-		MatrixXd::Constant(node.regrets.rows(), node.regrets.cols(), regret_epsilon));
+		ArrayXX::Constant(node.regrets.rows(), node.regrets.cols(), regret_epsilon));
+
+	node.regrets.row(Fold) *= node.children[Fold]->foldMask;
 }
 
-void TreeLookahead::_fillChanceRangesAndStrategy(Node &node, map<int, Ranges> &children_ranges_absolute, ArrayXX& current_strategy)
+void TreeLookahead::_fillChanceRangesAndStrategy(Node &node, Ranges(&children_ranges_absolute)[players_count])
 {
 	int actions_count = (int)node.children.size();
-	current_strategy = node.strategy;
+	//_current_strategy = node.strategy;
 
 	ArrayXX ranges_mul_matrix = node.ranges.row(0).replicate(actions_count, 1);
-	children_ranges_absolute[0] = current_strategy * ranges_mul_matrix;
+	children_ranges_absolute[0] = node.strategy * ranges_mul_matrix;
 
 	ranges_mul_matrix = node.ranges.row(1).replicate(actions_count, 1);
-	children_ranges_absolute[1] = current_strategy * ranges_mul_matrix;
+	children_ranges_absolute[1] = node.strategy * ranges_mul_matrix;
 }
 
-void TreeLookahead::_fillPlayersRangesAndStrategy(Node & node, map<int, Ranges>& children_ranges_absolute, ArrayXX & current_strategy)
+void TreeLookahead::_fillPlayersRangesAndStrategy(Node & node, Ranges(&children_ranges_absolute)[players_count])
 {
 	int currentPlayer = node.current_player; // Because we have zero based indexes, unlike the original source.
 	int opponentIndex = 1 - currentPlayer;
@@ -338,24 +374,25 @@ void TreeLookahead::_fillPlayersRangesAndStrategy(Node & node, map<int, Ranges>&
 	//--initialize regrets in the first iteration
 	if (node.regrets.size() == 0)
 	{
-		node.regrets = MatrixX(actions_count, card_count);
+		node.regrets = ArrayXX(actions_count, card_count);
 		node.regrets.fill(regret_epsilon);
+		node.regrets.row(Fold) *= node.children[Fold]->foldMask;
 	}
 
-	assert((node.regrets >= regret_epsilon).all() && "All regrets must be positive or uncomment commented code below.");
+//	assert((node.regrets >= regret_epsilon).all() && "All regrets must be positive or uncomment commented code below.");
 
 	//--compute the current strategy
-	ArrayXX regrets_sum = node.regrets.colwise().sum().row(action_dimension);
-	current_strategy = ArrayXX(node.regrets);
-	current_strategy /= Util::ExpandAs(regrets_sum, current_strategy); // We are dividing regrets for each actions by the sum of regrets for all actions and doing this element wise for every card
-	current_strategy.row(Fold) *= node.children[Fold]->foldMask;
+	node.regrets_sum = node.regrets.colwise().sum().row(action_dimension);
+	node.current_strategy = ArrayXX(node.regrets);
+	node.current_strategy /= Util::ExpandAs(node.regrets_sum, node.current_strategy); // We are dividing regrets for each actions by the sum of regrets for all actions and doing this element wise for every card
+	//current_strategy.row(Fold) *= node.children[Fold]->foldMask;
 
 	ArrayXX ranges_mul_matrix = node.ranges.row(currentPlayer).replicate(actions_count, 1);
-	children_ranges_absolute[currentPlayer] = current_strategy.array() * ranges_mul_matrix.array(); // Just multiplying ranges(cards probabilities) by the probability that action will be taken(from the strategy) inside the matrix  
+	children_ranges_absolute[currentPlayer] = node.current_strategy.array() * ranges_mul_matrix.array(); // Just multiplying ranges(cards probabilities) by the probability that action will be taken(from the strategy) inside the matrix 
 	children_ranges_absolute[opponentIndex] = node.ranges.row(opponentIndex).replicate(actions_count, 1); //For opponent we are just cloning ranges
 }
 
-ArrayXX TreeLookahead::ComputeRegrets(Node &node, ArrayXX &current_strategy, ArrayXX * cf_values_allactions)
+ArrayXX TreeLookahead::ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count])
 {
 	Tensor<float, 2> tempVar;
 	static const int PLAYERS_DIM = 1;
@@ -363,21 +400,21 @@ ArrayXX TreeLookahead::ComputeRegrets(Node &node, ArrayXX &current_strategy, Arr
 	const int currentPlayer = node.current_player; // Because we have zero based indexes, unlike the original source.
 	const int opponent = 1 - node.current_player;
 
-	assert(current_strategy.rows() == actions_count && current_strategy.cols() == card_count);
+	assert(node.current_strategy.rows() == actions_count && node.current_strategy.cols() == card_count);
 	//current_strategy.conservativeResize(actions_count, card_count); // Do we need this?
 
 	//Map<ArrayXX> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
 
-	ArrayXX opCfAr = cf_values_allactions[opponent]; // [actions X cards] - cf values for the opponent
+	ArrayXX& opCfAr = cf_values_allactions[opponent]; // [actions X cards] - cf values for the opponent
 	node.cf_values.row(opponent) = opCfAr.colwise().sum(); // for opponent assume that strategy is uniform
 
 														   //ArrayXX strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
 														   //Map<ArrayXX> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
 
-	ArrayXX currentPlayerCfValues = cf_values_allactions[currentPlayer];
+	ArrayXX& currentPlayerCfValues = cf_values_allactions[currentPlayer];
 	assert(currentPlayerCfValues.rows() == actions_count && currentPlayerCfValues.cols() == card_count);
 
-	ArrayXX weigtedCfValues = current_strategy * currentPlayerCfValues; // weight the regrets by the used strategy
+	auto weigtedCfValues = node.current_strategy * currentPlayerCfValues; // weight the regrets by the used strategy
 	node.cf_values.row(currentPlayer) = weigtedCfValues.colwise().sum(); // summing CF values for different actions
 
 																		 //--computing regrets
@@ -386,9 +423,9 @@ ArrayXX TreeLookahead::ComputeRegrets(Node &node, ArrayXX &current_strategy, Arr
 																		 //current_regrets.resize(actions_count, card_count); Do we need this resize?
 
 
-	ArrayXX cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayer);
+	auto cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayer);
 	cfValuesOdCurrentPlayer.resize(1, card_count); // [1(action) X card_count]
-	ArrayXX matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
+	auto matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
 	currentPlayerCfValues -= matrixToSubstract; // Substructing sum of CF values over all actions with every action CF value
 	return currentPlayerCfValues;
 }

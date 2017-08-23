@@ -217,4 +217,15 @@ void Util::Print(const ArrayX& dataArg)
 	result << string_to_wstring(ss.str());
 	OutputDebugString(result.str().c_str());
 }
-
+//
+//void Util::Print(const Ranges& dataArg)
+//{
+//	IOFormat CleanFmt(3, 0, ", ", "\n", "[", "]");
+//
+//	ostringstream ss;
+//	ss << dataArg.format(CleanFmt) << endl;
+//	std::wostringstream result;
+//	result << string_to_wstring(ss.str());
+//	OutputDebugString(result.str().c_str());
+//}
+//

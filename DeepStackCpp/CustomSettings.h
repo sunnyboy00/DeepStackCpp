@@ -13,7 +13,7 @@ typedef float mainDataType;
 #define Array2 Eigen::Array<float, 2, MyLayoutType>
 
 #define Range Eigen::Array<float, Eigen::Dynamic, MyLayoutType>
-#define Ranges Eigen::Array<float, 2, Eigen::Dynamic, MyLayoutType>
+#define Ranges Eigen::Array<float, Eigen::Dynamic, Eigen::Dynamic, MyLayoutType>
 #define CFVS ArrayXX
 
 #define Range_f Eigen::Array<float, card_count, MyLayoutType>

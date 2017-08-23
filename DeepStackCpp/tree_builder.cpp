@@ -145,7 +145,7 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 
 	for (auto &child : children)
 	{
-		if (child->bets[0] == child->bets[1])
+		if (child->type == terminal_fold && child->bets[0] == child->bets[1])
 		{
 			child->foldMask = 0;
 		}
