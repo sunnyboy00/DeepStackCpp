@@ -3,7 +3,15 @@
 #include "bucketer.h"
 #include "bucket_conversion.h"
 #include "random_card_generator.h"
-#include <ctime>
+#include  "range_generator.h"
+#include "arguments.h"
+#include <iostream>
+#include <chrono>
+#include <vector>
+
+using namespace std;
+using std::chrono::duration_cast;
+using std::chrono::high_resolution_clock;
 
 class data_generation
 {
@@ -34,5 +42,9 @@ public:
 	//-- @param file_name the prefix of the files where the data is saved(appended
 	//	-- with `.inputs`, `.targets`, and `.mask`).
 	void generate_data_file(size_t data_count, string file_name);
+
+private:
+
+	void _print_time(std::chrono::duration<double> diff);
 };
 

@@ -147,17 +147,17 @@
     <ClInclude Include="range_generator.h">
       <Filter>Header Files\DataGeneration</Filter>
     </ClInclude>
-    <ClInclude Include="bucketer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="data_generation.h">
       <Filter>Header Files\DataGeneration</Filter>
     </ClInclude>
     <ClInclude Include="bucket_conversion.h">
       <Filter>Header Files\NN</Filter>
     </ClInclude>
+    <ClInclude Include="bucketer.h">
+      <Filter>Header Files\NN</Filter>
+    </ClInclude>
     <ClInclude Include="random_card_generator.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DataGeneration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -221,9 +221,6 @@
     <ClCompile Include="range_generator.cpp">
       <Filter>Source Files\DataGeneration</Filter>
     </ClCompile>
-    <ClCompile Include="bucketer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bucket_conversion.cpp">
       <Filter>Source Files\NN</Filter>
     </ClCompile>
@@ -232,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="random_card_generator.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bucketer.cpp">
+      <Filter>Source Files\NN</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
