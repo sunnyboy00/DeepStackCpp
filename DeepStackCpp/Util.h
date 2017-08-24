@@ -366,28 +366,28 @@ class Util
 			assert(rows * cols == size);
 		}
 
-		static inline TmAxx ArXXView(Tf5 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf5 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
-		static inline TmAxx ArXXView(Tf4 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf4 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
-		static inline TmAxx ArXXView(Tf3 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf3 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
-		static inline TmAxx ArXXView(Tf2 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf2 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)

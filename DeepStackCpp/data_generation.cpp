@@ -34,6 +34,28 @@ void data_generation::generate_data(size_t train_data_count, size_t valid_data_c
 	std::cout << "Generation data file time: ";
 }
 
+void _save_file(const char* filename, ArrayXX& dataArray)
+{
+	const int mode = ios::out | ios::binary | ios::trunc;
+	std::ofstream out(filename, mode);
+	typename ArrayXX::Index rows = dataArray.rows(), cols = dataArray.cols();
+	out.write((char*)(&rows), sizeof(typename ArrayXX::Index));
+	out.write((char*)(&cols), sizeof(typename ArrayXX::Index));
+	out.write((char*)dataArray.data(), rows*cols * sizeof(float));
+	out.close();
+}
+
+//void _read_file(const char* filename, ArrayXX& dataArray)
+//{
+//	std::ifstream in(filename, ios::in | std::ios::binary);
+//	typename ArrayXX::Index rows = 0, cols = 0;
+//	in.read((char*)(&rows), sizeof(typename ArrayXX::Index));
+//	in.read((char*)(&cols), sizeof(typename ArrayXX::Index));
+//	dataArray.resize(rows, cols);
+//	in.read((char *)dataArray.data(), rows*cols * sizeof(float));
+//	in.close();
+//}
+
 void data_generation::generate_data_file(size_t data_count, string file_name)
 {
 		range_generator rng_generator;
@@ -50,6 +72,9 @@ void data_generation::generate_data_file(size_t data_count, string file_name)
 		size_t input_size = bucket_count * players_count + 1;
 		ArrayXX inputs(data_count, input_size);
 		ArrayXX mask = ArrayXX::Zero(data_count, bucket_count);
+
+		//-- A mask of possible buckets
+		const ArrayXX bucket_mask = b_conversion.get_possible_bucket_mask();
 
 		for (size_t batch = 1; batch < batch_count; batch++)
 		{
@@ -85,46 +110,49 @@ void data_generation::generate_data_file(size_t data_count, string file_name)
 				pot_size_features.data(),
 				pot_size_features.size() * sizeof(float));
 
-			local player_indexes = { { 1, bucket_count },{ bucket_count + 1, bucket_count * 2 } }
-			for (int player = 0; player < players_count; player++)
+			for (int playerId = 0; playerId < players_count; playerId++)
 			{
-				local player_index = player_indexes[player];
-				b_conversion.card_range_to_bucket_range(ranges[player], inputs[{batch_index, player_index}]);
+				AmAxx imputsMap(inputs.data() + batchStart*playerId, bucket_count);
+				b_conversion.card_range_to_bucket_range(ranges[playerId], imputsMap);
 			}
 
 			//--computation of values using re - solving
-			ArrayXX values(players_count, batch_size, card_count)
-				for (size_t i = 0; i < batch_size; i++)
-				{
-					local resolving = Resolving()
-						local current_node = {}
+			// (players_count x batch_size x card_count)
+			ArrayXX values[players_count];
+			for (size_t i = 0; i < batch_size; i++)
+			{
+				Resolving resolving;
+				Node current_node;
+				current_node.board = board;
+				current_node.street = 2;
+				current_node.current_player = P1;
+				size_t pot_size = pot_size_features(i, 0) * stack;
+				current_node.bets(0) = pot_size;
+				current_node.bets(1) = pot_size;
 
-						current_node.board = board
-						current_node.street = 2
-						current_node.current_player = constants.players.P1
-						local pot_size = pot_size_features[i][1] * arguments.stack
-						current_node.bets = arguments.Tensor{ pot_size, pot_size }
-						local p1_range = ranges[1][i]
-						local p2_range = ranges[2][i]
-						resolving:resolve_first_node(current_node, p1_range, p2_range)
-						local root_values = resolving : get_root_cfv_both_players()
-						root_values : mul(1 / pot_size)
-						values[{ {}, i, {}}] : copy(root_values)
+				ArrayX p1_range = ranges[P1].row(i);
+				ArrayX p2_range = ranges[P2].row(i);
+				resolving.resolve_first_node(current_node, p1_range, p2_range);
+				ArrayXX root_values = resolving.get_root_cfv_both_players();
+				root_values /= pot_size;
+
+				size_t target = players_count * i * card_count;
+
+				//Remove3D(values, i) = root_values;
+				for (int playerId = 0; playerId < players_count; playerId++)
+				{
+					//--translating values to nn targets
+					auto cardRange = values[playerId].row(card_count);
+					AmAx backetRange(targets.data(), card_count);
+					b_conversion.card_range_to_bucket_range(cardRange, backetRange);
+
 				}
 
-
-			//--translating values to nn targets
-			for (int player = 0; player < players_count; player++)
-			{
-				local player_index = player_indexes[player];
-				b_conversion.card_range_to_bucket_range(values[player], targets[{batch_index, player_index}]);
+				mask.row(i) = bucket_mask.replicate(batch_size, bucket_count);
 			}
-			//--computing a mask of possible buckets
-			ArrayXX bucket_mask = b_conversion.get_possible_bucket_mask();
-			mask[{batch_index, {}}] : copy(bucket_mask : expand(batch_size, bucket_count))
-		}
 
-		torch.save(file_name .. '.inputs', inputs:float())
-		torch.save(file_name .. '.targets', targets:float())
-		torch.save(file_name .. '.mask', mask:float())
+			_save_file("C:\\data\\inputs.bin", inputs);
+			_save_file("C:\\data\\targets.bin", targets);
+			_save_file("C:\\data\\mask.bin", mask);
+		}
 }

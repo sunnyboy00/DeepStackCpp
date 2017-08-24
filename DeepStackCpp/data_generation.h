@@ -5,9 +5,12 @@
 #include "random_card_generator.h"
 #include  "range_generator.h"
 #include "arguments.h"
+#include "Resolving.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 using std::chrono::duration_cast;
@@ -46,5 +49,9 @@ public:
 private:
 
 	void _print_time(std::chrono::duration<double> diff);
+
+	// Saves data for training inside the binary file
+	void _save_file(const char* filename, ArrayXX& dataArray);
+
 };
 

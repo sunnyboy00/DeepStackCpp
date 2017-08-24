@@ -42,7 +42,8 @@ void bucket_conversion::bucket_value_to_card_value(const ArrayX& bucket_value, A
 	card_value = bucket_value.matrix() * _reverse_value_matrix.matrix();
 }
 
-void bucket_conversion::card_range_to_bucket_range(const ArrayX& card_range, ArrayX& bucket_range)
+template <typename Derived, typename OtherDerived>
+void bucket_conversion::card_range_to_bucket_range(const ArrayBase<Derived>& card_range, ArrayBase<OtherDerived>& bucket_range)
 {
 	bucket_range = card_range.matrix() * _range_matrix.matrix();
 }
