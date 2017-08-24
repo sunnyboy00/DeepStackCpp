@@ -55,6 +55,12 @@
     <Filter Include="NN">
       <UniqueIdentifier>{2939f731-2c95-4fc6-a445-866903cf6a0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{51a4b3ca-b10d-4b36-8e6e-2e0f2e15ce11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Player">
+      <UniqueIdentifier>{3df97ed2-2aef-4bae-99d5-4c9d5dd0df29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -159,6 +165,9 @@
     <ClInclude Include="random_card_generator.h">
       <Filter>Header Files\DataGeneration</Filter>
     </ClInclude>
+    <ClInclude Include="continual_resolving.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -232,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="bucketer.cpp">
       <Filter>Source Files\NN</Filter>
+    </ClCompile>
+    <ClCompile Include="continual_resolving.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

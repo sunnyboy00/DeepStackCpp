@@ -169,6 +169,7 @@
     <ClInclude Include="card_to_string_conversion.h" />
     <ClInclude Include="cfrd_gadget.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="continual_resolving.h" />
     <ClInclude Include="CustomSettings.h" />
     <ClInclude Include="data_generation.h" />
     <ClInclude Include="game_settings.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="card_to_string_conversion.cpp" />
     <ClCompile Include="cfrd_gadget.cpp" />
+    <ClCompile Include="continual_resolving.cpp" />
     <ClCompile Include="data_generation.cpp" />
     <ClCompile Include="LeducEvaluator.cpp" />
     <ClCompile Include="lookahead.cpp" />
