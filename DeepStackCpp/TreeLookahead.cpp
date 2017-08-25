@@ -56,7 +56,7 @@ LookaheadResult_f TreeLookahead::get_results()
 	out.achieved_cfvs = _average_root_cfvs_data.row(P2);
 
 	//--3.0 CFVs for the acting player only when resolving first node
-	if (_reconstruction)
+	if (!_reconstruction)
 	{
 		out.root_cfvs = _average_root_cfvs_data.row(P1);
 	}
@@ -350,6 +350,8 @@ void TreeLookahead::update_regrets(Node& node, const ArrayXX& current_regrets)
 	node.regrets = (node.regrets.array() >= regret_epsilon).select(
 		node.regrets,
 		ArrayXX::Constant(node.regrets.rows(), node.regrets.cols(), regret_epsilon));
+
+	node.regrets.row(Fold) *= node.children[Fold]->foldMask;
 }
 
 void TreeLookahead::_fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count])
@@ -436,7 +438,6 @@ ArrayXX TreeLookahead::ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[pl
 	auto matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
 	currentPlayerCfValues -= matrixToSubstract; // Substructing sum of CF values over all actions with every action CF value
 	
-	currentPlayerCfValues.row(Fold) *= node.children[Fold]->foldMask;
 	return currentPlayerCfValues;
 }
 
