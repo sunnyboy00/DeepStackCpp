@@ -186,21 +186,6 @@ int TreeLookahead::_getCurrentOpponent(const Node& node)
 	}
 }
 
-void TreeLookahead::_compute_terminal_equities_terminal_equity()
-{
-
-}
-
-void TreeLookahead::_processSecondStreetTermEq(int d, Tf2& csvfs_res)
-{
-
-}
-
-void TreeLookahead::_processFirstStreetTermEq(int d, Tf2& csvfs_res)
-{
-
-}
-
 void TreeLookahead::_compute_cumulate_average_cfvs()
 {
 	if (_average_root_cfvs_data.size() == 0)
@@ -374,8 +359,6 @@ void TreeLookahead::update_regrets(Node& node, const ArrayXX& current_regrets)
 void TreeLookahead::_fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count])
 {
 	int actions_count = (int)node.children.size();
-	//_current_strategy = node.strategy;
-
 	ArrayXX ranges_mul_matrix = node.ranges.row(0).replicate(actions_count, 1);
 	children_ranges_absolute[0] = node.strategy * ranges_mul_matrix;
 
