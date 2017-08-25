@@ -54,6 +54,9 @@ public:
 	// Contains sum of cfvs data for the root node that are accumulated after skip_iters iterations
 	Ranges _average_root_cfvs_data;
 
+	// Contains sum of cfvs data for the root child nodes that are accumulated after skip_iters iterations
+	vector<ArrayXX> _average_root_child_cfvs_data;
+
 	// Average average strategy data
 	ArrayXX _average_root_strategy;
 

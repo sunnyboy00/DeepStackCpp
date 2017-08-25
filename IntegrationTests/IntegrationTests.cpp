@@ -130,8 +130,8 @@ void Resolve()
 int main()
 {
 	clock_t begin = clock();
-	test_tree_visualiser();
-	//test_run_cfr();
+	//test_tree_visualiser();
+	test_run_cfr();
 	//test_tree_visualiser();
 	//Resolve();
 	clock_t end = clock();

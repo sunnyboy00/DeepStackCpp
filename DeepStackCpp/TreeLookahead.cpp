@@ -46,6 +46,9 @@ Tf1 TreeLookahead::get_chance_action_cfv(int action_index, Tf1& board)
 LookaheadResult_f TreeLookahead::get_results()
 {
 	LookaheadResult_f out;
+	const int actionsCount = _root.children.size();
+	const int curPlayer = _getCurrentPlayer(_root);
+	const int opPlayer = _getCurrentOpponent(_root);
 
 	//--1.0 average strategy
 	//--[actions x range]
@@ -53,49 +56,47 @@ LookaheadResult_f TreeLookahead::get_results()
 	out.strategy = _average_root_strategy;
 
 	//--2.0 achieved opponent's CFVs at the starting node 
-	out.achieved_cfvs = _average_root_cfvs_data.row(P2);
+	out.achieved_cfvs = _average_root_cfvs_data.row(opPlayer);
 
 	//--3.0 CFVs for the acting player only when resolving first node
 	if (!_reconstruction)
 	{
-		out.root_cfvs = _average_root_cfvs_data.row(P1);
-	}
-	//else
-	//{
-	//	assert(false);
-	//}
+		out.root_cfvs = _average_root_cfvs_data.row(opPlayer);
 
+		if (_playersSwap)
+		{
+			out.root_cfvs_both_players.resize(players_count, card_count);
+			out.root_cfvs_both_players.row(P1) = _average_root_cfvs_data.row(P2);
+			out.root_cfvs_both_players.row(P2) = _average_root_cfvs_data.row(P1);
+		}
+		else
+		{
+			out.root_cfvs_both_players = _average_root_cfvs_data;
+		}
+	}
 
 	//--4.0 children CFVs
 	//--[actions x range]
-	out.children_cfvs.resize(_root.children.size(), card_count);
+	out.children_cfvs.resize(_average_root_child_cfvs_data.size(), card_count);
+
 	for (size_t childId = 0; childId < _root.children.size(); childId++)
 	{
-		//out.children_cfvs.row(childId) = _root.children[childId]->cf_values.rows.row(P1);
+		out.children_cfvs.row(childId) = _average_root_child_cfvs_data[childId];
 	}
 
 	//--IMPORTANT divide average CFVs by average strategy in here
-	//ArrayXX& scaler = average_strategies_data[1].reshape(action_cards_dims);
+	//scaler.replicate(actionsCount, 1);
 
-	//const Eigen::array<DenseIndex, 2> s_dims = { 1, card_count };
-
-	//Tf2 range_mul = Remove4D(ranges_data[0], P1).reshape(s_dims);
-	//range_mul = Util::ExpandAs(range_mul, scaler);
-
-	//scaler *= range_mul;
-	//Tf2 scalerSum = Util::NotReduceSum(scaler, 1);
-
-	//scaler = Util::ExpandAs(scalerSum, range_mul);
-	//scaler *= scaler.constant((float)(_cfr_iters - _cfr_skip_iters));
-
-	//out.children_cfvs /= scaler;
-
-	//assert(out.strategy.size() > 0);
-	//assert(out.achieved_cfvs.size() > 0);
-	//assert(out.children_cfvs.size() > 0);
-
-	//return out;
-
+	auto range_mul = _root.ranges.row(P1).replicate(actionsCount, 1);
+	ArrayXX scaler = _average_root_strategy * range_mul;
+	auto scalerSum = scaler.rowwise().sum();
+	auto ss = scalerSum.replicate(1, card_count);
+	//scalerSum.replicate(actionsCount, 1);
+	scaler =  ss * (_cfr_iters - _cfr_skip_iters);
+	out.children_cfvs /= scaler;
+	assert(out.strategy.size() > 0);
+	assert(out.achieved_cfvs.size() > 0);
+	assert(out.children_cfvs.size() > 0);
 	return out;
 }
 
@@ -209,6 +210,22 @@ void TreeLookahead::_compute_cumulate_average_cfvs()
 	else
 	{
 		_average_root_cfvs_data += _root.cf_values;
+	}
+
+	const int curOp = _getCurrentOpponent(_root);
+	if (_average_root_child_cfvs_data.size() == 0)
+	{
+		for (size_t childId = 0; childId < _root.children.size(); childId++)
+		{
+			_average_root_child_cfvs_data.push_back(_root.children[childId]->cf_values.row(curOp));
+		}
+	}
+	else
+	{
+		for (size_t childId = 0; childId < _root.children.size(); childId++)
+		{
+			_average_root_child_cfvs_data[childId] += _root.children[childId]->cf_values.row(curOp);
+		}
 	}
 }
 
