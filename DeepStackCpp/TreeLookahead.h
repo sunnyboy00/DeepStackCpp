@@ -196,7 +196,7 @@ public:
 
 	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
 
-	ArrayXX ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count]);
+	void ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count]);
 
 	void _fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count]);
 
