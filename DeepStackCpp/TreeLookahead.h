@@ -61,7 +61,7 @@ public:
 	ArrayXX _current_strategy;
 
 	// Do wee need to swap players(if the first player to act in the lookahed is the second player)
-	bool _playersSwap;
+	int _playersSwapOffset;
 
 
 	//	--- Re - solves the lookahead using input ranges.
@@ -172,6 +172,9 @@ public:
 	// -- for every state in the lookahead.
 	void _compute_regrets();
 
+	int _getCurrentPlayer(const Node& node);
+
+	int _getCurrentOpponent(const Node& node);
 
 	//-- - Gets an evaluator for player equities at a terminal node.
 	//--
@@ -192,9 +195,9 @@ public:
 
 	ArrayXX ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count]);
 
-	void _fillChanceRangesAndStrategy(Node &node, Ranges(&children_ranges_absolute)[players_count]);
+	void _fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count]);
 
-	void _fillPlayersRangesAndStrategy(Node & node, Ranges(&children_ranges_absolute)[players_count]);
+	void _fillChildRanges(Node & node, Ranges(&children_ranges_absolute)[players_count]);
 
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update
@@ -214,5 +217,7 @@ public:
 	//--Used at the end of re - solving so that we can track un - normalized average
 	//-- cfvs, which are simpler to compute.
 	void _compute_normalize_average_cfvs();
+
+	void _fillCurrentStrategy(Node & node);
 };
 

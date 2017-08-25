@@ -8,11 +8,11 @@ TreeLookahead::TreeLookahead(Node& root, long long skip_iters, long long iters)
 	_root = root;
 	if (_root.current_player == P2)
 	{
-		_playersSwap = true;
+		_playersSwapOffset = -1;
 	}
 	else
 	{
-		_playersSwap = false;
+		_playersSwapOffset = 0;
 	}
 }
 
@@ -161,6 +161,16 @@ void TreeLookahead::_compute_update_average_strategies(ArrayXX& current_strategy
 	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
 }
 
+int TreeLookahead::_getCurrentPlayer(const Node& node)
+{
+	return node.current_player + _playersSwapOffset;
+}
+
+int TreeLookahead::_getCurrentOpponent(const Node& node)
+{
+	return 1 - _getCurrentPlayer(node);
+}
+
 void TreeLookahead::_compute_terminal_equities_terminal_equity()
 {
 
@@ -207,7 +217,7 @@ void TreeLookahead::_compute_normalize_average_strategies()
 
 void TreeLookahead::cfrs_iter_dfs(Node& node, size_t iter)
 {
-	assert(node.current_player == P1 || node.current_player == P2 || node.current_player == chance);
+	assert(_getCurrentPlayer(node) == P1 || _getCurrentPlayer(node) == P2 || _getCurrentPlayer(node) == chance);
 	//--compute values using terminal_equity in terminal nodes
 	if (node.terminal)
 	{
@@ -222,7 +232,7 @@ void TreeLookahead::cfrs_iter_dfs(Node& node, size_t iter)
 void TreeLookahead::_fillCFvaluesForTerminalNode(Node &node)
 {
 	assert(node.terminal && (node.type == terminal_fold || node.type == terminal_call));
-	int opponnent = 1 - node.current_player;
+	int opponnent = _getCurrentOpponent(node);
 
 	terminal_equity* termEquity = _get_terminal_equity(node);
 
@@ -267,13 +277,14 @@ void TreeLookahead::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 
 	//cf_values_allactions.setZero();
 
-	if (node.current_player == chance) // ToDO: Possible need to remove because no chance for lookahead
+	if (_getCurrentPlayer(node) == chance) // ToDO: Possible need to remove because no chance for lookahead
 	{
-		_fillChanceRangesAndStrategy(node, children_ranges_absolute);
+		_fillChanceChildRanges(node, children_ranges_absolute);
 	}
 	else
 	{
-		_fillPlayersRangesAndStrategy(node, children_ranges_absolute);
+		_fillCurrentStrategy(node);
+		_fillChildRanges(node, children_ranges_absolute);
 	}
 
 	for (size_t i = 0; i < node.children.size(); i++)
@@ -350,7 +361,7 @@ void TreeLookahead::update_regrets(Node& node, const ArrayXX& current_regrets)
 	node.regrets.row(Fold) *= node.children[Fold]->foldMask;
 }
 
-void TreeLookahead::_fillChanceRangesAndStrategy(Node &node, Ranges(&children_ranges_absolute)[players_count])
+void TreeLookahead::_fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count])
 {
 	int actions_count = (int)node.children.size();
 	//_current_strategy = node.strategy;
@@ -362,11 +373,8 @@ void TreeLookahead::_fillChanceRangesAndStrategy(Node &node, Ranges(&children_ra
 	children_ranges_absolute[1] = node.strategy * ranges_mul_matrix;
 }
 
-void TreeLookahead::_fillPlayersRangesAndStrategy(Node & node, Ranges(&children_ranges_absolute)[players_count])
+void TreeLookahead::_fillCurrentStrategy(Node & node)
 {
-	int currentPlayer = node.current_player; // Because we have zero based indexes, unlike the original source.
-	int opponentIndex = 1 - currentPlayer;
-
 	const int actions_count = (int)node.children.size();
 
 	//--we have to compute current strategy at the beginning of each iteration
@@ -379,13 +387,20 @@ void TreeLookahead::_fillPlayersRangesAndStrategy(Node & node, Ranges(&children_
 		node.regrets.row(Fold) *= node.children[Fold]->foldMask;
 	}
 
-//	assert((node.regrets >= regret_epsilon).all() && "All regrets must be positive or uncomment commented code below.");
+	//	assert((node.regrets >= regret_epsilon).all() && "All regrets must be positive or uncomment commented code below.");
 
 	//--compute the current strategy
 	node.regrets_sum = node.regrets.colwise().sum().row(action_dimension);
 	node.current_strategy = ArrayXX(node.regrets);
 	node.current_strategy /= Util::ExpandAs(node.regrets_sum, node.current_strategy); // We are dividing regrets for each actions by the sum of regrets for all actions and doing this element wise for every card
-	//current_strategy.row(Fold) *= node.children[Fold]->foldMask;
+																					  //current_strategy.row(Fold) *= node.children[Fold]->foldMask;
+}
+
+void TreeLookahead::_fillChildRanges(Node & node, Ranges(&children_ranges_absolute)[players_count])
+{
+	const int currentPlayer = _getCurrentPlayer(node); // Because we have zero based indexes, unlike the original source.
+	const int opponentIndex = _getCurrentOpponent(node);
+	const int actions_count = (int)node.children.size();
 
 	ArrayXX ranges_mul_matrix = node.ranges.row(currentPlayer).replicate(actions_count, 1);
 	children_ranges_absolute[currentPlayer] = node.current_strategy.array() * ranges_mul_matrix.array(); // Just multiplying ranges(cards probabilities) by the probability that action will be taken(from the strategy) inside the matrix 
@@ -397,8 +412,8 @@ ArrayXX TreeLookahead::ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[pl
 	Tensor<float, 2> tempVar;
 	static const int PLAYERS_DIM = 1;
 	const int actions_count = (int)node.children.size();
-	const int currentPlayer = node.current_player; // Because we have zero based indexes, unlike the original source.
-	const int opponent = 1 - node.current_player;
+	const int currentPlayer = _getCurrentPlayer(node);
+	const int opponent = _getCurrentOpponent(node);
 
 	assert(node.current_strategy.rows() == actions_count && node.current_strategy.cols() == card_count);
 	//current_strategy.conservativeResize(actions_count, card_count); // Do we need this?

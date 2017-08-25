@@ -43,8 +43,8 @@ void test_tree_visualiser()
 	card_to_string_conversion converter;
 	params.root_node->board = converter.string_to_board("Ks");
 	params.root_node->street = 2;
-	params.root_node->current_player = P2;
-	params.root_node->bets << 1200, 1200;
+	params.root_node->current_player = P1;
+	params.root_node->bets << 800, 800;
 
 	tree_builder builder;
 	Node* tree = builder.build_tree(params);
@@ -112,7 +112,7 @@ void Resolve()
 	node.board = converter.string_to_board("Ks");
 	node.street = 2;
 	node.current_player = P1;
-	node.bets << 100, 100;
+	node.bets << 800, 800;
 
 	card_tools tools;
 	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));

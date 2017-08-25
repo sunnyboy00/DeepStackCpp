@@ -210,8 +210,8 @@ TEST_CASE("tree_lookahed_full_cycle")
 	card_to_string_conversion converter;
 	node.board = converter.string_to_board("Ks");
 	node.street = 2;
-	node.current_player = P1;
-	node.bets << 100, 100;
+	node.current_player = P2;
+	node.bets << 800, 800;
 
 	card_tools tools;
 	Range player_range = tools.get_uniform_range(node.board);
