@@ -142,14 +142,16 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 				
 	}
 
+	//for (size_t i = 0; i < children.size(); i++)
+	//{
+	//	Node* child = children[i];
 
-	for (auto &child : children)
-	{
-		if (child->type == terminal_fold && child->bets[0] == child->bets[1])
-		{
-			child->foldMask = 0;
-		}
-	}
+	//	////		if (child->type == terminal_fold && children[i + 1]->bets[0] == children[i + 1]->bets[1])
+	//	if (child->type == terminal_fold && children[i + 1]->type == check)
+	//	{
+	//		child->foldMask = 0;
+	//	}
+	//}
 
 	return children;
 }
@@ -207,7 +209,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 			current_node.actions(i) = cur_children->bets.maxCoeff(); // Max possible bet is the max bet off child?
 		}
 	}
-
+	
 	current_node.depth = depth + 1;
 
 	return current_node;
@@ -238,6 +240,11 @@ Node* tree_builder::build_tree(TreeBuilderParams& params)
 	_bet_sizing = params.bet_sizing;
 	_limit_to_street = params.limit_to_street;
 	_build_tree_dfs(*root);
+
+	if (root->bets[0] == root->bets[1]) // Just as in original for testing. ToDo: remove and uncommented code below!!!
+	{
+		root->children[0]->foldMask = 0;
+	}
 
 	strategy_filling filler;
 	filler.fill_uniform(*root);

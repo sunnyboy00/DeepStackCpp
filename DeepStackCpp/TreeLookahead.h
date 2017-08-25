@@ -61,7 +61,7 @@ public:
 	ArrayXX _current_strategy;
 
 	// Do wee need to swap players(if the first player to act in the lookahed is the second player)
-	int _playersSwapOffset;
+	bool _playersSwap;
 
 
 	//	--- Re - solves the lookahead using input ranges.
