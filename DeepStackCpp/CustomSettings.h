@@ -49,8 +49,8 @@ typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic
 #define Tm2 Eigen::TensorMap<Tf2, 2>
 #define Tm1 Eigen::TensorMap<Tf1, 1>
 
-#define TmAxx Eigen::Map<ArrayXX>
-#define TmAx Eigen::Map<ArrayX>
+#define AmAxx Eigen::Map<ArrayXX>
+#define AmAx Eigen::Map<ArrayX>
 
 #define CardsT Eigen::TensorFixedSize<float, Eigen::Sizes<card_count>>
 #define CfvsT Eigen::TensorFixedSize<float, Eigen::Sizes<players_count, card_count>>

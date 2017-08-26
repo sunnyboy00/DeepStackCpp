@@ -16,6 +16,16 @@ class Util
 {
 	public:
 
+		static inline void SortReverse(ArrayX & target)
+		{
+			std::sort(target.data(), target.data() + target.size(), greater());
+		}
+
+		static inline void Sort(ArrayX& target)
+		{
+			std::sort(target.data(), target.data() + target.size());
+		}
+
 		//Coping source tensor to the target tensor
 		template <int N>
 		static inline void Copy(TfN& target, const TfN& source)
@@ -32,8 +42,32 @@ class Util
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
 		}
 
-		template <typename Derived>
-		static inline void Copy(ArrayBase<Derived> & target, ArrayBase<Derived> & source)
+		//template <typename Derived>
+		//static inline void Copy(ArrayBase<Derived> & target, ArrayBase<Derived> & source)
+		//{
+		//	assert(target.size() >= source.size());
+		//	memcpy(target.da.data(), source.data(), source.size() * sizeof(float));
+		//}
+
+		static inline void Copy(ArrayXX target, ArrayXX & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayX target, ArrayX & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayXX target, ArrayX & source)
+		{
+			assert(target.size() >= source.size());
+			memcpy(target.data(), source.data(), source.size() * sizeof(float));
+		}
+
+		static inline void Copy(ArrayX target, ArrayXX & source)
 		{
 			assert(target.size() >= source.size());
 			memcpy(target.data(), source.data(), source.size() * sizeof(float));
@@ -341,28 +375,28 @@ class Util
 			assert(rows * cols == size);
 		}
 
-		static inline TmAxx ArXXView(Tf5 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf5 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
-		static inline TmAxx ArXXView(Tf4 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf4 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
-		static inline TmAxx ArXXView(Tf3 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf3 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
-		static inline TmAxx ArXXView(Tf2 &source, int rows, int cols)
+		static inline AmAxx ArXXView(Tf2 &source, int rows, int cols)
 		{
 			Process2dSizes(source.size(), rows, cols);
-			return TmAxx(source.data(), rows, cols);
+			return AmAxx(source.data(), rows, cols);
 		}
 
 		static Tf1 CardArrayToTensor(CardArray cardArray)
@@ -417,6 +451,13 @@ class Util
 		{
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
+
+private:
+	struct greater
+	{
+		template<class T>
+		bool operator()(T const &a, T const &b) const { return a > b; }
+	};
 };
 
 
