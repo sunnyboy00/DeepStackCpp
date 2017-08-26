@@ -168,7 +168,6 @@
     <ClInclude Include="continual_resolving.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
     <ClInclude Include="cfrd_gadget_f.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -209,7 +209,6 @@
     <ClCompile Include="data_generation.cpp" />
     <ClCompile Include="LeducEvaluator.cpp" />
     <ClCompile Include="cfrd_gadget_f.cpp" />
-    <ClCompile Include="LeducEvaluator.cpp" />
     <ClCompile Include="lookahead.cpp" />
     <ClCompile Include="LookaheadBuilder.cpp" />
     <ClCompile Include="LookaheadResult_f.h" />
