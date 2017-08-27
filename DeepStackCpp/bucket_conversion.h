@@ -4,6 +4,9 @@
 
 //-- - Converts between vectors over private hands and vectors over buckets.
 
+//using Eigen::ArrayBase;
+using namespace Eigen;
+
 class bucket_conversion
 {
 public:
@@ -30,7 +33,7 @@ public:
 	//-- @param card_range a probability vector over private hands
 	//-- @param bucket_range a vector in which to save the resulting probability
 	//-- vector over buckets
-	template <typename Derived, typename OtherDerived>
+	template<typename Derived, typename OtherDerived>
 	void card_range_to_bucket_range(const ArrayBase<Derived>& card_range, ArrayBase<OtherDerived>& bucket_range);
 
 	//	-- - Gives a vector of possible buckets on the the board.

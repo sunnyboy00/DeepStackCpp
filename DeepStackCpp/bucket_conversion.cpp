@@ -17,14 +17,14 @@ void bucket_conversion::set_board(const ArrayX& board)
 	_range_matrix = ArrayXX::Zero(card_count, _bucket_count);
 
 	ArrayX buckets = _bucketer.compute_buckets(board);
-	ArrayXX class_ids = ArrayX::LinSpaced(1, 0, _bucket_count).replicate(card_count, _bucket_count);
+	ArrayXX class_ids = ArrayX::LinSpaced(1, 0, (float)_bucket_count).replicate(card_count, _bucket_count);
 	ArrayXX card_buckets = buckets.replicate(card_count, _bucket_count);
 
 	//--finding all strength classes
 	//--matrix for transformation from card ranges to strength class ranges
-	for (size_t row = 0; row < class_ids.rows(); row++)
+	for (DenseIndex row = 0; row < class_ids.rows(); row++)
 	{
-		for (size_t col = 0; col < class_ids.cols(); col++)
+		for (DenseIndex col = 0; col < class_ids.cols(); col++)
 		{
 			if (class_ids(row, col) == card_buckets(row, col))
 			{
