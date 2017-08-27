@@ -5,7 +5,6 @@
 #include <Eigen/Dense>
 #include "tree_builder.h"
 #include "lookahead.h"
-#include "LookaheadBuilder.h"
 #include "LookaheadResult.h"
 
 //-- - Implements depth - limited re - solving at a node of the game tree.
@@ -25,7 +24,7 @@ public:
 	//---- @param node the public node at which to re - solve
 	//---- @param player_range a range vector for the re - solving player
 	//---- @param opponent_range a range vector for the opponent
-	LookaheadResult resolve_first_node(Node& node, const Tf1& player_range, const Tf1& opponent_range);
+	LookaheadResult resolve_first_node(Node& node, const ArrayX& player_range, const ArrayX& opponent_range);
 
 	//---- - Re - solves a depth - limited lookahead using an input range for the player and
 	//----the @{cfrd_gadget | CFRDGadget
@@ -35,7 +34,7 @@ public:
 	//---- @param player_range a range vector for the re - solving player
 	//---- @param opponent_cfvs a vector of cfvs achieved by the opponent
 	//---- before re - solving
-	LookaheadResult resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs, long long cfr_skip_iters = cfr_skip_iters, long long iters = cfr_iters);
+	LookaheadResult resolve(Node& node, ArrayX& player_range, ArrayX& opponent_cfvs, long long cfr_skip_iters = cfr_skip_iters, long long iters = cfr_iters);
 
 	//---- - Gives a list of possible actions at the node being re - solved.
 	//----
@@ -49,7 +48,7 @@ public:
 	//----The node must first be re - solved with @{resolve_first_node}.
 	//----
 	//---- @return a vector of cfvs
-	Tf1 get_root_cfv();
+	ArrayX get_root_cfv();
 
 	//---- - Gives the average counterfactual values that each player received
 	//---- at the node during re - solving.
@@ -59,7 +58,7 @@ public:
 	//----The node must first be re - solved with @{resolve_first_node}.
 	//----
 	//---- @return a 2xK tensor of cfvs, where K is the range size
-	Tf2 get_root_cfv_both_players();
+	ArrayXX get_root_cfv_both_players();
 
 	//---- - Gives the average counterfactual values that the opponent received
 	//---- during re - solving after the re - solve player took a given action.
@@ -70,7 +69,7 @@ public:
 	//---- @param action the action taken by the re - solve player at the node being
 	//---- re - solved
 	//---- @return a vector of cfvs
-	Tf1 get_action_cfv(int action);
+	ArrayX get_action_cfv(int action);
 
 	//---- - Gives the average counterfactual values that the opponent received
 	//---- during re - solving after a chance event(the betting round changes and
@@ -83,7 +82,7 @@ public:
 	//---- re - solved
 	//---- @param board a vector of board cards which were updated by the chance event
 	//---- @return a vector of cfvs
-	Tf1 get_chance_action_cfv(int action, Tf1 board);
+	ArrayX get_chance_action_cfv(int action, ArrayX board);
 
 	//---- - Gives the probability that the re - solved strategy takes a given action.
 	//----
@@ -92,7 +91,7 @@ public:
 	//---- @param action a legal action at the re - solve node
 	//---- @return a vector giving the probability of taking the action with each
 	//---- private hand
-	Tf1 get_action_strategy(int action);
+	ArrayX get_action_strategy(int action);
 
 	//---- - Gives the index of the given action at the node being re - solved.
 	//----
@@ -112,9 +111,7 @@ public:
 
 	tree_builder builder;
 
-	lookahead _lookahead;
-
-	LookaheadBuilder* _lookBuilder;
+	lookahead* _lookahead;
 
 	card_tools _cardTools;
 

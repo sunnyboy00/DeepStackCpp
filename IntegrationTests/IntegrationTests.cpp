@@ -115,8 +115,8 @@ void Resolve()
 	node.bets << 800, 800;
 
 	card_tools tools;
-	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
-	Tf1 op_cfvs(card_count);
+	ArrayX player_range = tools.get_uniform_range(node.board);
+	ArrayX op_cfvs(card_count);
 	op_cfvs(0) = -500;
 	op_cfvs(1) = 0;
 	op_cfvs(2) = 700;

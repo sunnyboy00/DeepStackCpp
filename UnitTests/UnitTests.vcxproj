@@ -172,8 +172,6 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="cfr_gadget.cpp" />
     <ClCompile Include="leduc_evaluator.cpp" />
-    <ClCompile Include="Lookahead.cpp" />
-    <ClCompile Include="lookahed_builder.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="tree_lookahead.cpp" />

@@ -10,31 +10,9 @@
 #include "cfrd_gadget.h"
 #include "LookaheadResult.h"
 
-using namespace std;
-using namespace Eigen;
-
 class lookahead
 {
-	// 	-- - A depth - limited lookahead of the game tree used for re - solving.
 public:
-	lookahead(long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
-
-	~lookahead();
-
-	terminal_equity _terminal_equity;
-
-
-	// Game tree
-	Node* tree = nullptr;
-
-	size_t _cfr_skip_iters;
-
-	size_t _cfr_iters;
-
-	// Lookahead depth to solve
-	int depth;
-
-	const float regret_epsilon = 1.0f / 1000000000;
 
 	//Action order:
 	// - fold
@@ -42,85 +20,51 @@ public:
 	// - not all int bets
 	// - all inn bet.
 	enum Actions {
-		Fold = 0, Call = 1, FirstNotAllInnBet = 2, AllInnBet = -1 
+		Fold = 0, Call = 1, FirstNotAllInnBet = 2, AllInnBet = -1
 	};
 
-	//-----------------------------------------------------------------------
-	//--Per layer information about tree actions
-	//--per layer actions are the max number of actions for any of the nodes on the layer
 
-	// Max number of actions per layer. That is max number of children for all layer nodes. 
-	map<int, int> actions_count;
+	lookahead(Node& root, long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
 
-	// Max terminal actions per layer:
-	// For the final layer: terminal_actions = 2 (fold + check).
-	// For the non-final layer: terminal_actions = 2 + chance_nodes_count(1) = 3. (?)
-	map<int, int> terminal_actions_count;
+	~lookahead();
 
-	// Bet actions per layer:
-	// bets_count = max(total_actions) - max(terminal_actions)
-	map<int, int> bets_count;
+//private:
 
-	// Total bets except allin:
-	// nonallinbets_count = bets_count - 1
-	map<int, int> nonallinbets_count;
+	size_t _cfr_skip_iters;
 
+	size_t _cfr_iters;
 
-	//--------------------------------------------------------------------
-	// The node counts per layer: 
+	Node _root;
 
-	// Nodes per layer without allin node:
-	// nonterminal_nonallin_nodes_count = bets - 1
-	map<int, int> nonterminal_nonallin_nodes_count;
+	cfrd_gadget* _reconstruction_gadget;
 
-	// ----------------------------------------------------------------
-	map<int, Tf5> pot_size;
+	Range _reconstruction_opponent_cfvs;
 
-	//--lookahead main data structures
-	//--all the structures are per - layer tensors, that is, each layer holds the data in n - dimensional tensors
+	bool _reconstruction = false;
 
-	//[actions x parent_action x grandparent_id x players x range] - (([actions x parent_action x grandparent_id x batch x players x range]))
-	enum LookaheadMainDims {
-		ActionsDim = 0, ParActionDim = 1, GpActionDim = 2, PlayersDim = 3, RangeDim = 4
-	};
+	//--dimensions in tensor
+	static const int action_dimension = 0;
+	static const int card_dimension = 1;
 
-	map<int, Tf5> ranges_data;
-	map<int, Tf5> cfvs_data;
-	map<int, Tf5> average_cfvs_data;
-	map<int, Tf5> placeholder_data;
+	// --for ease of implementation, we use small epsilon rather than zero when working with regrets
+	const float regret_epsilon = 1.0f / 1000000000;
 
-	//--data structures for one player[actions x parent_action x grandparent_id x 1 x range]
-	enum LookaheadOnPlDims {
-		ActionsDim_1 = 0, ParActionDim_1 = 1, GpActionDim_1 = 2, RangeDim_1 = 3
-	};
+	map<ArrayX*, terminal_equity*> _cached_terminal_equities;
 
-	map<int, Tf4> average_strategies_data;
-	map<int, Tf4> current_strategy_data;
-	map<int, Tf4> regrets_data;
-	map<int, Tf4> current_regrets_data;
-	//--used to mask empty actions
-	map<int, Tf4> empty_action_mask; //ToDo: possible we can remove it by not using empty actions in calulation of CSVs
+	// Contains sum of cfvs data for the root node that are accumulated after skip_iters iterations
+	Ranges _average_root_cfvs_data;
 
-	//--data structures for summing over the actions [1 x parent_action x grandparent_id x range]
-	enum LookaheadSumDims {
-		ParActionDim_sum = 0, GpActionDim_sum = 2, RangeDim_sum = 3
-	};
+	// Contains sum of cfvs data for the root child nodes that are accumulated after skip_iters iterations
+	vector<ArrayXX> _average_root_child_cfvs_data;
 
-	map<int, Tf4> regrets_sum;
+	// Average average strategy data
+	ArrayXX _average_root_strategy;
 
+	// Current strategy
+	ArrayXX _current_strategy;
 
-	//--used to hold and swap inner(nonterminal) nodes when doing some transpose operations
-	// --data structures for inner nodes (not terminal nor allin) [bets_count x parent_nonallinbetscount x gp_id x batch x players x range]
-	map<int, Tf5> inner_nodes;
-	map<int, Tf5> inner_nodes_p1;
-	map<int, Tf5> swap_data;
-
-	// Which player acts at particular depth. 0 - first player to act. 1 - second player to act.
-	ArrayX acting_player;
-
-	bool first_call_terminal;
-	bool first_call_transition;
-	bool first_call_check;
+	// Do wee need to swap players(if the first player to act in the lookahed is the second player)
+	bool _playersSwap;
 
 
 	//	--- Re - solves the lookahead using input ranges.
@@ -134,7 +78,7 @@ public:
 	//--
 	//-- @param player_range a range vector for the re - solving player
 	//-- @param opponent_range a range vector for the opponent
-	void resolve_first_node(const Tf1& player_range, const  Tf1& opponent_range);
+	void resolve_first_node(const Range& player_range, const  Range& opponent_range);
 
 	//-- - Re - solves the lookahead using an input range for the player and
 	//--the @{cfrd_gadget | CFRDGadget
@@ -145,7 +89,7 @@ public:
 	//-- @param player_range a range vector for the re - solving player
 	//-- @param opponent_cfvs a vector of cfvs achieved by the opponent
 	//-- before re - solving
-	void resolve(Tf1& player_range, Tf1& opponent_cfvs);
+	void resolve(const Range& player_range, const Range& opponent_cfvs);
 
 	//-- - Gives the average counterfactual values for the opponent during re - solving
 	//	-- after a chance event(the betting round changes and more cards are dealt).
@@ -157,7 +101,7 @@ public:
 	//	-- of the lookahead
 	//	-- @param board a tensor of board cards, updated by the chance event
 	//	-- @return a vector of cfvs
-	Tf1 get_chance_action_cfv(int action_index, Tf1& board);
+	ArrayX get_chance_action_cfv(int action_index, ArrayX& board);
 
 	//-- - Gets the results of re - solving the lookahead.
 	//	--
@@ -175,19 +119,6 @@ public:
 	//	-- * `children_cfvs`: an AxK tensor of opponent average counterfactual values after
 	//	-- each action that the re - solve player can take at the root of the lookahead
 	LookaheadResult get_results();
-
-
-//private:
-
-	vector<Tf3> _next_street_boxes_inputs;
-
-	vector<Tf3> _next_street_boxes_outputs;
-
-	vector<Tf3> _next_street_boxes; // ??
-
-	cfrd_gadget* _reconstruction_gadget;
-
-	Tf1 _reconstruction_opponent_cfvs;
 
 	//-- - Re - solves the lookahead.
 	void _compute();
@@ -207,7 +138,7 @@ public:
 
 	//-- - Updates the players' average strategies with their current strategies.
 	//-- @param iter the current iteration number of re - solving
-	void _compute_update_average_strategies(size_t iter);
+	void _compute_update_average_strategies(ArrayXX& current_strategy);
 
 	//-- - Using the players' reach probabilities, computes their counterfactual
 	//--values at each lookahead state which is a terminal state of the game. Saves it in the cfvs_data.
@@ -232,7 +163,7 @@ public:
 	//-- - Updates the players' average counterfactual values with their cfvs from the
 	//--current iteration.
 	//-- @param iter the current iteration number of re - solving
-	void _compute_cumulate_average_cfvs(size_t iter);
+	void _compute_cumulate_average_cfvs();
 
 	//-- - Normalizes the players' average strategies.
 	//	--
@@ -244,6 +175,41 @@ public:
 	// -- for every state in the lookahead.
 	void _compute_regrets();
 
+	int _getCurrentPlayer(const Node& node);
+
+	int _getCurrentOpponent(const Node& node);
+
+	//-- - Gets an evaluator for player equities at a terminal node.
+	//--
+	//--Caches the result to minimize creation of @{terminal_equity | TerminalEquity
+	//}
+	//--objects.
+	//-- @param node the terminal node to evaluate
+	//-- @return a @{terminal_equity | TerminalEquity} evaluator for the node
+	terminal_equity* _get_terminal_equity(Node& node);
+
+	//-- - Recursively walks the tree, applying the CFR algorithm.
+	//	-- @param node the current node in the tree
+	//	-- @param iter the current iteration number
+	//	-- @local
+	void cfrs_iter_dfs(Node& node, size_t iter);
+
+	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
+
+	void ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count]);
+
+	void _fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count]);
+
+	void _fillChildRanges(Node & node, Ranges(&children_ranges_absolute)[players_count]);
+
+	//-- - Update a node's total regrets with the current iteration regrets.
+	//-- @param node the node to update
+	//-- @param current_regrets the regrets from the current iteration of CFR
+	void update_regrets(Node& node, const ArrayXX& current_regrets);
+
+	// Fill cf_values for terminal nodes
+	void _fillCFvaluesForTerminalNode(Node &node);
+
 	//-- - Generates the opponent's range for the current re-solve iteration using
 	//	--the @{cfrd_gadget | CFRDGadget}.
 	//	-- @param iteration the current iteration number of re - solving
@@ -254,4 +220,7 @@ public:
 	//--Used at the end of re - solving so that we can track un - normalized average
 	//-- cfvs, which are simpler to compute.
 	void _compute_normalize_average_cfvs();
+
+	void _fillCurrentStrategy(Node & node);
 };
+

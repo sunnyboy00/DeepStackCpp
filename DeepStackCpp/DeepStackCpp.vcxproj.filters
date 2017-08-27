@@ -132,23 +132,11 @@
     <ClInclude Include="tree_values.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
-    <ClInclude Include="cfrd_gadget.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
     <ClInclude Include="Resolving.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
     <ClInclude Include="ValueNn.h">
       <Filter>Header Files\NN</Filter>
-    </ClInclude>
-    <ClInclude Include="lookahead.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
-    <ClInclude Include="LookaheadBuilder.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
-    <ClInclude Include="LookaheadResult.h">
-      <Filter>Header Files\Resolving</Filter>
     </ClInclude>
     <ClInclude Include="range_generator.h">
       <Filter>Header Files\DataGeneration</Filter>
@@ -168,10 +156,10 @@
     <ClInclude Include="continual_resolving.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cfrd_gadget_f.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="cfrd_gadget.h">
+      <Filter>Header Files\Resolving</Filter>
     </ClInclude>
-    <ClInclude Include="TreeLookahead.h">
+    <ClInclude Include="lookahead.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
   </ItemGroup>
@@ -206,9 +194,6 @@
     <ClCompile Include="TreeVisualizer.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="cfrd_gadget.cpp">
-      <Filter>Source Files\Resolving</Filter>
-    </ClCompile>
     <ClCompile Include="tree_values.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
@@ -223,12 +208,6 @@
     </ClCompile>
     <ClCompile Include="ValueNn.cpp">
       <Filter>Source Files\NN</Filter>
-    </ClCompile>
-    <ClCompile Include="lookahead.cpp">
-      <Filter>Source Files\Resolving</Filter>
-    </ClCompile>
-    <ClCompile Include="LookaheadBuilder.cpp">
-      <Filter>Source Files\Resolving</Filter>
     </ClCompile>
     <ClCompile Include="terminal_equity.cpp">
       <Filter>Source Files\Game</Filter>
@@ -251,13 +230,13 @@
     <ClCompile Include="continual_resolving.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cfrd_gadget_f.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TreeLookahead.cpp">
+    <ClCompile Include="cfrd_gadget.cpp">
       <Filter>Source Files\Resolving</Filter>
     </ClCompile>
-    <ClCompile Include="LookaheadResult_f.h">
+    <ClCompile Include="lookahead.cpp">
+      <Filter>Source Files\Resolving</Filter>
+    </ClCompile>
+    <ClCompile Include="LookaheadResult.h">
       <Filter>Header Files\Resolving</Filter>
     </ClCompile>
   </ItemGroup>

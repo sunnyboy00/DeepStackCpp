@@ -4,7 +4,6 @@
 
 Resolving::Resolving()
 {
-	_lookBuilder = new LookaheadBuilder(_lookahead);
 }
 
 
@@ -16,10 +15,10 @@ Resolving::~Resolving()
 		_lookahead_tree = nullptr;
 	}
 
-	if (_lookBuilder != nullptr)
+	if (_lookahead != nullptr)
 	{
-		delete(_lookBuilder);
-		_lookBuilder = nullptr;
+		delete(_lookahead);
+		_lookahead = nullptr;
 	}
 }
 
@@ -32,38 +31,35 @@ void Resolving::_create_lookahead_tree(Node & node)
 	_lookahead_tree = builder.build_tree(build_tree_params);
 }
 
-LookaheadResult Resolving::resolve_first_node(Node& node, const Tf1& player_range, const Tf1& opponent_range)
+LookaheadResult Resolving::resolve_first_node(Node& node, const Range& player_range, const ArrayX& opponent_range)
 {
 	_create_lookahead_tree(node);
-	_lookBuilder->build_from_tree(node);
-
-	_lookahead.resolve_first_node(player_range, opponent_range);
-
-	_resolve_results = _lookahead.get_results();
+	_lookahead = new lookahead(*_lookahead_tree);
+	_lookahead->resolve_first_node(player_range, opponent_range);
+	_resolve_results = _lookahead->get_results();
 	return _resolve_results;
 }
 
-//LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs)
+//LookaheadResult Resolving::resolve(Node& node, ArrayX& player_range, ArrayX& opponent_cfvs)
 //{
 //	assert(_cardTools.is_valid_range(ToAmxx(player_range), node.board));
 //	_create_lookahead_tree(node);
 //
 //	_lookBuilder->build_from_tree(_lookahead_tree);
-//	_lookahead.resolve(player_range, opponent_cfvs);
-//	_resolve_results = _lookahead.get_results();
+//	_lookahead->resolve(player_range, opponent_cfvs);
+//	_resolve_results = _lookahead->get_results();
 //	return _resolve_results;
 //}
 
-LookaheadResult Resolving::resolve(Node& node, Tf1& player_range, Tf1& opponent_cfvs, long long cfr_skip_iters, long long iters)
+LookaheadResult Resolving::resolve(Node& node, ArrayX& player_range, ArrayX& opponent_cfvs, long long cfr_skip_iters, long long iters)
 {
 	assert(_cardTools.is_valid_range(ToAmx(player_range), node.board));
 	_create_lookahead_tree(node);
-
-	_lookBuilder->build_from_tree(*_lookahead_tree);
-	_lookahead._cfr_skip_iters = cfr_skip_iters;
-	_lookahead._cfr_iters = iters;
-	_lookahead.resolve(player_range, opponent_cfvs);
-	_resolve_results = _lookahead.get_results();
+	_lookahead = new lookahead(*_lookahead_tree);
+	_lookahead->_cfr_skip_iters = cfr_skip_iters;
+	_lookahead->_cfr_iters = iters;
+	_lookahead->resolve(player_range, opponent_cfvs);
+	_resolve_results = _lookahead->get_results();
 	return _resolve_results;
 }
 
@@ -72,32 +68,32 @@ ArrayX Resolving::get_possible_actions()
 	return _lookahead_tree->actions;
 }
 
-Tf1 Resolving::get_root_cfv()
+ArrayX Resolving::get_root_cfv()
 {
 	return _resolve_results.root_cfvs;
 }
 
-Tf2 Resolving::get_root_cfv_both_players()
+ArrayXX Resolving::get_root_cfv_both_players()
 {
 	return _resolve_results.root_cfvs_both_players;
 }
 
-Tf1 Resolving::get_action_cfv(int action)
+ArrayX Resolving::get_action_cfv(int action)
 {
 	int action_id = _action_to_action_id(action);
-	return _resolve_results.children_cfvs.chip(action_id, 0);
+	return _resolve_results.children_cfvs.row(action_id);
 }
 
-Tf1 Resolving::get_chance_action_cfv(int action, Tf1 board)
+ArrayX Resolving::get_chance_action_cfv(int action, ArrayX board)
 {
 	int action_id = _action_to_action_id(action);
-	return _lookahead.get_chance_action_cfv(action_id, board);
+	return _lookahead->get_chance_action_cfv(action_id, board);
 }
 
-Tf1 Resolving::get_action_strategy(int action)
+ArrayX Resolving::get_action_strategy(int action)
 {
 	int action_id = _action_to_action_id(action);
-	return _resolve_results.strategy.chip(action_id, 0);
+	return _resolve_results.strategy.row(action_id);
 }
 
 int Resolving::_action_to_action_id(int action)

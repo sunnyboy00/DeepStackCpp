@@ -1,384 +1,103 @@
 #include "lookahead.h"
 
 
-lookahead::lookahead(long long skip_iters, long long iters)
+lookahead::lookahead(Node& root, long long skip_iters, long long iters)
 {
 	_cfr_skip_iters = skip_iters;
 	_cfr_iters = iters;
+	_root = root;
+	if (_root.current_player == P2)
+	{
+		_playersSwap = true;
+	}
+	else
+	{
+		_playersSwap = false;
+	}
 }
-
 
 lookahead::~lookahead()
 {
 }
 
-void lookahead::resolve_first_node(const Tf1& player_range, const Tf1& opponent_range)
+void lookahead::resolve_first_node(const Range& player_range, const Range& opponent_range)
 {
-	RemoveF4D(ranges_data[1], 0, 0, 0, P1) = player_range;
-	RemoveF4D(ranges_data[1], 0, 0, 0, P2) = opponent_range;
+	assert(player_range.size() > 0);
+	assert(opponent_range.size() > 0);
+	assert(_cfr_iters >= _cfr_skip_iters);
+	_root.ranges.row(P1) = player_range;
+	_root.ranges.row(P2) = opponent_range;
 	_compute();
 }
 
-void lookahead::resolve(Tf1& player_range, Tf1& opponent_cfvs)
+void lookahead::resolve(const Range& player_range, const Range& opponent_cfvs)
 {
-	_reconstruction_gadget = new cfrd_gadget(tree->board, player_range, opponent_cfvs);
-	RemoveF4D(ranges_data[0], 0, 0, 0, P1) = player_range;
+	_reconstruction_gadget = new cfrd_gadget(_root.board, player_range, opponent_cfvs);
 	_reconstruction_opponent_cfvs = opponent_cfvs;
+	_reconstruction = true;
 	_compute();
 }
 
-Tf1 lookahead::get_chance_action_cfv(int action_index, Tf1& board)
+ArrayX lookahead::get_chance_action_cfv(int action_index, ArrayX& board)
 {
-	Tf3 box_outputs;
-	Tf3 next_street_box;
-	int batch_index = 0;
-	Tf4 pot_mult;
-
-	assert(!((action_index == 0) && (first_call_terminal)));
-
-	//--check if we should not use the first layer for transition call
-	if (action_index == 0 && first_call_transition)
-	{
-		box_outputs = _next_street_boxes_inputs[1];
-		box_outputs.setZero();
-		assert(box_outputs.dimension(0) == 1);
-		batch_index = 0;
-		next_street_box = _next_street_boxes[1];
-		pot_mult = RemoveF1D(pot_size[1], 1);
-	}
-	else
-	{
-		batch_index = action_index - 1; //--remove fold
-		if (first_call_transition)
-		{
-			batch_index--;
-		}
-
-		box_outputs = _next_street_boxes_inputs[2];
-		next_street_box = _next_street_boxes[2];
-		pot_mult = RemoveF1D(pot_size[2], 1);;
-	}
-
-#ifdef DEBUG
-	if (box_outputs.size() == 0)
-	{
-		assert(false);
-	}
-#endif // DEBUG
-
-
-	//ToDo: uncomment when NN will be ready!
-	//next_street_box.get_value_on_board(board, box_outputs)
-
-	box_outputs *= pot_mult;
-
-	Tf1 out = RemoveF2D(box_outputs, batch_index, 2 - tree->current_player);
-	return out;
+	return ArrayX();
 }
 
 LookaheadResult lookahead::get_results()
 {
 	LookaheadResult out;
+	const int actionsCount = _root.children.size();
+	const int curPlayer = _getCurrentPlayer(_root);
+	const int opPlayer = _getCurrentOpponent(_root);
 
-	const int actions_count = (int)average_strategies_data[1].dimension(0);
-	 
 	//--1.0 average strategy
 	//--[actions x range]
 	//--lookahead already computes the average strategy we just convert the dimensions
-	const std::array<DenseIndex, 2> action_cards_dims = { actions_count, card_count};
-	out.strategy = average_strategies_data[1].reshape(action_cards_dims);
+	out.strategy = _average_root_strategy;
 
 	//--2.0 achieved opponent's CFVs at the starting node 
-	const std::array<DenseIndex, 2> players_cards_dims = { players_count, card_count };
-	Tf2 resized_average_cfvs = average_cfvs_data[0].reshape(players_cards_dims); //ToDo: copy
-
-	out.achieved_cfvs = RemoveF1D(resized_average_cfvs, P1);
+	out.achieved_cfvs = _average_root_cfvs_data.row(opPlayer);
 
 	//--3.0 CFVs for the acting player only when resolving first node
-	if (_reconstruction_opponent_cfvs.size() > 0)
+	if (!_reconstruction)
 	{
-		out.root_cfvs = RemoveF1D(resized_average_cfvs, P2);
+		out.root_cfvs = _average_root_cfvs_data.row(opPlayer);
 
-		//--swap cfvs indexing
-		out.root_cfvs_both_players = resized_average_cfvs; // !Copy Do we need this? Looks like we are overwriting below
-		RemoveF1D(out.root_cfvs_both_players, P2) = out.achieved_cfvs;
-		RemoveF1D(out.root_cfvs_both_players, P1) = out.root_cfvs;
-	}
-	else
-	{
-		assert(false);
+		if (_playersSwap)
+		{
+			out.root_cfvs_both_players.resize(players_count, card_count);
+			out.root_cfvs_both_players.row(P1) = _average_root_cfvs_data.row(P2);
+			out.root_cfvs_both_players.row(P2) = _average_root_cfvs_data.row(P1);
+		}
+		else
+		{
+			out.root_cfvs_both_players = _average_root_cfvs_data;
+		}
 	}
 
 	//--4.0 children CFVs
 	//--[actions x range]
-	out.children_cfvs = Remove4D(average_cfvs_data[1], P1).reshape(action_cards_dims);
+	out.children_cfvs.resize(_average_root_child_cfvs_data.size(), card_count);
+
+	for (size_t childId = 0; childId < _root.children.size(); childId++)
+	{
+		out.children_cfvs.row(childId) = _average_root_child_cfvs_data[childId];
+	}
 
 	//--IMPORTANT divide average CFVs by average strategy in here
-	Tf2 scaler = average_strategies_data[1].reshape(action_cards_dims);
+	//scaler.replicate(actionsCount, 1);
 
-	const Eigen::array<DenseIndex, 2> s_dims = { 1, card_count };
-
-	Tf2 range_mul = Remove4D(ranges_data[0], P1).reshape(s_dims);
-	range_mul = Util::ExpandAs(range_mul, scaler);
-
-	scaler *= range_mul;
-	Tf2 scalerSum = Util::NotReduceSum(scaler, 1);
-
-	scaler = Util::ExpandAs(scalerSum, range_mul);
-	scaler *= scaler.constant((float)(_cfr_iters - _cfr_skip_iters));
-
+	auto range_mul = _root.ranges.row(P1).replicate(actionsCount, 1);
+	ArrayXX scaler = _average_root_strategy * range_mul;
+	auto scalerSum = scaler.rowwise().sum();
+	auto ss = scalerSum.replicate(1, card_count);
+	//scalerSum.replicate(actionsCount, 1);
+	scaler =  ss * (_cfr_iters - _cfr_skip_iters);
 	out.children_cfvs /= scaler;
-
 	assert(out.strategy.size() > 0);
 	assert(out.achieved_cfvs.size() > 0);
 	assert(out.children_cfvs.size() > 0);
-
 	return out;
-}
-
-void lookahead::_compute_terminal_equities_next_street_box()
-{
-	assert(tree->street == 1);
-
-	for (int d = 1; d <= depth; d++)
-	{
-		if (d > 1 || first_call_transition)
-		{
-			if (_next_street_boxes_inputs[d].size() == 0)
-			{
-				size_t totalLen = ranges_data[d].dimension(1) + ranges_data[d].dimension(2) + ranges_data[d].dimension(3) + ranges_data[d].dimension(4);
-				_next_street_boxes_inputs[d] = Tf3(totalLen - players_count - card_count, players_count, card_count);
-				_next_street_boxes_inputs[d].setZero();
-			}
-
-			if (_next_street_boxes_outputs[d].size() == 0)
-			{
-				_next_street_boxes_outputs[d] = _next_street_boxes_inputs[d];
-			}
-
-			//--now the neural net accepts the input for P1 and P2 respectively, so we need to swap the ranges if necessary
-			Tf4 dataCopy = RemoveF1D(ranges_data[d], 1);// ToDo: copy
-
-			CopyDif(_next_street_boxes_outputs[d], dataCopy);
-
-			if (tree->current_player == P1)
-			{
-				Util::Copy(_next_street_boxes_inputs[d], _next_street_boxes_outputs[d]);
-			}
-			else
-			{
-				Tf2 p2Ranges = Remove2D(_next_street_boxes_outputs[d], P2);
-				Remove2D(_next_street_boxes_inputs[d], P1) = Remove2D(_next_street_boxes_outputs[d], P2);
-				Remove2D(_next_street_boxes_inputs[d], P2) = Remove2D(_next_street_boxes_outputs[d], P1);
-			}
-
-			//!!!!!!!!!!!!!!!!!!!!! ToDo: Uncomment after adding NN 
-			//_next_street_boxes[d] : get_value(_next_street_boxes_inputs[d], self.next_street_boxes_outputs[d])
-
-			//--now the neural net outputs for P1 and P2 respectively, so we need to swap the output values if necessary
-			if (tree->current_player == 1)
-			{
-				Util::Copy(_next_street_boxes_inputs[d], _next_street_boxes_outputs[d]);
-
-				Remove2D(_next_street_boxes_outputs[d], P1) = Remove2D(_next_street_boxes_inputs[d], P2);
-				Remove2D(_next_street_boxes_outputs[d], P2) = Remove2D(_next_street_boxes_inputs[d], P1);
-			}
-
-			Tf4 cfvsCopy = RemoveF1D(cfvs_data[d], 1);
-			CopyDif(cfvsCopy, _next_street_boxes_outputs[d]);
-		}
-	}
-}
-
-void lookahead::_compute_update_average_strategies(size_t iter)
-{
-	if (iter >= _cfr_skip_iters)
-	{
-		//--no need to go through layers since we care for the average strategy only in the first node anyway
-		//--note that if you wanted to average strategy on lower layers, you would need to weight the current strategy by the current reach probability
-		average_strategies_data[1] += current_strategy_data[1];
-	}
-}
-
-void lookahead::_compute_terminal_equities_terminal_equity()
-{
-	for (int d = 1; d <= depth; d++)
-	{
-		size_t sizeToUse = cfvs_data[d].dimension(4) * cfvs_data[d].dimension(3) * cfvs_data[d].dimension(2) * cfvs_data[d].dimension(1);
-		assert(tree->street == 2);
-		float rows = (float)sizeToUse / card_count;
-		assert(ceilf(rows) == rows && "The coefficients must be integers");
-		Tf2 csvfs_res((int)rows, card_count);  // ToDo: Extra copy 
-
-		//--call term eq evaluation
-		if (tree->street == 1)
-		{
-			_processFirstStreetTermEq(d, csvfs_res);
-		}
-		else
-		{
-			_processSecondStreetTermEq(d, csvfs_res);
-		}
-
-		//--multiply by pot scale factor
-		cfvs_data[d] *= pot_size[d];
-	}
-}
-
-void lookahead::_processFirstStreetTermEq(int d, Tf2& csvfs_res)
-{
-	const int rows = csvfs_res.dimension(0);
-
-	if (d > 1 || first_call_terminal)
-	{
-		Eigen::array<Eigen::DenseIndex, 2> rangesDims = { players_count, card_count };
-		Tf3 ranges = RemoveF2D(ranges_data[d], 1, -1);//.reshape(rangesDims); // ToDo: Extra copy
-		_terminal_equity.call_value(ToAmxx_ex(ranges, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
-		Util::CopyToSlice(cfvs_data[d], { { { Call, Call },{ -1, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
-	}
-}
-
-void lookahead::_processSecondStreetTermEq(int d, Tf2& csvfs_res)
-{
-	const int rows = csvfs_res.dimension(0);
-
-	//--on river, any call is terminal
-	if (d > 1 || first_call_terminal)
-	{
-		Tf4 ranges_1 = RemoveF1D(ranges_data[d], 1); // ToDo: Extra copy
-		_terminal_equity.call_value(ToAmxx_ex(ranges_1, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
-		Util::CopyToSlice(cfvs_data[d], { { {Call, Call}, {0, -1}, {0, -1}, {0, -1}, {0, -1} } }, csvfs_res);
-	}
-
-	//--folds
-	Tf4 ranges_0 = RemoveF1D(ranges_data[d], 0); // ToDo: Extra copy
-	_terminal_equity.fold_value(ToAmxx_ex(ranges_0, rows, card_count), ToAmxx_ex(csvfs_res, rows, card_count));
-	Util::CopyToSlice(cfvs_data[d], { { { Fold, Fold },{ 0, -1 },{ 0, -1 },{ 0, -1 },{ 0, -1 } } }, csvfs_res);
-
-	//--correctly set the folded player by multiplying by - 1
-	float fold_mutliplier = (acting_player[d] * 2 - 1);
-	auto flodCfvs = cfvs_data[d].chip(ActionsDim, Fold);
-
-	auto chip1 = flodCfvs.chip(P1, PlayersDim - 1); // - 1 because of after a chip
-	chip1 *= chip1.constant(fold_mutliplier);
-
-	auto chip2 = flodCfvs.chip(P2, PlayersDim - 1);
-	chip2 *= chip2.constant(-fold_mutliplier);
-}
-
-void lookahead::_compute_terminal_equities()
-{
-	if (tree->street == 1)
-	{
-		_compute_terminal_equities_next_street_box();
-	}
-
-	_compute_terminal_equities_terminal_equity();
-}
-
-void lookahead::_compute_cfvs()
-{
-	for (int d = depth; d >= 1; d--)
-	{
-		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
-		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
-		Remove4D(cfvs_data[d], P1) *= empty_action_mask[d];
-		Remove4D(cfvs_data[d], P2) *= empty_action_mask[d];
-		Util::Copy(placeholder_data[d], cfvs_data[d]);
-
-		//--player indexing is swapped for cfvs
-		Remove4D(placeholder_data[d], (int)acting_player[d]) *= current_strategy_data[d];
-
-		std::array<int, 1> dims = { ActionsDim };
-		regrets_sum[d] = placeholder_data[d].sum(dims);
-		//regrets_sum[d] = Util::NotReduceSum(placeholder_data[d], 0);
-
-		//--use a swap placeholder to change{ { 1,2,3 },{ 4,5,6 } } into{ { 1,2 },{ 3,4 },{ 5,6 } }
-		Tf5& swap = swap_data[d - 1];
-		CopyDif(swap, regrets_sum[d]);
-
-		std::array<std::array<DenseIndex, 2>, 5> const slices =
-		{ { { gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 }, { 0 , -1 }, { 0 , -1 }, { 0, -1 } } };
-
-		auto transposedRegretSum = Util::Transpose(swap, { ActionsDim, GpActionDim, ParActionDim, PlayersDim, RangeDim });
-		Util::CopyToSlice(cfvs_data[d - 1], slices, transposedRegretSum);
-	}
-}
-
-void lookahead::_compute_cumulate_average_cfvs(size_t iter)
-{
-	if (iter >= _cfr_skip_iters)
-	{
-		average_cfvs_data[P1] += cfvs_data[P1];
-		average_cfvs_data[P2] += cfvs_data[P2];
-	}
-}
-
-void lookahead::_compute_normalize_average_strategies()
-{
-	//--using regrets_sum as a placeholder container
-	Tf4& player_avg_strategy = average_strategies_data[1];
-	Tf4& player_avg_strategy_sum = regrets_sum[1];
-
-	player_avg_strategy_sum = Util::NotReduceSum(player_avg_strategy, 0);
-	player_avg_strategy /= Util::ExpandAs(player_avg_strategy_sum, player_avg_strategy);
-
-	//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
-	//--it sums to one->now we set to always fold
-	//ToDo: BuG! Fix!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//player_avg_strategy[1][player_avg_strategy[1]:ne(player_avg_strategy[1])] = 1
-	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
-}
-
-void lookahead::_compute_regrets()
-{
-	for (int d = depth; d >= 1; d--)
-	{
-		int gp_layer_terminal_actions_count = terminal_actions_count[d - 2];
-		int gp_layer_bets_count = bets_count[d - 2];
-		int ggp_layer_nonallin_bets_count = nonallinbets_count[d - 3];
-
-		Tf4& current_regrets = current_regrets_data[d];
-		DenseIndex cur_acting_player = (DenseIndex)acting_player[d];
-		Tf4 dataToCopy = Remove4D(cfvs_data[d], cur_acting_player);
-		Util::Copy(current_regrets, dataToCopy);
-
-		auto parent_inner_nodes = inner_nodes_p1[d - 1];
-		std::array<std::array<DenseIndex, 2>, 5> const slices =
-		{ {{ gp_layer_terminal_actions_count, -1 }, { 0, ggp_layer_nonallin_bets_count - 1 }, { 0 , -1 }, { cur_acting_player, cur_acting_player}, { 0 , -1 }} };
-		Tf5 sliceData = Util::Slice(cfvs_data[d - 1], slices);
-		Tf5 c =Util::Transpose(sliceData, { ActionsDim, GpActionDim, ParActionDim, PlayersDim, RangeDim });
-		Util::Copy(parent_inner_nodes, Util::Transpose(sliceData, { ActionsDim, GpActionDim, ParActionDim, PlayersDim, RangeDim }));
-
-		std::array<int, 4> sizes = { 1, gp_layer_bets_count, -1, card_count };
-		Util::ProcessSizes((int)parent_inner_nodes.size(), sizes);
-
-		Tm4 parrentMap(parent_inner_nodes.data(), sizes[0], sizes[1], sizes[2], sizes[3]);
-		Tf4 ex_parent_inner_nodes = Util::ExpandAs(parrentMap, current_regrets);
-		current_regrets -= ex_parent_inner_nodes;
-		regrets_data[d] += current_regrets;
-
-		//--(CFR + )
-		Util::ClipLow(regrets_data[d], 0);
-	}
-}
-
-void lookahead::_set_opponent_starting_range()
-{
-	if (_reconstruction_opponent_cfvs.size() > 0)
-	{
-		//--note that CFVs indexing is swapped, thus the CFVs for the reconstruction player are for player '1'
-		const std::array<DenseIndex, 1> dims = { card_count };
-		auto p1_cfvs = Remove4D(cfvs_data[0], P1).reshape(dims);
-
-		Tf1 opponent_range = _reconstruction_gadget->compute_opponent_range(p1_cfvs);
-		RemoveF4D(ranges_data[0], 0, 0, 0, P2) = opponent_range;
-	}
-}
-
-void lookahead::_compute_normalize_average_cfvs()
-{
-	average_cfvs_data[0] /= average_cfvs_data[0].constant(_cfr_iters - _cfr_skip_iters);
 }
 
 void lookahead::_compute()
@@ -386,14 +105,20 @@ void lookahead::_compute()
 	//--1.0 main loop
 	for (size_t iter = 0; iter < _cfr_iters; iter++)
 	{
-		_set_opponent_starting_range();
-		_compute_current_strategies();
-		_compute_ranges();
-		_compute_update_average_strategies(iter);
-		_compute_terminal_equities();
-		_compute_cfvs();
-		_compute_regrets();
-		_compute_cumulate_average_cfvs(iter);
+		if (_reconstruction)
+		{
+			_set_opponent_starting_range();
+		}
+
+		cfrs_iter_dfs(_root, iter);
+
+		if (iter >= _cfr_skip_iters)
+		{
+			//--no need to go through layers since we care for the average strategy only in the first node anyway
+			//--note that if you wanted to average strategy on lower layers, you would need to weight the current strategy by the current reach probability
+			_compute_update_average_strategies(_root.current_strategy);
+			_compute_cumulate_average_cfvs();
+		}
 	}
 
 	//--2.0 at the end normalize average strategy
@@ -402,56 +127,317 @@ void lookahead::_compute()
 	_compute_normalize_average_cfvs();
 }
 
-void lookahead::_compute_current_strategies()
+void lookahead::_set_opponent_starting_range()
 {
-	for (int d = 1; d <= depth; d++)
+	//int oponent = 1 - P1; // In the reconstruction CFR-D gadget we are adding opponent as the first node. So for this root we are just swapping players.
+	//_root.ranges.row(oponent) = _reconstruction_gadget->compute_opponent_range(_root.cf_values.row(oponent));
+	_root.ranges.row(P2) = _reconstruction_gadget->compute_opponent_range(_root.cf_values.row(P2));
+}
+
+void lookahead::_compute_normalize_average_cfvs()
+{
+	_average_root_cfvs_data /= (_cfr_iters - _cfr_skip_iters);
+}
+
+void lookahead::_compute_terminal_equities_next_street_box()
+{
+	_average_root_strategy /= _average_root_strategy.rowwise().sum();
+}
+
+void lookahead::_compute_update_average_strategies(ArrayXX& current_strategy)
+{
+	if (_average_root_strategy.size() == 0)
 	{
-		Util::ClipLow(regrets_data[d], regret_epsilon);
+		_average_root_strategy = current_strategy;
+	}
+	else
+	{
+		_average_root_strategy += current_strategy;
+	}
 
-		//--1.0 set regret of empty actions to 0
-		regrets_data[d] *= empty_action_mask[d]; //ToDo: how can we get non zero regret of impossible actions? Remove?
+	//ToDo:
+	//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
+	//--it sums to one->now we set to always fold
+	//player_avg_strategy[1][player_avg_strategy[1]:ne(player_avg_strategy[1])] = 1
+	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
+}
 
-		//--1.1  regret matching
-		//--note that the regrets as well as the CFVs have switched player indexing
-		regrets_sum[d] = Util::NotReduceSum(regrets_data[d], ActionsDim);
-		current_strategy_data[d] = regrets_data[d] / Util::ExpandAs(regrets_sum[d], regrets_data[d]);
+int lookahead::_getCurrentPlayer(const Node& node)
+{
+	if (_playersSwap)
+	{
+		return 1 - node.current_player;
+	}
+	else
+	{
+		return node.current_player;
 	}
 }
 
-void lookahead::_compute_ranges()
+int lookahead::_getCurrentOpponent(const Node& node)
 {
-	for (int d = 0; d < depth; d++) // d < depth because we are setting next level range[d+1]
+	if (_playersSwap)
 	{
-		Tf5& current_level_ranges = ranges_data[d];
-		Tf5& next_level_ranges = ranges_data[d + 1]; // ToDo: check Is this a copy or a ref to original tensor?
-
-		int prev_layer_terminal_actions_count = terminal_actions_count[d - 1];
-		int prev_layer_bets_count = bets_count[d - 1];
-		int gp_layer_nonallin_bets_count = nonallinbets_count[d - 2];
-
-		//for (size_t action = prev_layer_terminal_actions_count; action < current_level_ranges.dimension(0); action++)
-		//{
-		//	for (size_t parentAction = 0; parentAction < gp_layer_nonallin_bets_count; parentAction++)
-		//	{
-		//	}
-		//}
-
-		//--copy the ranges of inner nodes and transpose
-		Tf5& betActionsRanges = Util::Slice(current_level_ranges,
-		{ { { prev_layer_terminal_actions_count, -1 }, { 0, gp_layer_nonallin_bets_count - 1}, {0, -1}, {0 , -1}, {0, -1} } });
-		inner_nodes[d] = Util::Transpose(betActionsRanges, { 0, 2, 1, 3, 4}); // Shuffle parent and gp axis;
-		std::array<int, 5> sizes = { { 1, prev_layer_bets_count, -1, players_count, card_count } };
-		Tm5& super_view = Util::View(inner_nodes[d], sizes);
-		Tf5& super_view_t = Util::ExpandAs(super_view, next_level_ranges); // ToDo: Extra copy perf hit
-		Util::Copy(next_level_ranges, super_view_t);
-		Tf4& next_level_strategies = current_strategy_data[d + 1];
-
-		//--multiply the ranges of the acting player by his strategy
-		DenseIndex curPlayer = (DenseIndex)acting_player[d];
-
-		Remove4D(next_level_ranges, curPlayer) *= next_level_strategies;
-		//RemoveF4D(next_level_ranges, 0, 0, 0, curPlayer) *= next_level_strategies;
-			/*Util::Slice(next_level_ranges,
-			{ { { 0, -1 },{ 0, -1 },{ 0, -1 },{ curPlayer, curPlayer },{ 0, -1 } } }) *= next_level_strategies;*/
+		return node.current_player;
+	}
+	else
+	{
+		return 1 - node.current_player;
 	}
 }
+
+void lookahead::_compute_cumulate_average_cfvs()
+{
+	if (_average_root_cfvs_data.size() == 0)
+	{
+		_average_root_cfvs_data = _root.cf_values;
+	}
+	else
+	{
+		_average_root_cfvs_data += _root.cf_values;
+	}
+
+	const int curOp = _getCurrentOpponent(_root);
+	if (_average_root_child_cfvs_data.size() == 0)
+	{
+		for (size_t childId = 0; childId < _root.children.size(); childId++)
+		{
+			_average_root_child_cfvs_data.push_back(_root.children[childId]->cf_values.row(curOp));
+		}
+	}
+	else
+	{
+		for (size_t childId = 0; childId < _root.children.size(); childId++)
+		{
+			_average_root_child_cfvs_data[childId] += _root.children[childId]->cf_values.row(curOp);
+		}
+	}
+}
+
+void lookahead::_compute_normalize_average_strategies()
+{
+	auto player_avg_strategy_sum = _average_root_strategy.colwise().sum();
+	player_avg_strategy_sum.resize(1, _average_root_strategy.cols());
+	//_root.cf_values
+	auto divis = player_avg_strategy_sum.replicate(_average_root_strategy.rows(), 1);
+	_average_root_strategy /= divis;
+
+		//--if the strategy is 'empty' (zero reach), strategy does not matter but we need to make sure
+	//--it sums to one->now we set to always fold
+	//ToDo: BuG! Fix!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//player_avg_strategy[1][player_avg_strategy[1]:ne(player_avg_strategy[1])] = 1
+	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
+}
+
+//------------------------------------------
+
+void lookahead::cfrs_iter_dfs(Node& node, size_t iter)
+{
+	//--compute values using terminal_equity in terminal nodes
+	if (node.terminal)
+	{
+		_fillCFvaluesForTerminalNode(node);
+	}
+	else
+	{
+		_fillCFvaluesForNonTerminalNode(node, iter);
+	}
+}
+
+void lookahead::_fillCFvaluesForTerminalNode(Node &node)
+{
+	assert(node.terminal && (node.type == terminal_fold || node.type == terminal_call));
+	int opponnent = _getCurrentOpponent(node);
+
+	terminal_equity* termEquity = _get_terminal_equity(node);
+
+	// CF values  2p X each private hand.
+	//node.cf_values.resize(players_count, card_count);
+
+	if (node.type == terminal_fold)
+	{
+		if (node.foldMask == 0)
+		{
+			return;
+		}
+
+		termEquity->tree_node_fold_value(node.ranges, node.cf_values, opponnent);
+	}
+	else
+	{
+		termEquity->tree_node_call_value(node.ranges, node.cf_values);
+	}
+
+	//--multiply by the pot
+	node.cf_values *= node.pot;
+
+	//Looks like this not needed? ToDo: check during debugging!
+	//node.cf_values.conservativeResize(node.ranges_absolute.rows(), node.ranges_absolute.cols());
+}
+
+
+void lookahead::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
+{
+	const int actions_count = (int)node.children.size();
+	//--current cfv[[actions, players, ranges]]
+	//[actions_count x card_count][players_count]
+	CFVS cf_values_allactions[players_count];
+	cf_values_allactions[P1] = CFVS::Zero(actions_count, card_count);
+	cf_values_allactions[P2] = CFVS::Zero(actions_count, card_count);
+
+	//Tensor like <player/[actions, ranges]>
+	Ranges children_ranges_absolute[players_count];
+
+	static const int PLAYERS_DIM = 1;
+
+	//cf_values_allactions.setZero();
+
+	_fillCurrentStrategy(node);
+	_fillChildRanges(node, children_ranges_absolute);
+
+	for (size_t i = 0; i < node.children.size(); i++)
+	{
+		Node* child_node = node.children[i];
+		if (child_node->foldMask == 0)
+		{
+			continue;
+		}
+
+		//--set new absolute ranges(after the action) for the child
+		child_node->ranges = node.ranges;
+
+		child_node->ranges.row(P1) = children_ranges_absolute[P1].row(i);
+		child_node->ranges.row(P2) = children_ranges_absolute[P2].row(i);
+		cfrs_iter_dfs(*child_node, iter);
+
+		// Now coping cf_values from children to calculate the regret
+
+		cf_values_allactions[P1].row(i) = child_node->cf_values.row(P1); //ToDo: Can be single copy operation(two rows copy)? ToDo:remove convention to Range
+		cf_values_allactions[P2].row(i) = child_node->cf_values.row(P2); 
+	}
+
+	//node.cf_values = Ranges(players_count, card_count);// ToDo:remove convention to Range
+	//node.cf_values.fill(0);
+
+	ComputeRegrets(node, cf_values_allactions);
+	ArrayXX& current_regrets = cf_values_allactions[_getCurrentPlayer(node)];
+	update_regrets(node, current_regrets);
+}
+
+terminal_equity* lookahead::_get_terminal_equity(Node& node)
+{
+	auto it = _cached_terminal_equities.find(&node.board);
+
+	terminal_equity* cached = nullptr;
+	if (it == _cached_terminal_equities.end())
+	{
+		cached = new terminal_equity();
+		cached->set_board(node.board);
+		_cached_terminal_equities[&node.board] = cached;
+	}
+	else
+	{
+		cached = it->second;
+	}
+
+	return cached;
+}
+
+void lookahead::update_regrets(Node& node, const ArrayXX& current_regrets)
+{
+	//--node.regrets:add(current_regrets)
+	//	--local negative_regrets = node.regrets[node.regrets:lt(0)]
+	//	--node.regrets[node.regrets:lt(0)] = negative_regrets
+	node.regrets.array() += current_regrets;
+
+	node.regrets = (node.regrets.array() >= regret_epsilon).select(
+		node.regrets,
+		ArrayXX::Constant(node.regrets.rows(), node.regrets.cols(), regret_epsilon));
+
+	node.regrets.row(Fold) *= node.children[Fold]->foldMask; // ToDo: possible we can remove this and avoid NANs when deviding by zero
+}
+
+void lookahead::_fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count])
+{
+	int actions_count = (int)node.children.size();
+	ArrayXX ranges_mul_matrix = node.ranges.row(0).replicate(actions_count, 1);
+	children_ranges_absolute[0] = node.strategy * ranges_mul_matrix;
+
+	ranges_mul_matrix = node.ranges.row(1).replicate(actions_count, 1);
+	children_ranges_absolute[1] = node.strategy * ranges_mul_matrix;
+}
+
+void lookahead::_fillCurrentStrategy(Node & node)
+{
+	const int actions_count = (int)node.children.size();
+
+	//--we have to compute current strategy at the beginning of each iteration
+
+	//--initialize regrets in the first iteration
+	if (node.regrets.size() == 0)
+	{
+		node.regrets = ArrayXX::Constant(actions_count, card_count, regret_epsilon);
+		node.regrets.row(Fold) *= node.children[Fold]->foldMask;
+	}
+
+	//	assert((node.regrets >= regret_epsilon).all() && "All regrets must be positive or uncomment commented code below.");
+
+	//--compute the current strategy
+	node.regrets_sum = node.regrets.colwise().sum().row(action_dimension);
+	node.current_strategy = ArrayXX(node.regrets);
+	node.current_strategy /= Util::ExpandAs(node.regrets_sum, node.current_strategy); // We are dividing regrets for each actions by the sum of regrets for all actions and doing this element wise for every card
+																					  //current_strategy.row(Fold) *= node.children[Fold]->foldMask;
+}
+
+void lookahead::_fillChildRanges(Node & node, Ranges(&children_ranges_absolute)[players_count])
+{
+	const int currentPlayer = _getCurrentPlayer(node); // Because we have zero based indexes, unlike the original source.
+	const int opponentIndex = _getCurrentOpponent(node);
+	const int actions_count = (int)node.children.size();
+
+	auto ranges_mul_matrix = node.ranges.row(currentPlayer).replicate(actions_count, 1);
+	children_ranges_absolute[currentPlayer] = node.current_strategy.array() * ranges_mul_matrix.array(); // Just multiplying ranges(cards probabilities) by the probability that action will be taken(from the strategy) inside the matrix 
+	children_ranges_absolute[opponentIndex] = node.ranges.row(opponentIndex).replicate(actions_count, 1); //For opponent we are just cloning ranges
+}
+
+void lookahead::ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count])
+{
+	Tensor<float, 2> tempVar;
+	static const int PLAYERS_DIM = 1;
+	const int actions_count = (int)node.children.size();
+	const int currentPlayer = _getCurrentPlayer(node);
+	const int opponent = _getCurrentOpponent(node);
+
+	assert(node.current_strategy.rows() == actions_count && node.current_strategy.cols() == card_count);
+	//current_strategy.conservativeResize(actions_count, card_count); // Do we need this?
+
+	//Map<ArrayXX> opCfAr = Util::TensorToArray2d(cf_values_allactions, opponentIndexNorm, PLAYERS_DIM, tempVar);
+
+	ArrayXX& opCfAr = cf_values_allactions[opponent]; // [actions X cards] - cf values for the opponent
+	//opCfAr.row(Fold) *= node.children[Fold]->foldMask;
+	node.cf_values.row(opponent) = opCfAr.colwise().sum(); // for opponent assume that strategy is uniform
+
+														   //ArrayXX strategy_mul_matrix = current_strategy; //ToDo: remove or add copy
+														   //Map<ArrayXX> plCfAr = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
+
+	ArrayXX& currentRegrets = cf_values_allactions[currentPlayer];
+	//currentPlayerCfValues.row(Fold) *= node.children[Fold]->foldMask;
+	assert(currentRegrets.rows() == actions_count && currentRegrets.cols() == card_count);
+
+	auto weigtedCfValues = node.current_strategy * currentRegrets; // weight the regrets by the used strategy
+	node.cf_values.row(currentPlayer) = weigtedCfValues.colwise().sum(); // summing CF values for different actions
+
+																		 //--computing regrets
+																		 //Map<ArrayXX> current_regrets = Util::TensorToArray2d(cf_values_allactions, currentPlayerNorm, PLAYERS_DIM, tempVar);
+
+																		 //current_regrets.resize(actions_count, card_count); Do we need this resize?
+
+
+	auto cfValuesOdCurrentPlayer = node.cf_values.row(currentPlayer);
+	cfValuesOdCurrentPlayer.resize(1, card_count); // [1(action) X card_count]
+	auto matrixToSubstract = cfValuesOdCurrentPlayer.replicate(actions_count, 1); // [actions X card_count]
+	currentRegrets -= matrixToSubstract; // Substructing sum of CF values over all actions with every action CF value
+}
+
+
+

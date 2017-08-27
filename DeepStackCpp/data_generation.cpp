@@ -85,7 +85,6 @@
 //			//--generating ranges players_count x batch_size x card_count
 //			ArrayXX ranges[players_count];
 //
-//			ArrayXX ranges(players_count, batch_size, card_count);
 //			for (int player = 1; player < players_count; player++)
 //			{
 //				rng_generator.generate_range(ranges[player]);
