@@ -41,7 +41,7 @@ void range_generator::_generate_recursion(ArrayXX& cards, ArrayX& mass)
 		memcpy(one.data(), cards.data(), halfSize * sizeof(float));
 
 		int startOffset =  halfSizeInt + 1;
-		int twoRows = cards.cols() - startOffset;
+		int twoRows = cards.rows() - startOffset;
 		ArrayXX two(batch_size, twoRows);
 		memcpy(two.data(), cards.data() + startOffset, twoRows * sizeof(float));
 
@@ -61,19 +61,22 @@ void range_generator::set_board(const ArrayX & board)
 {
 	ArrayX hand_strengths = _evaluator.batch_eval(board);
 	_possible_hands_mask = _cardTools.get_possible_hand_indexes(board);
-	_possible_hands_count = _possible_hands_mask.rowwise().sum()(0);
+	_possible_hands_count = _possible_hands_mask.colwise().sum()(0);
 
 	_order = ArrayX(_possible_hands_count);
 	_order = hand_strengths * _possible_hands_mask;
 	Util::Sort(_order);
 	_reverse_order = ArrayX(_order);
 	Util::SortReverse(_reverse_order);
+	_possible_hands_mask.resize(1, card_count);
 }
 
 void range_generator::generate_range(ArrayXX & range)
 {
 	size_t batch_size = range.rows();
 	_sorted_range.resize(batch_size, _possible_hands_count);
+	_reordered_range.resize(batch_size, _possible_hands_count);
+
 	generate_sorted_range(_sorted_range);
 	//--we have to reorder the the range back to undo the sort by strength
 	ArrayX A;
@@ -88,5 +91,6 @@ void range_generator::generate_range(ArrayXX & range)
 	}
 
 	range.setZero();
-	range = Util::ExpandAs(_possible_hands_mask, range) * _reordered_range;
+	auto repl = _possible_hands_mask.replicate(batch_size, 1);
+	range = repl * _reordered_range;
 }

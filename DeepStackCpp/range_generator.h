@@ -48,7 +48,7 @@ private:
 
 	size_t _possible_hands_count;
 
-	ArrayX _possible_hands_mask;
+	ArrayXX _possible_hands_mask;
 
 	//-- - Recursively samples a section of the range vector.
 	//-- @param cards an NxJ section of the range tensor, where N is the batch size
@@ -61,7 +61,7 @@ private:
 
 	ArrayX _reverse_order;
 
-	ArrayX _reordered_range;
+	ArrayXX _reordered_range;
 
 	ArrayXX _sorted_range;
 };

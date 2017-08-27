@@ -13,6 +13,7 @@
 #include "Constants.h"
 #include "tree_builder.h"
 #include "TreeVisualizer.h"
+#include "data_generation.h"
 #include "lookahead.h"
 #include "TreeCFR.h"
 #include <Eigen/Dense>
@@ -125,6 +126,12 @@ void Resolve()
 	op_cfvs(5) = 1200;
 
 	LookaheadResult result = resolver.resolve(node, player_range, op_cfvs);
+}
+
+void GenerateData()
+{
+	data_generation generator;
+	generator.generate_data(train_data_count, valid_data_count);
 }
 
 int main()

@@ -172,6 +172,7 @@
     <ClCompile Include="card_tools.cpp" />
     <ClCompile Include="cfr_gadget.cpp" />
     <ClCompile Include="leduc_evaluator.cpp" />
+    <ClCompile Include="range_generator.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="tree_lookahead.cpp" />

@@ -68,5 +68,8 @@
     <ClCompile Include="tree_lookahead.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
+    <ClCompile Include="range_generator.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
