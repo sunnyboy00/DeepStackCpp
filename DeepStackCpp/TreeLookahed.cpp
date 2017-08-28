@@ -1,7 +1,7 @@
-#include "TreeLook2.h"
+#include "TreeLookahed.h"
 
 
-TreeLook2::TreeLook2(Node& root, long long skip_iters, long long iters)
+TreeLookahed::TreeLookahed(Node& root, long long skip_iters, long long iters)
 {
 	_cfr_skip_iters = skip_iters;
 	_cfr_iters = iters;
@@ -16,11 +16,11 @@ TreeLook2::TreeLook2(Node& root, long long skip_iters, long long iters)
 	}
 }
 
-TreeLook2::~TreeLook2()
+TreeLookahed::~TreeLookahed()
 {
 }
 
-void TreeLook2::resolve_first_node(const Range& player_range, const Range& opponent_range)
+void TreeLookahed::resolve_first_node(const Range& player_range, const Range& opponent_range)
 {
 	assert(player_range.size() > 0);
 	assert(opponent_range.size() > 0);
@@ -30,23 +30,23 @@ void TreeLook2::resolve_first_node(const Range& player_range, const Range& oppon
 	_compute();
 }
 
-void TreeLook2::resolve(const Range& player_range, const Range& opponent_cfvs)
+void TreeLookahed::resolve(const Range& player_range, const Range& opponent_cfvs)
 {
 	_root->ranges.row(P1) = player_range;
-	_reconstruction_gadget = new cfrd_gadget_f(_root->board, player_range, opponent_cfvs);
+	_reconstruction_gadget = new cfrd_gadget(_root->board, player_range, opponent_cfvs);
 	_reconstruction_opponent_cfvs = opponent_cfvs;
 	_reconstruction = true;
 	_compute();
 }
 
-Tf1 TreeLook2::get_chance_action_cfv(int action_index, Tf1& board)
+ArrayX TreeLookahed::get_chance_action_cfv(int action_index, ArrayX& board)
 {
-	return Tf1();
+	return ArrayX();
 }
 
-LookaheadResult_f TreeLook2::get_results()
+LookaheadResult TreeLookahed::get_results()
 {
-	LookaheadResult_f out;
+	LookaheadResult out;
 	const int actionsCount = _root->children.size();
 	const int curPlayer = _getCurrentPlayer(*_root);
 	const int opPlayer = _getCurrentOpponent(*_root);
@@ -101,7 +101,7 @@ LookaheadResult_f TreeLook2::get_results()
 	return out;
 }
 
-void TreeLook2::_buildFlatList(Node& node)
+void TreeLookahed::_buildFlatList(Node& node)
 {
 	const int actionsCount = node.children.size();
 	if (actionsCount > 0)
@@ -118,7 +118,7 @@ void TreeLook2::_buildFlatList(Node& node)
 	}
 }
 
-void TreeLook2::_compute()
+void TreeLookahed::_compute()
 {
 	_nodes.push_back(_root);
 	_buildFlatList(*_root);
@@ -158,24 +158,24 @@ void TreeLook2::_compute()
 	_compute_normalize_average_cfvs();
 }
 
-void TreeLook2::_set_opponent_starting_range()
+void TreeLookahed::_set_opponent_starting_range()
 {
 	//int oponent = 1 - P1; // In the reconstruction CFR-D gadget we are adding opponent as the first node. So for this root we are just swapping players.
 	//_root->ranges.row(oponent) = _reconstruction_gadget->compute_opponent_range(_root->cf_values.row(oponent));
 	_root->ranges.row(P2) = _reconstruction_gadget->compute_opponent_range(_root->cf_values.row(P2));
 }
 
-void TreeLook2::_compute_normalize_average_cfvs()
+void TreeLookahed::_compute_normalize_average_cfvs()
 {
 	_average_root_cfvs_data /= (_cfr_iters - _cfr_skip_iters);
 }
 
-void TreeLook2::_compute_terminal_equities_next_street_box()
+void TreeLookahed::_compute_terminal_equities_next_street_box()
 {
 	_average_root_strategy /= _average_root_strategy.rowwise().sum();
 }
 
-void TreeLook2::_compute_update_average_strategies(ArrayXX& current_strategy)
+void TreeLookahed::_compute_update_average_strategies(ArrayXX& current_strategy)
 {
 	if (_average_root_strategy.size() == 0)
 	{
@@ -193,7 +193,7 @@ void TreeLook2::_compute_update_average_strategies(ArrayXX& current_strategy)
 	//player_avg_strategy[player_avg_strategy:ne(player_avg_strategy)] = 0
 }
 
-int TreeLook2::_getCurrentPlayer(const Node& node)
+int TreeLookahed::_getCurrentPlayer(const Node& node)
 {
 	if (_playersSwap)
 	{
@@ -205,7 +205,7 @@ int TreeLook2::_getCurrentPlayer(const Node& node)
 	}
 }
 
-int TreeLook2::_getCurrentOpponent(const Node& node)
+int TreeLookahed::_getCurrentOpponent(const Node& node)
 {
 	if (_playersSwap)
 	{
@@ -217,7 +217,7 @@ int TreeLook2::_getCurrentOpponent(const Node& node)
 	}
 }
 
-void TreeLook2::_compute_cumulate_average_cfvs()
+void TreeLookahed::_compute_cumulate_average_cfvs()
 {
 	if (_average_root_cfvs_data.size() == 0)
 	{
@@ -245,7 +245,7 @@ void TreeLook2::_compute_cumulate_average_cfvs()
 	}
 }
 
-void TreeLook2::_compute_normalize_average_strategies()
+void TreeLookahed::_compute_normalize_average_strategies()
 {
 	auto player_avg_strategy_sum = _average_root_strategy.colwise().sum();
 	player_avg_strategy_sum.resize(1, _average_root_strategy.cols());
@@ -262,7 +262,7 @@ void TreeLook2::_compute_normalize_average_strategies()
 
 //------------------------------------------
 
-void TreeLook2::cfrs_iter_dfs(Node& node, size_t iter)
+void TreeLookahed::cfrs_iter_dfs(Node& node, size_t iter)
 {
 	if (node.foldMask != 0 && node.parent != nullptr)
 	{
@@ -281,7 +281,7 @@ void TreeLook2::cfrs_iter_dfs(Node& node, size_t iter)
 	}
 }
 
-void TreeLook2::_fillCFvaluesForTerminalNode(Node &node)
+void TreeLookahed::_fillCFvaluesForTerminalNode(Node &node)
 {
 	assert(node.terminal && (node.type == terminal_fold || node.type == terminal_call));
 	int opponnent = _getCurrentOpponent(node);
@@ -313,7 +313,7 @@ void TreeLook2::_fillCFvaluesForTerminalNode(Node &node)
 }
 
 
-void TreeLook2::_fillCfvs(Node &node)
+void TreeLookahed::_fillCfvs(Node &node)
 {
 	const int actions_count = (int)node.children.size();
 	const int currentPlayer = _getCurrentPlayer(node);
@@ -341,7 +341,7 @@ void TreeLook2::_fillCfvs(Node &node)
 
 }
 
-void TreeLook2::_back(Node &node)
+void TreeLookahed::_back(Node &node)
 {
 	if (!node.terminal)
 	{
@@ -359,7 +359,7 @@ void TreeLook2::_back(Node &node)
 	}
 }
 
-void TreeLook2::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
+void TreeLookahed::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 {
 	const int actions_count = (int)node.children.size();
 
@@ -370,7 +370,7 @@ void TreeLook2::_fillCFvaluesForNonTerminalNode(Node &node, size_t iter)
 
 }
 
-terminal_equity* TreeLook2::_get_terminal_equity(Node& node)
+terminal_equity* TreeLookahed::_get_terminal_equity(Node& node)
 {
 	auto it = _cached_terminal_equities.find(&node.board);
 
@@ -389,7 +389,7 @@ terminal_equity* TreeLook2::_get_terminal_equity(Node& node)
 	return cached;
 }
 
-void TreeLook2::update_regrets(Node& node, const ArrayXX& current_regrets)
+void TreeLookahed::update_regrets(Node& node, const ArrayXX& current_regrets)
 {
 	//--node.regrets:add(current_regrets)
 	//	--local negative_regrets = node.regrets[node.regrets:lt(0)]
@@ -404,7 +404,7 @@ void TreeLook2::update_regrets(Node& node, const ArrayXX& current_regrets)
 }
 
 
-void TreeLook2::_fillCurrentStrategy(Node & node)
+void TreeLookahed::_fillCurrentStrategy(Node & node)
 {
 	const int actions_count = (int)node.children.size();
 
@@ -426,7 +426,7 @@ void TreeLook2::_fillCurrentStrategy(Node & node)
 																					  //current_strategy.row(Fold) *= node.children[Fold]->foldMask;
 }
 
-void TreeLook2::_fillChildRanges(Node & node)
+void TreeLookahed::_fillChildRanges(Node & node)
 {
 	const int currentPlayer = _getCurrentPlayer(node); // Because we have zero based indexes, unlike the original source.
 	const int opponentIndex = _getCurrentOpponent(node);
@@ -437,7 +437,7 @@ void TreeLook2::_fillChildRanges(Node & node)
 	node.children_ranges_absolute[opponentIndex] = node.ranges.row(opponentIndex).replicate(actions_count, 1); //For opponent we are just cloning ranges
 }
 
-CFVS TreeLook2::ComputeRegrets(Node &node)
+CFVS TreeLookahed::ComputeRegrets(Node &node)
 {
 	const int currentPlayer = _getCurrentPlayer(node);
 	const int opponent = _getCurrentOpponent(node);

@@ -5,10 +5,10 @@
 #include "arguments.h"
 #include "Util.h"
 #include "terminal_equity.h"
-#include "cfrd_gadget_f.h"
-#include "LookaheadResult_f.h"
+#include "cfrd_gadget.h"
+#include "LookaheadResult.h"
 
-class TreeLook2
+class TreeLookahed
 {
 public:
 
@@ -22,9 +22,9 @@ public:
 	};
 
 
-	TreeLook2(Node& root, long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
+	TreeLookahed(Node& root, long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
 
-	~TreeLook2();
+	~TreeLookahed();
 
 	//private:
 
@@ -34,7 +34,7 @@ public:
 
 	Node* _root;
 
-	cfrd_gadget_f* _reconstruction_gadget;
+	cfrd_gadget* _reconstruction_gadget;
 
 	Range _reconstruction_opponent_cfvs;
 
@@ -104,7 +104,7 @@ public:
 	//	-- of the lookahead
 	//	-- @param board a tensor of board cards, updated by the chance event
 	//	-- @return a vector of cfvs
-	Tf1 get_chance_action_cfv(int action_index, Tf1& board);
+	ArrayX get_chance_action_cfv(int action_index, ArrayX& board);
 
 	//-- - Gets the results of re - solving the lookahead.
 	//	--
@@ -121,7 +121,7 @@ public:
 	//	--
 	//	-- * `children_cfvs`: an AxK tensor of opponent average counterfactual values after
 	//	-- each action that the re - solve player can take at the root of the lookahead
-	LookaheadResult_f get_results();
+	LookaheadResult get_results();
 
 	//-- - Re - solves the lookahead.
 	void _compute();

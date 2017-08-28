@@ -34,7 +34,7 @@ void Resolving::_create_lookahead_tree(Node & node)
 LookaheadResult Resolving::resolve_first_node(Node& node, const Range& player_range, const ArrayX& opponent_range)
 {
 	_create_lookahead_tree(node);
-	_lookahead = new lookahead(*_lookahead_tree);
+	_lookahead = new TreeLookahed(*_lookahead_tree);
 	_lookahead->resolve_first_node(player_range, opponent_range);
 	_resolve_results = _lookahead->get_results();
 	return _resolve_results;
@@ -55,7 +55,7 @@ LookaheadResult Resolving::resolve(Node& node, ArrayX& player_range, ArrayX& opp
 {
 	assert(_cardTools.is_valid_range(ToAmx(player_range), node.board));
 	_create_lookahead_tree(node);
-	_lookahead = new lookahead(*_lookahead_tree);
+	_lookahead = new TreeLookahed(*_lookahead_tree);
 	_lookahead->_cfr_skip_iters = cfr_skip_iters;
 	_lookahead->_cfr_iters = iters;
 	_lookahead->resolve(player_range, opponent_cfvs);

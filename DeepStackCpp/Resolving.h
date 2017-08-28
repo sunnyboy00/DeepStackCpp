@@ -4,7 +4,7 @@
 #include "Util.h"
 #include <Eigen/Dense>
 #include "tree_builder.h"
-#include "lookahead.h"
+#include "TreeLookahed.h"
 #include "LookaheadResult.h"
 
 //-- - Implements depth - limited re - solving at a node of the game tree.
@@ -111,7 +111,7 @@ public:
 
 	tree_builder builder;
 
-	lookahead* _lookahead;
+	TreeLookahed* _lookahead;
 
 	card_tools _cardTools;
 

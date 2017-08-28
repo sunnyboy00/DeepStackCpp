@@ -7,7 +7,7 @@
 //#include "card_tools.h"
 //#include "Resolving.h"
 //#include "TreeLookahead.h"
-//#include "cfrd_gadget_f.h"
+//#include "cfrd_gadget.h"
 //#include <string>
 //#include <iostream>
 //
@@ -50,10 +50,10 @@
 //
 //	resolver._create_lookahead_tree(node);
 //	TreeLookahead* look = new TreeLookahead(*resolver._lookahead_tree);
-//	Range_f p = Range_f(player_range);
-//	Range_f o = Range_f(op_cfvs);
+//	Range p = Range(player_range);
+//	Range o = Range(op_cfvs);
 //
-//	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root.board, p, o);
+//	look->_reconstruction_gadget = new cfrd_gadget(look->_root.board, p, o);
 //	look->_root.ranges.row(P1) = player_range;
 //	look->_reconstruction_opponent_cfvs = op_cfvs;
 //	return look;
@@ -99,10 +99,10 @@
 //
 //	resolver._create_lookahead_tree(node);
 //	TreeLookahead* look = new TreeLookahead(*resolver._lookahead_tree);
-//	Range_f p = Range_f(player_range);
-//	Range_f o = Range_f(op_cfvs);
+//	Range p = Range(player_range);
+//	Range o = Range(op_cfvs);
 //
-//	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root.board, p, o);
+//	look->_reconstruction_gadget = new cfrd_gadget(look->_root.board, p, o);
 //	look->_root.ranges.row(P1) = player_range;
 //	look->_reconstruction_opponent_cfvs = op_cfvs;
 //
@@ -110,7 +110,7 @@
 //	look->_cfr_iters = 10;
 //	look->_reconstruction = true;
 //	look->_compute();
-//	LookaheadResult_f result = look->get_results();
+//	LookaheadResult result = look->get_results();
 //
 //	std::array<float, card_count> achieved_cfvs = { 10.2131f, 10.2131f, 0.0000f, 80.0000f,- 60.0000,- 60.0000 };
 //	AreEq(result.achieved_cfvs, achieved_cfvs);
@@ -166,10 +166,10 @@
 //
 //	resolver._create_lookahead_tree(node);
 //	TreeLookahead* look = new TreeLookahead(*resolver._lookahead_tree);
-//	Range_f p = Range_f(player_range);
-//	Range_f o = Range_f(op_cfvs);
+//	Range p = Range(player_range);
+//	Range o = Range(op_cfvs);
 //
-//	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root.board, p, o);
+//	look->_reconstruction_gadget = new cfrd_gadget(look->_root.board, p, o);
 //	look->_root.ranges.row(P1) = player_range;
 //	look->_reconstruction_opponent_cfvs = op_cfvs;
 //
@@ -177,7 +177,7 @@
 //	look->_cfr_iters = 10;
 //	look->_reconstruction = true;
 //	look->_compute();
-//	LookaheadResult_f result = look->get_results();
+//	LookaheadResult result = look->get_results();
 //
 //	std::array<float, card_count> achieved_cfvs = { 11.4541, 8.4088, 0.0000,87.3549,-11.0164,-11.0164 };
 //	AreEq(result.achieved_cfvs, achieved_cfvs);

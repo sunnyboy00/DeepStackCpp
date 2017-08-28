@@ -32,16 +32,16 @@ public:
 	//	-- @param[opt] impossible_hand_value the value to return if the hand is invalid
 	//	-- @return the strength value of the hand, or `impossible_hand_value` if the
 	//	-- hand is invalid. Warning: Looks like this is not about hand but about hand card + board card.
-	ArrayX evaluate(ArrayX hand, ArrayX impossible_hand_value);
+	ArrayX evaluate(const ArrayX& hand, const ArrayX& impossible_hand_value);
 
 	//-- - Gives strength representations for all private hands on the given board.
 	//	-- @param board a possibly empty vector of board cards
 	//	-- on the board
 	//	-- @return a vector containing a strength value or `impossible_hand_value` for
 	//	--every private hand.
-	ArrayX batch_eval(ArrayX board, ArrayX impossible_hand_value);
+	ArrayX batch_eval(const ArrayX& board, const ArrayX& impossible_hand_value);
 
-	ArrayX batch_eval(ArrayX board);
+	ArrayX batch_eval(const ArrayX& board);
 
 private:
 

@@ -6,8 +6,8 @@
 #include "tree_builder.h"
 #include "card_tools.h"
 #include "Resolving.h"
-#include "TreeLook2.h"
-#include "cfrd_gadget_f.h"
+#include "TreeLookahed.h"
+#include "cfrd_gadget.h"
 #include <string>
 #include <iostream>
 
@@ -34,7 +34,7 @@ void AreEq(Range& source, float scalar)
 	}
 }
 
-TreeLook2* BuildLook(Resolving& resolver)
+TreeLookahed* BuildLook(Resolving& resolver)
 {
 	Node node;
 	card_to_string_conversion converter;
@@ -49,11 +49,11 @@ TreeLook2* BuildLook(Resolving& resolver)
 	op_cfvs.setZero();
 
 	resolver._create_lookahead_tree(node);
-	TreeLook2* look = new TreeLook2(*resolver._lookahead_tree);
-	Range_f p = Range_f(player_range);
-	Range_f o = Range_f(op_cfvs);
+	TreeLookahed* look = new TreeLookahed(*resolver._lookahead_tree);
+	Range p = Range(player_range);
+	Range o = Range(op_cfvs);
 
-	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root->board, p, o);
+	look->_reconstruction_gadget = new cfrd_gadget(look->_root->board, p, o);
 	look->_root->ranges.row(P1) = player_range;
 	look->_reconstruction_opponent_cfvs = op_cfvs;
 	return look;
@@ -63,7 +63,7 @@ TreeLook2* BuildLook(Resolving& resolver)
 TEST_CASE("tree_lookahed_set_opponent_starting_range")
 {
 	Resolving resolver;
-	TreeLook2* look = BuildLook(resolver);
+	TreeLookahed* look = BuildLook(resolver);
 	look->_set_opponent_starting_range();
 
 	std::array<float, card_count> opTarget = { 0.5f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f };
@@ -98,11 +98,11 @@ TEST_CASE("tree_lookahed_full_cycle_P2")
 		1200;
 
 	resolver._create_lookahead_tree(node);
-	TreeLook2* look = new TreeLook2(*resolver._lookahead_tree);
-	Range_f p = Range_f(player_range);
-	Range_f o = Range_f(op_cfvs);
+	TreeLookahed* look = new TreeLookahed(*resolver._lookahead_tree);
+	Range p = Range(player_range);
+	Range o = Range(op_cfvs);
 
-	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root->board, p, o);
+	look->_reconstruction_gadget = new cfrd_gadget(look->_root->board, p, o);
 	look->_root->ranges.row(P1) = player_range;
 	look->_reconstruction_opponent_cfvs = op_cfvs;
 
@@ -110,7 +110,7 @@ TEST_CASE("tree_lookahed_full_cycle_P2")
 	look->_cfr_iters = 10;
 	look->_reconstruction = true;
 	look->_compute();
-	LookaheadResult_f result = look->get_results();
+	LookaheadResult result = look->get_results();
 
 	std::array<float, card_count> achieved_cfvs = { 10.2131f, 10.2131f, 0.0000f, 80.0000f,-60.0000,-60.0000 };
 	AreEq(result.achieved_cfvs, achieved_cfvs);
@@ -165,11 +165,11 @@ TEST_CASE("tree_lookahed_full_cycle_P1")
 		1200;
 
 	resolver._create_lookahead_tree(node);
-	TreeLook2* look = new TreeLook2(*resolver._lookahead_tree);
-	Range_f p = Range_f(player_range);
-	Range_f o = Range_f(op_cfvs);
+	TreeLookahed* look = new TreeLookahed(*resolver._lookahead_tree);
+	Range p = Range(player_range);
+	Range o = Range(op_cfvs);
 
-	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root->board, p, o);
+	look->_reconstruction_gadget = new cfrd_gadget(look->_root->board, p, o);
 	look->_root->ranges.row(P1) = player_range;
 	look->_reconstruction_opponent_cfvs = op_cfvs;
 
@@ -177,7 +177,7 @@ TEST_CASE("tree_lookahed_full_cycle_P1")
 	look->_cfr_iters = 10;
 	look->_reconstruction = true;
 	look->_compute();
-	LookaheadResult_f result = look->get_results();
+	LookaheadResult result = look->get_results();
 
 	std::array<float, card_count> achieved_cfvs = { 11.4541, 8.4088, 0.0000,87.3549,-11.0164,-11.0164 };
 	AreEq(result.achieved_cfvs, achieved_cfvs);

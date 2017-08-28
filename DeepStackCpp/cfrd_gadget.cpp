@@ -1,6 +1,6 @@
 #include "cfrd_gadget.h"
 
-cfrd_gadget::cfrd_gadget(const ArrayX& board, const Range_f& player_range, const Range_f& opponent_cfvs)
+cfrd_gadget::cfrd_gadget(const ArrayX& board, const Range& player_range, const Range& opponent_cfvs)
 {
 	_input_opponent_value = opponent_cfvs;
 
@@ -20,10 +20,10 @@ cfrd_gadget::cfrd_gadget(const ArrayX& board, const Range_f& player_range, const
 	_range_mask = _card_tools.get_possible_hand_indexes(board);
 }
 
-Range_f cfrd_gadget::compute_opponent_range(const Range_f& current_opponent_cfvs)
+Range cfrd_gadget::compute_opponent_range(const Range& current_opponent_cfvs)
 {
-	Range_f play_values = current_opponent_cfvs;
-	Range_f& terminate_values = _input_opponent_value;
+	Range play_values = current_opponent_cfvs;
+	Range& terminate_values = _input_opponent_value;
 
 	//--1.0 compute current regrets
 	_total_values = play_values * _play_current_strategy; /* In the beginning we assume that we never Follow

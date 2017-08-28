@@ -111,12 +111,6 @@
     <ClInclude Include="GraphvizConnection.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
-    <ClInclude Include="TreeBuilderParams.h">
-      <Filter>Header Files\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="TreeVisualizer.h">
-      <Filter>Header Files\Tree</Filter>
-    </ClInclude>
     <ClInclude Include="LeducEvaluator.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
@@ -125,9 +119,6 @@
     </ClInclude>
     <ClInclude Include="Util.h">
       <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="TreeCFR.h">
-      <Filter>Header Files\Tree</Filter>
     </ClInclude>
     <ClInclude Include="tree_values.h">
       <Filter>Header Files\Tree</Filter>
@@ -162,8 +153,20 @@
     <ClInclude Include="lookahead.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
-    <ClInclude Include="TreeLook2.h">
+    <ClInclude Include="TreeBuilderParams.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeCFR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeVisualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeLookahed.h">
+      <Filter>Header Files\Resolving</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeBuilderParams.h">
+      <Filter>Header Files\Tree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -194,13 +197,7 @@
     <ClCompile Include="TreeBuilderParams.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="TreeVisualizer.cpp">
-      <Filter>Source Files\Tree</Filter>
-    </ClCompile>
     <ClCompile Include="tree_values.cpp">
-      <Filter>Source Files\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="TreeCFR.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
@@ -236,14 +233,17 @@
     <ClCompile Include="cfrd_gadget.cpp">
       <Filter>Source Files\Resolving</Filter>
     </ClCompile>
-    <ClCompile Include="lookahead.cpp">
-      <Filter>Source Files\Resolving</Filter>
-    </ClCompile>
     <ClCompile Include="LookaheadResult.h">
       <Filter>Header Files\Resolving</Filter>
     </ClCompile>
-    <ClCompile Include="TreeLook2.cpp">
+    <ClCompile Include="TreeCFR.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeVisualizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeLookahed.cpp">
+      <Filter>Source Files\Resolving</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

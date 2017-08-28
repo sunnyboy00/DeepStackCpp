@@ -52,7 +52,7 @@ long long LeducEvaluator::evaluate_three_card_hand(Array2 hand_ranks)
 	return hand_value;
 }
 
-ArrayX LeducEvaluator::evaluate(ArrayX hand, ArrayX impossible_hand_value)
+ArrayX LeducEvaluator::evaluate(const ArrayX& hand, const ArrayX& impossible_hand_value)
 {
 	assert(hand.maxCoeff() <= card_count && hand.minCoeff() >= 0 && "hand does not correspond to any cards");
 
@@ -89,7 +89,7 @@ ArrayX LeducEvaluator::evaluate(ArrayX hand, ArrayX impossible_hand_value)
 	}
 }
 
-ArrayX LeducEvaluator::batch_eval(ArrayX board, ArrayX impossible_hand_value)
+ArrayX LeducEvaluator::batch_eval(const ArrayX& board, const ArrayX& impossible_hand_value)
 {
 	CardArray hand_values = CardArray::Constant(-1);
 	size_t board_size = board.size();
@@ -117,7 +117,7 @@ ArrayX LeducEvaluator::batch_eval(ArrayX board, ArrayX impossible_hand_value)
 }
 
 // Warning is it ok to use -1 as DEFAULT_IMPOSSIBLE_HAND_VALUE?
-ArrayX LeducEvaluator::batch_eval(ArrayX board)
+ArrayX LeducEvaluator::batch_eval(const ArrayX& board)
 {
 	ArrayX impossible_hand_value(1);
 	impossible_hand_value << (float)DEFAULT_IMPOSSIBLE_HAND_VALUE;

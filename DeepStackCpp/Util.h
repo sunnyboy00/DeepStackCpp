@@ -399,14 +399,14 @@ class Util
 			return AmAxx(source.data(), rows, cols);
 		}
 
-		static Tf1 CardArrayToTensor(CardArray cardArray)
+		static Tf1 CardArrayToTensor(CardArray& cardArray)
 		{
 			TensorMap<Tf1> cardMap(cardArray.data(), card_count);
 			Tf1 resultTensor = cardMap;
 			return resultTensor;
 		}
 
-		static inline MatrixX ExpandAs(VectorX data, MatrixX as)
+		static inline MatrixX ExpandAs(VectorX& data, MatrixX& as)
 		{
 			return data.replicate(as.rows(), as.cols());
 		}
@@ -441,10 +441,10 @@ class Util
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
-		static inline void Clip(CardArray& target, float lowLimin, float maxValue)
-		{
-			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
-		}
+		//static inline void Clip(CardArray& target, float lowLimin, float maxValue)
+		//{
+		//	target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
+		//}
 
 		template <int N>
 		static inline void Clip(TfN& target, float lowLimin, float maxValue)

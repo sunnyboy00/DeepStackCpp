@@ -16,10 +16,6 @@ typedef float mainDataType;
 #define Ranges Eigen::Array<float, Eigen::Dynamic, Eigen::Dynamic, MyLayoutType>
 #define CFVS ArrayXX
 
-#define Range_f Eigen::Array<float, card_count, MyLayoutType>
-#define Ranges_f Eigen::Array<float, 2, card_count, MyLayoutType>
-#define CFVS_f Eigen::Array<float, Eigen::Dynamic, card_count, MyLayoutType>
-
 #define VectorX Eigen::Matrix<float, Eigen::Dynamic, 1>
 #define RowVectorX Eigen::Matrix<float, 1, Eigen::Dynamic>
 
@@ -33,7 +29,7 @@ typedef float mainDataType;
 
 
 //typedef Eigen::TensorFixedSize<float, Sizes<1>> Tf1;
-typedef Eigen::Array<float, card_count, 1> CardArray; // Perf: Change to dynamic for a lot of cards to avoid usage of stack!
+#define CardArray Eigen::Array<float, card_count, MyLayoutType>
 
 #define TbN Eigen::TensorBase<float, N>
 #define Tb5 Eigen::TensorBase<float, 5>
