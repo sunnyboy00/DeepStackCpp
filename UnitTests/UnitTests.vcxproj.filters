@@ -59,14 +59,8 @@
     <ClCompile Include="tree_values.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
-    <ClCompile Include="lookahed_builder.cpp">
-      <Filter>Source Files\Leduc</Filter>
-    </ClCompile>
     <ClCompile Include="Util.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Lookahead.cpp">
-      <Filter>Source Files\Leduc</Filter>
     </ClCompile>
     <ClCompile Include="cfr_gadget.cpp">
       <Filter>Source Files\Leduc</Filter>
@@ -75,6 +69,9 @@
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
     <ClCompile Include="tree_look2.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
+    <ClCompile Include="range_generator.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
   </ItemGroup>

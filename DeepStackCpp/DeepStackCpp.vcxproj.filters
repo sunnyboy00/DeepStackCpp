@@ -47,7 +47,19 @@
       <UniqueIdentifier>{211bc78b-e871-4f1f-a08b-62e9e9aae3f2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\DataGeneration">
-      <UniqueIdentifier>{eb145677-231f-45e1-985b-37c9aa87cac1}</UniqueIdentifier>
+      <UniqueIdentifier>{68c61839-0466-412e-bb75-e52ff58eaa32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataGeneration">
+      <UniqueIdentifier>{a732f0d3-5b0b-4939-8797-7496899db932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NN">
+      <UniqueIdentifier>{2939f731-2c95-4fc6-a445-866903cf6a0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{51a4b3ca-b10d-4b36-8e6e-2e0f2e15ce11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Player">
+      <UniqueIdentifier>{3df97ed2-2aef-4bae-99d5-4c9d5dd0df29}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,31 +132,34 @@
     <ClInclude Include="tree_values.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
-    <ClInclude Include="cfrd_gadget.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
     <ClInclude Include="Resolving.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
     <ClInclude Include="ValueNn.h">
       <Filter>Header Files\NN</Filter>
     </ClInclude>
+    <ClInclude Include="range_generator.h">
+      <Filter>Header Files\DataGeneration</Filter>
+    </ClInclude>
+    <ClInclude Include="data_generation.h">
+      <Filter>Header Files\DataGeneration</Filter>
+    </ClInclude>
+    <ClInclude Include="bucket_conversion.h">
+      <Filter>Header Files\NN</Filter>
+    </ClInclude>
+    <ClInclude Include="bucketer.h">
+      <Filter>Header Files\NN</Filter>
+    </ClInclude>
+    <ClInclude Include="random_card_generator.h">
+      <Filter>Header Files\DataGeneration</Filter>
+    </ClInclude>
+    <ClInclude Include="continual_resolving.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cfrd_gadget.h">
+      <Filter>Header Files\Resolving</Filter>
+    </ClInclude>
     <ClInclude Include="lookahead.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
-    <ClInclude Include="LookaheadManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LookaheadBuilder.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
-    <ClInclude Include="LookaheadResult.h">
-      <Filter>Header Files\Resolving</Filter>
-    </ClInclude>
-    <ClInclude Include="cfrd_gadget_f.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TreeLookahead.h">
       <Filter>Header Files\Resolving</Filter>
     </ClInclude>
     <ClInclude Include="TreeLook2.h">
@@ -182,9 +197,6 @@
     <ClCompile Include="TreeVisualizer.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="cfrd_gadget.cpp">
-      <Filter>Source Files\Resolving</Filter>
-    </ClCompile>
     <ClCompile Include="tree_values.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
@@ -200,25 +212,34 @@
     <ClCompile Include="ValueNn.cpp">
       <Filter>Source Files\NN</Filter>
     </ClCompile>
-    <ClCompile Include="lookahead.cpp">
-      <Filter>Source Files\Resolving</Filter>
-    </ClCompile>
-    <ClCompile Include="LookaheadManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LookaheadBuilder.cpp">
-      <Filter>Source Files\Resolving</Filter>
-    </ClCompile>
     <ClCompile Include="terminal_equity.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="cfrd_gadget_f.cpp">
+    <ClCompile Include="range_generator.cpp">
+      <Filter>Source Files\DataGeneration</Filter>
+    </ClCompile>
+    <ClCompile Include="bucket_conversion.cpp">
+      <Filter>Source Files\NN</Filter>
+    </ClCompile>
+    <ClCompile Include="data_generation.cpp">
+      <Filter>Source Files\DataGeneration</Filter>
+    </ClCompile>
+    <ClCompile Include="random_card_generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TreeLookahead.cpp">
+    <ClCompile Include="bucketer.cpp">
+      <Filter>Source Files\NN</Filter>
+    </ClCompile>
+    <ClCompile Include="continual_resolving.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cfrd_gadget.cpp">
       <Filter>Source Files\Resolving</Filter>
     </ClCompile>
-    <ClCompile Include="LookaheadResult_f.h">
+    <ClCompile Include="lookahead.cpp">
+      <Filter>Source Files\Resolving</Filter>
+    </ClCompile>
+    <ClCompile Include="LookaheadResult.h">
       <Filter>Header Files\Resolving</Filter>
     </ClCompile>
     <ClCompile Include="TreeLook2.cpp">

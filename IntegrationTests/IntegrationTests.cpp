@@ -13,6 +13,7 @@
 #include "Constants.h"
 #include "tree_builder.h"
 #include "TreeVisualizer.h"
+#include "data_generation.h"
 #include "lookahead.h"
 #include "TreeCFR.h"
 #include <Eigen/Dense>
@@ -117,8 +118,8 @@ void Resolve()
 	node.bets << 800, 800;
 
 	card_tools tools;
-	Tf1 player_range = ToTmx(tools.get_uniform_range(node.board));
-	Tf1 op_cfvs(card_count);
+	ArrayX player_range = tools.get_uniform_range(node.board);
+	ArrayX op_cfvs(card_count);
 	op_cfvs(0) = -500;
 	op_cfvs(1) = 0;
 	op_cfvs(2) = 700;
@@ -165,6 +166,15 @@ void TestTreeLook()
 	LookaheadResult_f result = look->get_results();
 
 }
+	LookaheadResult result = resolver.resolve(node, player_range, op_cfvs);
+}
+
+void GenerateData()
+{
+	data_generation generator;
+	generator.generate_data(train_data_count, valid_data_count);
+}
+
 
 void TestTreeLook2()
 {
@@ -207,6 +217,10 @@ int main()
 {
 	clock_t begin = clock();
 	TestTreeLook2();
+	//test_tree_visualiser();
+int main()
+{
+	clock_t begin = clock();
 	//test_tree_visualiser();
 	//test_run_cfr();
 	//test_tree_visualiser();
