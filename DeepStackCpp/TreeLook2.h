@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-#include <Eigen/Dense>
 #include <numeric>
 #include "Node.h"
 #include "assert.h"
@@ -10,7 +8,7 @@
 #include "cfrd_gadget_f.h"
 #include "LookaheadResult_f.h"
 
-class TreeLookahead
+class TreeLook2
 {
 public:
 
@@ -24,17 +22,17 @@ public:
 	};
 
 
-	TreeLookahead(Node& root, long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
+	TreeLook2(Node& root, long long skip_iters = cfr_skip_iters, long long iters = cfr_iters);
 
-	~TreeLookahead();
+	~TreeLook2();
 
-//private:
+	//private:
 
 	size_t _cfr_skip_iters;
 
 	size_t _cfr_iters;
 
-	Node _root;
+	Node* _root;
 
 	cfrd_gadget_f* _reconstruction_gadget;
 
@@ -68,6 +66,9 @@ public:
 
 	vector <Node*> _nodes;
 
+	void _back(Node &node);
+
+	void _fillCfvs(Node &node);
 
 	//	--- Re - solves the lookahead using input ranges.
 	//	--
@@ -166,11 +167,11 @@ public:
 
 	void _fillCFvaluesForNonTerminalNode(Node &node, size_t iter);
 
-	void ComputeRegrets(Node &node, CFVS(&cf_values_allactions)[players_count]);
+	CFVS ComputeRegrets(Node &node);
 
 	void _fillChanceChildRanges(Node &node, Ranges(&children_ranges_absolute)[players_count]);
 
-	void _fillChildRanges(Node & node, Ranges(&children_ranges_absolute)[players_count]);
+	void _fillChildRanges(Node & node);
 
 	//-- - Update a node's total regrets with the current iteration regrets.
 	//-- @param node the node to update

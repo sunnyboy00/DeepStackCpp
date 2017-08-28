@@ -176,6 +176,7 @@
     <ClCompile Include="lookahed_builder.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
+    <ClCompile Include="tree_look2.cpp" />
     <ClCompile Include="tree_lookahead.cpp" />
     <ClCompile Include="tree_builder.cpp" />
     <ClCompile Include="tree_cfr.cpp" />

@@ -18,6 +18,8 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <ctime>
+#include "TreeLook2.h"
+#include "TreeLookahead.h"
 
 void test_tree_builder()
 {
@@ -127,11 +129,86 @@ void Resolve()
 	LookaheadResult result = resolver.resolve(node, player_range, op_cfvs);
 }
 
+void TestTreeLook()
+{
+	Resolving resolver;
+	Node node;
+	card_to_string_conversion converter;
+	node.board = converter.string_to_board("Ks");
+	node.street = 2;
+	node.current_player = P1;
+	node.bets << 10, 10;
+
+	card_tools tools;
+	Range player_range = tools.get_uniform_range(node.board);
+	Range op_cfvs(card_count);
+	op_cfvs.setZero();
+	op_cfvs <<
+		-500,
+		0,
+		700,
+		-900,
+		800,
+		1200;
+
+	resolver._create_lookahead_tree(node);
+	TreeLookahead* look = new TreeLookahead(*resolver._lookahead_tree, 500, 10000);
+	Range_f p = Range_f(player_range);
+	Range_f o = Range_f(op_cfvs);
+
+	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root.board, p, o);
+	look->_root.ranges.row(P1) = player_range;
+	look->_reconstruction_opponent_cfvs = op_cfvs;
+
+	look->_reconstruction = true;
+	look->_compute();
+	LookaheadResult_f result = look->get_results();
+
+}
+
+void TestTreeLook2()
+{
+	Resolving resolver;
+	Node node;
+	card_to_string_conversion converter;
+	node.board = converter.string_to_board("Ks");
+	node.street = 2;
+	node.current_player = P1;
+	node.bets << 10, 10;
+
+	card_tools tools;
+	Range player_range = tools.get_uniform_range(node.board);
+	Range op_cfvs(card_count);
+	op_cfvs.setZero();
+	op_cfvs <<
+		-500,
+		0,
+		700,
+		-900,
+		800,
+		1200;
+
+	resolver._create_lookahead_tree(node);
+	TreeLook2* look = new TreeLook2(*resolver._lookahead_tree, 500, 10000);
+	Range_f p = Range_f(player_range);
+	Range_f o = Range_f(op_cfvs);
+
+	look->_reconstruction_gadget = new cfrd_gadget_f(look->_root->board, p, o);
+	look->_root->ranges.row(P1) = player_range;
+	look->_reconstruction_opponent_cfvs = op_cfvs;
+
+	look->_reconstruction = true;
+	look->_compute();
+	LookaheadResult_f result = look->get_results();
+
+}
+
 int main()
 {
 	clock_t begin = clock();
+	TestTreeLook2();
 	//test_tree_visualiser();
-	test_run_cfr();
+	//test_run_cfr();
 	//test_tree_visualiser();
 	//Resolve();
 	clock_t end = clock();

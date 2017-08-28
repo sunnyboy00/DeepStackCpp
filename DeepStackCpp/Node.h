@@ -32,6 +32,11 @@ struct Node
 	// A string representation of the board cards
 	string board_string;
 
+	int childId;
+
+	//Tensor like <player/[actions, ranges]>
+	Ranges children_ranges_absolute[players_count];
+
 	// The player acting at the node
 	int current_player;
 
@@ -86,6 +91,8 @@ struct Node
 	//-- using the saved strategy profile when playing against
 	//--each other. [players_count X card_count]
 	ArrayXX cf_values;
+
+	CFVS cf_values_allactions[players_count];
 
 	//-- The cfvs for a best response against each player in the profile
 	ArrayXX cf_values_br;

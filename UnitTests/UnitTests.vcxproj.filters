@@ -74,5 +74,8 @@
     <ClCompile Include="tree_lookahead.cpp">
       <Filter>Source Files\Leduc</Filter>
     </ClCompile>
+    <ClCompile Include="tree_look2.cpp">
+      <Filter>Source Files\Leduc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

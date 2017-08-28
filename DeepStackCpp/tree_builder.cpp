@@ -195,6 +195,7 @@ Node & tree_builder::_build_tree_dfs(Node & current_node)
 		cur_children->parent = &current_node;
 		_build_tree_dfs(*cur_children);
 		depth = max(depth, cur_children->depth);
+		cur_children->childId = i;
 
 		if (i == 0) // First child is always fold, if exists
 		{

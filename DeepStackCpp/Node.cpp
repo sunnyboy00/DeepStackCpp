@@ -17,9 +17,9 @@
 //}
 
 Node::Node() : street(1), current_player(chance), bets(2), terminal(false), depth(-1), type(uninitialized), board_string(""), pot(0), 
-ranges(2, card_count) //ToDo: Perfomance Warning: do we realy need default constructor to save perfomance?
+ranges(players_count, card_count) //ToDo: Performance Warning: do we really need default constructor to save the performance?
 {
-	cf_values = ArrayXX::Zero(players_count, card_count);
+	cf_values = ArrayXX::Zero(players_count, card_count); // We need to do this because of empty fold. We are still comping it values and it should be zeros.
 }
 
 Node::~Node()
