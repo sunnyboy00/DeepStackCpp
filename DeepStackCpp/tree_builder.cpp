@@ -142,17 +142,6 @@ vector<Node*> tree_builder::_get_children_player_node(Node& parent_node)
 				
 	}
 
-	//for (size_t i = 0; i < children.size(); i++)
-	//{
-	//	Node* child = children[i];
-
-	//	////		if (child->type == terminal_fold && children[i + 1]->bets[0] == children[i + 1]->bets[1])
-	//	if (child->type == terminal_fold && children[i + 1]->type == check)
-	//	{
-	//		child->foldMask = 0;
-	//	}
-	//}
-
 	return children;
 }
 
@@ -242,7 +231,7 @@ Node* tree_builder::build_tree(TreeBuilderParams& params)
 	_limit_to_street = params.limit_to_street;
 	_build_tree_dfs(*root);
 
-	if (root->bets[0] == root->bets[1]) // Just as in original for testing. ToDo: remove and uncommented code below!!!
+	if (root->bets(0) == root->bets(1)) // Just as in original for testing. ToDo: remove and uncommented code below!!!
 	{
 		root->children[0]->foldMask = 0;
 	}

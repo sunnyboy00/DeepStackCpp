@@ -168,6 +168,12 @@
     <ClInclude Include="TreeBuilderParams.h">
       <Filter>Header Files\Tree</Filter>
     </ClInclude>
+    <ClInclude Include="TreeVisualizer.h">
+      <Filter>Header Files\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeCFR.h">
+      <Filter>Header Files\Tree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -244,6 +250,12 @@
     </ClCompile>
     <ClCompile Include="TreeLookahed.cpp">
       <Filter>Source Files\Resolving</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeVisualizer.cpp">
+      <Filter>Source Files\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeCFR.cpp">
+      <Filter>Source Files\Tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

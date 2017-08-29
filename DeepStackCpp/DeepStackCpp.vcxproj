@@ -187,7 +187,9 @@
     <ClInclude Include="terminal_equity.h" />
     <ClInclude Include="lookahead.h" />
     <ClInclude Include="TreeBuilderParams.h" />
+    <ClInclude Include="TreeCFR.h" />
     <ClInclude Include="TreeLookahed.h" />
+    <ClInclude Include="TreeVisualizer.h" />
     <ClInclude Include="tree_builder.h" />
     <ClInclude Include="tree_values.h" />
     <ClInclude Include="Util.h" />
@@ -212,7 +214,9 @@
     <ClCompile Include="strategy_filling.cpp" />
     <ClCompile Include="terminal_equity.cpp" />
     <ClCompile Include="TreeBuilderParams.cpp" />
+    <ClCompile Include="TreeCFR.cpp" />
     <ClCompile Include="TreeLookahed.cpp" />
+    <ClCompile Include="TreeVisualizer.cpp" />
     <ClCompile Include="tree_builder.cpp" />
     <ClCompile Include="tree_values.cpp" />
     <ClCompile Include="Util.cpp" />

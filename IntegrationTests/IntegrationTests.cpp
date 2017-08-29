@@ -20,7 +20,6 @@
 #include <iostream>
 #include <ctime>
 #include "TreeLookahed.h"
-#include "TreeLookahead.h"
 
 void test_tree_builder()
 {
@@ -130,11 +129,11 @@ void Resolve()
 	LookaheadResult result = resolver.resolve(node, player_range, op_cfvs);
 }
 
-void GenerateData()
-{
-	data_generation generator;
-	generator.generate_data(train_data_count, valid_data_count);
-}
+//void GenerateData()
+//{
+//	data_generation generator;
+//	generator.generate_data(train_data_count, valid_data_count);
+//}
 
 
 void TestTreeLookahed()
@@ -174,11 +173,34 @@ void TestTreeLookahed()
 
 }
 
-int main()
+
+void TestRangeGenPerf()
 {
-	clock_t begin = clock();
-	TestTreeLookahed();
-	//test_tree_visualiser();
+	card_to_string_conversion converter;
+	card_tools tools;
+	range_generator generator;
+
+	ArrayXX ranges(gen_batch_size, card_count);
+	ArrayX board = converter.string_to_board("Qs");
+	generator.set_board(board);
+	ArrayXX sum;
+
+	for (size_t i = 0; i < 1000; i++)
+	{
+		generator.generate_range(ranges);
+		if (sum.size() == 0)
+		{
+			sum = ranges;
+		}
+		else
+		{
+			sum += ranges;
+		}
+	}
+
+	cout << sum(0) << endl;
+}
+
 int main()
 {
 	clock_t begin = clock();
