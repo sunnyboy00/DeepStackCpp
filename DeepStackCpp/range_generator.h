@@ -5,6 +5,8 @@
 #include "Util.h"
 #include <stdlib.h>  
 
+using namespace Eigen;
+
 //--- Samples random probability vectors for use as player ranges.
 class range_generator
 {
@@ -55,7 +57,7 @@ private:
 	//-- and J is the length of the range sub - vector
 	//-- @param mass a vector of remaining probability mass for each batch member
 	//-- @see generate_range
-	void _generate_recursion(ArrayXX& cards, ArrayX& mass);
+	void _generate_recursion(ArrayXX& cards, ArrayX& mass, size_t offset, size_t len);
 
 	ArrayX _order;
 

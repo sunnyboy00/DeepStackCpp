@@ -97,7 +97,7 @@ ArrayX LeducEvaluator::batch_eval(const ArrayX& board, const ArrayX& impossible_
 	{
 		for (int hand = 0; hand < card_count; hand++)
 		{
-			hand_values(hand) = (float)((hand - 1) / suit_count + 1);
+			hand_values(hand) = (float)(hand / suit_count);
 		}
 	}
 	else

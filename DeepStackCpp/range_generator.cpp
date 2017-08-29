@@ -11,23 +11,23 @@ range_generator::~range_generator()
 {
 }
 
-void range_generator::_generate_recursion(ArrayXX& cards, ArrayX& mass)
+void range_generator::_generate_recursion(ArrayXX& cards, ArrayX& mass, size_t cardsOffset, size_t cardsCount)
 {
+	assert(cardsCount > 0 && cardsOffset < cards.cols());
 	size_t batch_size = cards.rows();
 	assert(mass.rows() == batch_size);
 	//--we terminate recursion at size of 1
-	size_t card_count = cards.cols();
-	if (card_count == 1)
+	//size_t card_count = cards.cols();
+	if (cardsCount == 1)
 	{
-		Util::Copy(cards, mass);
+		cards.col(cardsOffset) = mass; //ToDo: make cards column wise array for better speed.
 	}
 	else
 	{
-
-		ArrayX rand = ArrayX::Random(batch_size);
+		ArrayX rand = (ArrayX::Random(batch_size) + 1) /2; //ToDo: optimize
 		ArrayX mass1 = mass  * rand;
 		ArrayX mass2 = mass - mass1;
-		float halfSize = card_count / 2;
+		float halfSize = cardsCount / 2;
 		//--if the tensor contains an odd number of cards, randomize which way the
 		//--middle card goes
 		if (ceilf(halfSize) != halfSize)
@@ -37,16 +37,10 @@ void range_generator::_generate_recursion(ArrayXX& cards, ArrayX& mass)
 		}
 
 		int halfSizeInt = (int)halfSize;
-		ArrayXX one(batch_size, halfSizeInt);
-		memcpy(one.data(), cards.data(), halfSize * sizeof(float));
-
-		int startOffset =  halfSizeInt + 1;
-		int twoRows = cards.rows() - startOffset;
-		ArrayXX two(batch_size, twoRows);
-		memcpy(two.data(), cards.data() + startOffset, twoRows * sizeof(float));
-
-		_generate_recursion(one, mass1);
-		_generate_recursion(two, mass2);
+		_generate_recursion(cards, mass1, cardsOffset, halfSizeInt);
+		const int secondPartCardsCount = cardsCount - halfSizeInt;
+		_generate_recursion(cards, mass2, cardsOffset + halfSizeInt, secondPartCardsCount);
+		assert(halfSizeInt + secondPartCardsCount == cardsCount);
 	}
 }
 
@@ -54,7 +48,7 @@ void range_generator::generate_sorted_range(ArrayXX& range)
 {
 	size_t batch_size = range.rows();
 	ArrayX inputAr = ArrayX::Ones(batch_size);
-	_generate_recursion(range, inputAr);
+	_generate_recursion(range, inputAr, 0, range.cols());
 }
 
 void range_generator::set_board(const ArrayX & board)
@@ -65,7 +59,8 @@ void range_generator::set_board(const ArrayX & board)
 
 	_order = ArrayX(_possible_hands_count);
 	_order = hand_strengths * _possible_hands_mask;
-	Util::Sort(_order);
+	assert(std::is_sorted(_order.data(), _order.data() + _order.size()));
+	//Util::Sort(_order); //ToDo: looks like we don't need sort. It is already sorted.
 	_reverse_order = ArrayX(_order);
 	Util::SortReverse(_reverse_order);
 	_possible_hands_mask.resize(1, card_count);

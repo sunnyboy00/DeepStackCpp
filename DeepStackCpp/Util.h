@@ -441,10 +441,10 @@ class Util
 			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
 		}
 
-		//static inline void Clip(CardArray& target, float lowLimin, float maxValue)
-		//{
-		//	target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
-		//}
+		static inline void Clip(CardArray& target, float lowLimin, float maxValue)
+		{
+			target = target.cwiseMax(lowLimin).cwiseMin(maxValue);
+		}
 
 		template <int N>
 		static inline void Clip(TfN& target, float lowLimin, float maxValue)

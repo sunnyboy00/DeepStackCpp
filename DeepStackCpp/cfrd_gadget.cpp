@@ -1,6 +1,6 @@
 #include "cfrd_gadget.h"
 
-cfrd_gadget::cfrd_gadget(const ArrayX& board, const Range& player_range, const Range& opponent_cfvs)
+cfrd_gadget::cfrd_gadget(const ArrayX& board, const Range& player_range, const Range& opponent_cfvs) 
 {
 	_input_opponent_value = opponent_cfvs;
 
@@ -22,8 +22,8 @@ cfrd_gadget::cfrd_gadget(const ArrayX& board, const Range& player_range, const R
 
 Range cfrd_gadget::compute_opponent_range(const Range& current_opponent_cfvs)
 {
-	Range play_values = current_opponent_cfvs;
-	Range& terminate_values = _input_opponent_value;
+	CardArray play_values = current_opponent_cfvs;
+	CardArray& terminate_values = _input_opponent_value;
 
 	//--1.0 compute current regrets
 	_total_values = play_values * _play_current_strategy; /* In the beginning we assume that we never Follow

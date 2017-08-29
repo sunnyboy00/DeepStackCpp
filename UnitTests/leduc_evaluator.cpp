@@ -52,11 +52,7 @@ ArrayX GetBatchEvalVector(string boardCard)
 	card_to_string_conversion converter;
 	LeducEvaluator evaluator;
 
-	int card = converter.string_to_card(boardCard);
-
-	ArrayX board(1);
-	board << (float)card;
-
+	ArrayX board = converter.string_to_board(boardCard);
 	ArrayX invalid(1);
 	invalid << INVALID_HAND_VALUE;
 	ArrayX res = evaluator.batch_eval(board, invalid);
@@ -74,3 +70,4 @@ TEST_CASE("batch_eval")
 	REQUIRE(batch(converter.string_to_card("Qs")) == batch(converter.string_to_card("Qh")));
 	REQUIRE(batch(converter.string_to_card("As")) == INVALID_HAND_VALUE);
 }
+

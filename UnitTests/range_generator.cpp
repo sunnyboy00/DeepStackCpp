@@ -12,8 +12,7 @@
 #include <iostream>
 using namespace std;
 
-const float myEps = 0.001f;
-
+const float myEps = 0.01f;
 
 TEST_CASE("range_gen")
 {
@@ -30,6 +29,21 @@ TEST_CASE("range_gen")
 	for (size_t i = 0; i < genSize; i++)
 	{
 		generator.generate_range(ranges);
-		sum += ranges;
+		if (sum.size() == 0)
+		{
+			sum = ranges;
+		}
+		else
+		{
+			sum += ranges;
+		}
+	}
+
+	ArrayX bSum = sum.rowwise().sum();
+	bSum /= genSize;
+
+	for (size_t i = 0; i < card_count; i++)
+	{
+		REQUIRE(bSum(0) == Approx(1).epsilon(myEps));
 	}
 }

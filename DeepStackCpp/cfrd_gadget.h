@@ -31,33 +31,33 @@ private:
 	// Arbitrarily large number used for clamping regrets.
 	const float max_number = 999999;
 
-	Range _input_opponent_range;
+	CardArray _input_opponent_range;
 
-	Range _input_opponent_value;
+	CardArray _input_opponent_value;
 
-	Range _curent_opponent_values;
+	CardArray _curent_opponent_values;
 
-	Range _play_current_strategy;
+	CardArray _play_current_strategy;
 
-	Range _terminate_current_strategy;
+	CardArray _terminate_current_strategy;
 
-	Range _play_current_regret;
-	Range _terminate_current_regret;
+	CardArray _play_current_regret;
+	CardArray _terminate_current_regret;
 
-	Range _regret_sum;
+	CardArray _regret_sum;
 
 
 	// Holds achieved CFVs for both players at each iteration so that we can compute regret
-	Range _total_values;
+	CardArray _total_values;
 
 	// Holds achieved CFVs for p2
-	Range _total_values_p2;
+	CardArray _total_values_p2;
 
-	Range _terminate_regrets;
-	Range _play_regrets;
+	CardArray _terminate_regrets;
+	CardArray _play_regrets;
 
 	//masking out impossible hands
-	Range _range_mask;
+	CardArray _range_mask;
 
 	card_tools _card_tools;
 };
