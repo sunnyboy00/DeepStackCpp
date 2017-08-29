@@ -60,7 +60,7 @@ ArrayX GetBatchEvalVector(string boardCard)
 	return res;
 }
 
-TEST_CASE("batch_eval")
+TEST_CASE("batch_eval_As")
 {
 	card_to_string_conversion converter;
 	ArrayX batch = GetBatchEvalVector("As");
@@ -71,3 +71,12 @@ TEST_CASE("batch_eval")
 	REQUIRE(batch(converter.string_to_card("As")) == INVALID_HAND_VALUE);
 }
 
+TEST_CASE("batch_eval_Qs")
+{
+	card_to_string_conversion converter;
+	ArrayX batch = GetBatchEvalVector("Qs");
+
+	REQUIRE(batch(converter.string_to_card("Ah")) < batch(converter.string_to_card("Kh")));
+	REQUIRE(batch(converter.string_to_card("Qh")) < batch(converter.string_to_card("Ah"))); // We will have a pair with Qh. So it is more important than ace.
+	REQUIRE(batch(converter.string_to_card("Qs")) == INVALID_HAND_VALUE);
+}

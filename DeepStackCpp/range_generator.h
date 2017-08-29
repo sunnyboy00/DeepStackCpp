@@ -50,7 +50,7 @@ private:
 
 	size_t _possible_hands_count;
 
-	ArrayXX _possible_hands_mask;
+	ArrayX _possible_hands_mask;
 
 	//-- - Recursively samples a section of the range vector.
 	//-- @param cards an NxJ section of the range tensor, where N is the batch size

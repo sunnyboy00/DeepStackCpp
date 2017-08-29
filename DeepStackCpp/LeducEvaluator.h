@@ -38,7 +38,7 @@ public:
 	//	-- @param board a possibly empty vector of board cards
 	//	-- on the board
 	//	-- @return a vector containing a strength value or `impossible_hand_value` for
-	//	--every private hand.
+	//	--every private hand. The lower strength value the card is more important. Lower is better.
 	ArrayX batch_eval(const ArrayX& board, const ArrayX& impossible_hand_value);
 
 	ArrayX batch_eval(const ArrayX& board);

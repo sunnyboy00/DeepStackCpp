@@ -27,13 +27,22 @@ void range_generator::_generate_recursion(ArrayXX& cards, ArrayX& mass, size_t c
 		ArrayX rand = (ArrayX::Random(batch_size) + 1) /2; //ToDo: optimize
 		ArrayX mass1 = mass  * rand;
 		ArrayX mass2 = mass - mass1;
-		float halfSize = cardsCount / 2;
+		float halfSize = cardsCount / 2.0f;
 		//--if the tensor contains an odd number of cards, randomize which way the
 		//--middle card goes
 		if (ceilf(halfSize) != halfSize)
 		{
-			halfSize -= 0.5;
-			halfSize += std::rand();
+			if (std::rand() % 2 == 0)
+			{
+				halfSize = floorf(halfSize);
+			}
+			else
+			{
+				halfSize = ceilf(halfSize);
+			}
+			//halfSize -= 0.5;
+			//halfSize += (std::rand() / double(RAND_MAX));
+			//halfSize = halfSize;
 		}
 
 		int halfSizeInt = (int)halfSize;
@@ -59,11 +68,9 @@ void range_generator::set_board(const ArrayX & board)
 
 	_order = ArrayX(_possible_hands_count);
 	_order = hand_strengths * _possible_hands_mask;
-	assert(std::is_sorted(_order.data(), _order.data() + _order.size()));
-	//Util::Sort(_order); //ToDo: looks like we don't need sort. It is already sorted.
+	Util::Sort(_order);
 	_reverse_order = ArrayX(_order);
 	Util::SortReverse(_reverse_order);
-	_possible_hands_mask.resize(1, card_count);
 }
 
 void range_generator::generate_range(ArrayXX & range)
@@ -86,6 +93,16 @@ void range_generator::generate_range(ArrayXX & range)
 	}
 
 	range.setZero();
-	auto repl = _possible_hands_mask.replicate(batch_size, 1);
-	range = repl * _reordered_range;
+	size_t missedCols = 0;
+	for (size_t curCard = 0; curCard < card_count; curCard++)
+	{
+		if (_possible_hands_mask(curCard))
+		{
+			range.col(curCard) = _reordered_range.col(curCard - missedCols);
+		}
+		else
+		{
+			missedCols++;
+		}
+	}
 }
